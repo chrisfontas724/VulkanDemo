@@ -1,0 +1,12 @@
+/Users/Chris/Desktop/VulkanDemo/build/CMakeFiles/rebuild_cache.dir
+/Users/Chris/Desktop/VulkanDemo/build/CMakeFiles/edit_cache.dir
+/Users/Chris/Desktop/VulkanDemo/build/CMakeFiles/VulkanDemo.dir
+/Users/Chris/Desktop/VulkanDemo/build/source/VulkanWindowing/CMakeFiles/rebuild_cache.dir
+/Users/Chris/Desktop/VulkanDemo/build/source/VulkanWindowing/CMakeFiles/edit_cache.dir
+/Users/Chris/Desktop/VulkanDemo/build/source/VulkanWindowing/CMakeFiles/WindowDemo.dir
+/Users/Chris/Desktop/VulkanDemo/build/source/VulkanWindowing/display/CMakeFiles/rebuild_cache.dir
+/Users/Chris/Desktop/VulkanDemo/build/source/VulkanWindowing/display/CMakeFiles/edit_cache.dir
+/Users/Chris/Desktop/VulkanDemo/build/source/VulkanWindowing/display/CMakeFiles/display.dir
+/Users/Chris/Desktop/VulkanDemo/build/source/FileSystem/CMakeFiles/rebuild_cache.dir
+/Users/Chris/Desktop/VulkanDemo/build/source/FileSystem/CMakeFiles/edit_cache.dir
+/Users/Chris/Desktop/VulkanDemo/build/source/FileSystem/CMakeFiles/streaming.dir
