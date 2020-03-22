@@ -10,3 +10,6 @@
 [submodule "libs/vulkan_wrappers"]
 	path = libs/VulkanWrappers
 	url = git@github.com:chrisfontas724/VulkanWrappers.git
+[submodule "libs/VulkanWrappers"]
+	path = libs/VulkanWrappers
+	url = https://github.com/chrisfontas724/VulkanWrappers
