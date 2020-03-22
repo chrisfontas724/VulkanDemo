@@ -4,22 +4,22 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/Users/Chris/Desktop/VulkanDemo/main.cpp" "/Users/Chris/Desktop/VulkanDemo/build/CMakeFiles/VulkanDemo.dir/main.cpp.o"
+  "/Users/cfontas/Desktop/VulkanDemo/main.cpp" "/Users/cfontas/Desktop/VulkanDemo/build/CMakeFiles/VulkanDemo.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "AppleClang")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "../source/VulkanWindowing"
-  "../source/FileSystem"
-  "../source/VulkanWindowing/display"
+  "../libs/VulkanWindowing"
+  "../libs/FileSystem"
+  "../libs/VulkanWindowing/display"
   "/usr/local/include"
   )
 
 # Targets to which this target links.
 set(CMAKE_TARGET_LINKED_INFO_FILES
-  "/Users/Chris/Desktop/VulkanDemo/build/source/VulkanWindowing/display/CMakeFiles/display.dir/DependInfo.cmake"
-  "/Users/Chris/Desktop/VulkanDemo/build/source/FileSystem/CMakeFiles/streaming.dir/DependInfo.cmake"
+  "/Users/cfontas/Desktop/VulkanDemo/build/libs/VulkanWindowing/display/CMakeFiles/display.dir/DependInfo.cmake"
+  "/Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem/CMakeFiles/streaming.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.

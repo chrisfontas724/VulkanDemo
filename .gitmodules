@@ -1,12 +1,12 @@
-[submodule "source/VulkanWindowing"]
-	path = source/VulkanWindowing
+[submodule "libs/vulkan_windowing"]
+	path = libs/VulkanWindowing
 	url = https://github.com/chrisfontas724/VulkanWindowing
-[submodule "source/FileSystem"]
-	path = source/FileSystem
+[submodule "libs/file_system"]
+	path = libs/FileSystem
 	url = https://github.com/chrisfontas724/FileSystem
-[submodule "source/RTTI"]
-	path = source/RTTI
+[submodule "libs/rtti"]
+	path = libs/RTTI
 	url = https://github.com/chrisfontas724/RTTI
-[submodule "source/VulkanWrappers"]
-	path = source/VulkanWrappers
+[submodule "libs/vulkan_wrappers"]
+	path = libs/VulkanWrappers
 	url = git@github.com:chrisfontas724/VulkanWrappers.git

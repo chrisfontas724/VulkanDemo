@@ -1,0 +1,1 @@
+/Library/Developer/CommandLineTools/usr/bin/c++  -std=gnu++17 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/WindowDemo.dir/main.cpp.o  -o WindowDemo  display/libdisplay.a /usr/local/lib/libglfw3.a -framework Cocoa -framework IOKit -framework CoreFoundation 

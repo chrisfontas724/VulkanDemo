@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/VulkanDemo.dir/main.cpp.o"
-  "VulkanDemo.pdb"
   "VulkanDemo"
+  "VulkanDemo.pdb"
 )
 
 # Per-language clean rules from dependency scanning.
