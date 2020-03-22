@@ -4,12 +4,12 @@
 [submodule "libs/file_system"]
 	path = libs/FileSystem
 	url = https://github.com/chrisfontas724/FileSystem
-[submodule "libs/rtti"]
-	path = libs/RTTI
-	url = https://github.com/chrisfontas724/RTTI
 [submodule "libs/vulkan_wrappers"]
 	path = libs/VulkanWrappers
 	url = git@github.com:chrisfontas724/VulkanWrappers.git
 [submodule "libs/VulkanWrappers"]
 	path = libs/VulkanWrappers
 	url = https://github.com/chrisfontas724/VulkanWrappers
+[submodule "libs/CoreClasses"]
+	path = libs/CoreClasses
+	url = https://github.com/chrisfontas724/CoreClasses
