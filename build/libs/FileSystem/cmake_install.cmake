@@ -1,4 +1,4 @@
-# Install script for directory: /Users/cfontas/Desktop/VulkanDemo/libs/FileSystem
+# Install script for directory: /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

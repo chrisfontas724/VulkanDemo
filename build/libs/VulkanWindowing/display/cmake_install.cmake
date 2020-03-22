@@ -1,4 +1,4 @@
-# Install script for directory: /Users/cfontas/Desktop/VulkanDemo/libs/VulkanWindowing/display
+# Install script for directory: /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/VulkanWindowing/display
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

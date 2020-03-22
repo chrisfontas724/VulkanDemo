@@ -6,8 +6,8 @@ libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/main.cpp.o
  ../libs/VulkanWindowing/display/input_manager.hpp
  ../libs/VulkanWindowing/display/window_delegate.hpp
  ../libs/VulkanWindowing/vulkan.hpp
- /Users/cfontas/Desktop/VulkanDemo/libs/VulkanWindowing/display/window.hpp
- /Users/cfontas/Desktop/VulkanDemo/libs/VulkanWindowing/main.cpp
+ /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/VulkanWindowing/display/window.hpp
+ /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/VulkanWindowing/main.cpp
  /usr/local/include/vulkan/vk_platform.h
  /usr/local/include/vulkan/vulkan.h
  /usr/local/include/vulkan/vulkan_android.h

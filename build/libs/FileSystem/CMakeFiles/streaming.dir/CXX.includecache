@@ -40,9 +40,9 @@ string
 streaming/file_system.hpp
 ../libs/FileSystem/streaming/streaming/file_system.hpp
 
-/Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/buffer.cpp
+/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/buffer.cpp
 streaming/buffer.hpp
-/Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/streaming/buffer.hpp
+/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/streaming/buffer.hpp
 stdio.h
 -
 string.h
@@ -50,17 +50,17 @@ string.h
 stdlib.h
 -
 
-/Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/file_stream.cpp
+/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/file_stream.cpp
 streaming/file_stream.hpp
-/Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/streaming/file_stream.hpp
+/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/streaming/file_stream.hpp
 istream
 -
 iostream
 -
 
-/Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/file_system.cpp
+/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/file_system.cpp
 streaming/file_system.hpp
-/Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/streaming/file_system.hpp
+/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/streaming/file_system.hpp
 stdio.h
 -
 iostream
@@ -86,9 +86,9 @@ pwd.h
 unistd.h
 -
 
-/Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/memory_stream.cpp
+/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/memory_stream.cpp
 streaming/memory_stream.hpp
-/Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/streaming/memory_stream.hpp
+/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/streaming/memory_stream.hpp
 stdio.h
 -
 string.h
@@ -96,7 +96,7 @@ string.h
 stdlib.h
 -
 
-/Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/stream.cpp
+/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/stream.cpp
 streaming/stream.hpp
-/Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/streaming/stream.hpp
+/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/streaming/stream.hpp
 

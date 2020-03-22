@@ -48,10 +48,10 @@ RM = /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packag
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/cfontas/Desktop/VulkanDemo
+CMAKE_SOURCE_DIR = /Users/cfontas/Desktop/PersonalProjects/VulkanDemo
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/cfontas/Desktop/VulkanDemo/build
+CMAKE_BINARY_DIR = /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,14 +80,14 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/cfontas/Desktop/VulkanDemo/build/CMakeFiles /Users/cfontas/Desktop/VulkanDemo/build/libs/VulkanWindowing/display/CMakeFiles/progress.marks
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/display/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/cfontas/Desktop/VulkanDemo/build/CMakeFiles 0
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/CMakeFiles /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/VulkanWindowing/display/CMakeFiles/progress.marks
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/display/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/display/clean
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/display/clean
 .PHONY : clean
 
 # The main clean target
@@ -97,22 +97,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/display/preinstall
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/display/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/display/preinstall
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/display/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 libs/VulkanWindowing/display/CMakeFiles/display.dir/rule:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/display/CMakeFiles/display.dir/rule
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/display/CMakeFiles/display.dir/rule
 .PHONY : libs/VulkanWindowing/display/CMakeFiles/display.dir/rule
 
 # Convenience name for target.
@@ -122,7 +122,7 @@ display: libs/VulkanWindowing/display/CMakeFiles/display.dir/rule
 
 # fast build rule for target.
 display/fast:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/build
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/build
 .PHONY : display/fast
 
 glfw_window.o: glfw_window.cpp.o
@@ -131,7 +131,7 @@ glfw_window.o: glfw_window.cpp.o
 
 # target to build an object file
 glfw_window.cpp.o:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/glfw_window.cpp.o
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/glfw_window.cpp.o
 .PHONY : glfw_window.cpp.o
 
 glfw_window.i: glfw_window.cpp.i
@@ -140,7 +140,7 @@ glfw_window.i: glfw_window.cpp.i
 
 # target to preprocess a source file
 glfw_window.cpp.i:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/glfw_window.cpp.i
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/glfw_window.cpp.i
 .PHONY : glfw_window.cpp.i
 
 glfw_window.s: glfw_window.cpp.s
@@ -149,7 +149,7 @@ glfw_window.s: glfw_window.cpp.s
 
 # target to generate assembly for a file
 glfw_window.cpp.s:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/glfw_window.cpp.s
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/glfw_window.cpp.s
 .PHONY : glfw_window.cpp.s
 
 input_manager.o: input_manager.cpp.o
@@ -158,7 +158,7 @@ input_manager.o: input_manager.cpp.o
 
 # target to build an object file
 input_manager.cpp.o:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/input_manager.cpp.o
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/input_manager.cpp.o
 .PHONY : input_manager.cpp.o
 
 input_manager.i: input_manager.cpp.i
@@ -167,7 +167,7 @@ input_manager.i: input_manager.cpp.i
 
 # target to preprocess a source file
 input_manager.cpp.i:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/input_manager.cpp.i
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/input_manager.cpp.i
 .PHONY : input_manager.cpp.i
 
 input_manager.s: input_manager.cpp.s
@@ -176,7 +176,7 @@ input_manager.s: input_manager.cpp.s
 
 # target to generate assembly for a file
 input_manager.cpp.s:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/input_manager.cpp.s
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/input_manager.cpp.s
 .PHONY : input_manager.cpp.s
 
 window.o: window.cpp.o
@@ -185,7 +185,7 @@ window.o: window.cpp.o
 
 # target to build an object file
 window.cpp.o:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/window.cpp.o
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/window.cpp.o
 .PHONY : window.cpp.o
 
 window.i: window.cpp.i
@@ -194,7 +194,7 @@ window.i: window.cpp.i
 
 # target to preprocess a source file
 window.cpp.i:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/window.cpp.i
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/window.cpp.i
 .PHONY : window.cpp.i
 
 window.s: window.cpp.s
@@ -203,7 +203,7 @@ window.s: window.cpp.s
 
 # target to generate assembly for a file
 window.cpp.s:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/window.cpp.s
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/display/CMakeFiles/display.dir/build.make libs/VulkanWindowing/display/CMakeFiles/display.dir/window.cpp.s
 .PHONY : window.cpp.s
 
 # Help Target
@@ -235,6 +235,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

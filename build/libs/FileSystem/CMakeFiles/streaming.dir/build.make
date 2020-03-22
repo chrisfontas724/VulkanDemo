@@ -43,10 +43,10 @@ RM = /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packag
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/cfontas/Desktop/VulkanDemo
+CMAKE_SOURCE_DIR = /Users/cfontas/Desktop/PersonalProjects/VulkanDemo
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/cfontas/Desktop/VulkanDemo/build
+CMAKE_BINARY_DIR = /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build
 
 # Include any dependencies generated for this target.
 include libs/FileSystem/CMakeFiles/streaming.dir/depend.make
@@ -59,68 +59,68 @@ include libs/FileSystem/CMakeFiles/streaming.dir/flags.make
 
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/buffer.cpp.o: libs/FileSystem/CMakeFiles/streaming.dir/flags.make
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/buffer.cpp.o: ../libs/FileSystem/streaming/buffer.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/cfontas/Desktop/VulkanDemo/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object libs/FileSystem/CMakeFiles/streaming.dir/streaming/buffer.cpp.o"
-	cd /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/streaming.dir/streaming/buffer.cpp.o -c /Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/buffer.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object libs/FileSystem/CMakeFiles/streaming.dir/streaming/buffer.cpp.o"
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/streaming.dir/streaming/buffer.cpp.o -c /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/buffer.cpp
 
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/buffer.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/streaming.dir/streaming/buffer.cpp.i"
-	cd /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/buffer.cpp > CMakeFiles/streaming.dir/streaming/buffer.cpp.i
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/buffer.cpp > CMakeFiles/streaming.dir/streaming/buffer.cpp.i
 
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/buffer.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/streaming.dir/streaming/buffer.cpp.s"
-	cd /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/buffer.cpp -o CMakeFiles/streaming.dir/streaming/buffer.cpp.s
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/buffer.cpp -o CMakeFiles/streaming.dir/streaming/buffer.cpp.s
 
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_stream.cpp.o: libs/FileSystem/CMakeFiles/streaming.dir/flags.make
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_stream.cpp.o: ../libs/FileSystem/streaming/file_stream.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/cfontas/Desktop/VulkanDemo/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_stream.cpp.o"
-	cd /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/streaming.dir/streaming/file_stream.cpp.o -c /Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/file_stream.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_stream.cpp.o"
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/streaming.dir/streaming/file_stream.cpp.o -c /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/file_stream.cpp
 
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_stream.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/streaming.dir/streaming/file_stream.cpp.i"
-	cd /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/file_stream.cpp > CMakeFiles/streaming.dir/streaming/file_stream.cpp.i
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/file_stream.cpp > CMakeFiles/streaming.dir/streaming/file_stream.cpp.i
 
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_stream.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/streaming.dir/streaming/file_stream.cpp.s"
-	cd /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/file_stream.cpp -o CMakeFiles/streaming.dir/streaming/file_stream.cpp.s
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/file_stream.cpp -o CMakeFiles/streaming.dir/streaming/file_stream.cpp.s
 
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_system.cpp.o: libs/FileSystem/CMakeFiles/streaming.dir/flags.make
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_system.cpp.o: ../libs/FileSystem/streaming/file_system.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/cfontas/Desktop/VulkanDemo/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_system.cpp.o"
-	cd /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/streaming.dir/streaming/file_system.cpp.o -c /Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/file_system.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_system.cpp.o"
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/streaming.dir/streaming/file_system.cpp.o -c /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/file_system.cpp
 
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_system.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/streaming.dir/streaming/file_system.cpp.i"
-	cd /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/file_system.cpp > CMakeFiles/streaming.dir/streaming/file_system.cpp.i
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/file_system.cpp > CMakeFiles/streaming.dir/streaming/file_system.cpp.i
 
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_system.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/streaming.dir/streaming/file_system.cpp.s"
-	cd /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/file_system.cpp -o CMakeFiles/streaming.dir/streaming/file_system.cpp.s
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/file_system.cpp -o CMakeFiles/streaming.dir/streaming/file_system.cpp.s
 
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/memory_stream.cpp.o: libs/FileSystem/CMakeFiles/streaming.dir/flags.make
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/memory_stream.cpp.o: ../libs/FileSystem/streaming/memory_stream.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/cfontas/Desktop/VulkanDemo/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object libs/FileSystem/CMakeFiles/streaming.dir/streaming/memory_stream.cpp.o"
-	cd /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/streaming.dir/streaming/memory_stream.cpp.o -c /Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/memory_stream.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object libs/FileSystem/CMakeFiles/streaming.dir/streaming/memory_stream.cpp.o"
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/streaming.dir/streaming/memory_stream.cpp.o -c /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/memory_stream.cpp
 
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/memory_stream.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/streaming.dir/streaming/memory_stream.cpp.i"
-	cd /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/memory_stream.cpp > CMakeFiles/streaming.dir/streaming/memory_stream.cpp.i
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/memory_stream.cpp > CMakeFiles/streaming.dir/streaming/memory_stream.cpp.i
 
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/memory_stream.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/streaming.dir/streaming/memory_stream.cpp.s"
-	cd /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/memory_stream.cpp -o CMakeFiles/streaming.dir/streaming/memory_stream.cpp.s
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/memory_stream.cpp -o CMakeFiles/streaming.dir/streaming/memory_stream.cpp.s
 
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/stream.cpp.o: libs/FileSystem/CMakeFiles/streaming.dir/flags.make
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/stream.cpp.o: ../libs/FileSystem/streaming/stream.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/cfontas/Desktop/VulkanDemo/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object libs/FileSystem/CMakeFiles/streaming.dir/streaming/stream.cpp.o"
-	cd /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/streaming.dir/streaming/stream.cpp.o -c /Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/stream.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object libs/FileSystem/CMakeFiles/streaming.dir/streaming/stream.cpp.o"
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/streaming.dir/streaming/stream.cpp.o -c /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/stream.cpp
 
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/stream.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/streaming.dir/streaming/stream.cpp.i"
-	cd /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/stream.cpp > CMakeFiles/streaming.dir/streaming/stream.cpp.i
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/stream.cpp > CMakeFiles/streaming.dir/streaming/stream.cpp.i
 
 libs/FileSystem/CMakeFiles/streaming.dir/streaming/stream.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/streaming.dir/streaming/stream.cpp.s"
-	cd /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/cfontas/Desktop/VulkanDemo/libs/FileSystem/streaming/stream.cpp -o CMakeFiles/streaming.dir/streaming/stream.cpp.s
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem/streaming/stream.cpp -o CMakeFiles/streaming.dir/streaming/stream.cpp.s
 
 # Object files for target streaming
 streaming_OBJECTS = \
@@ -140,9 +140,9 @@ libs/FileSystem/libstreaming.a: libs/FileSystem/CMakeFiles/streaming.dir/streami
 libs/FileSystem/libstreaming.a: libs/FileSystem/CMakeFiles/streaming.dir/streaming/stream.cpp.o
 libs/FileSystem/libstreaming.a: libs/FileSystem/CMakeFiles/streaming.dir/build.make
 libs/FileSystem/libstreaming.a: libs/FileSystem/CMakeFiles/streaming.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/cfontas/Desktop/VulkanDemo/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX static library libstreaming.a"
-	cd /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem && $(CMAKE_COMMAND) -P CMakeFiles/streaming.dir/cmake_clean_target.cmake
-	cd /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/streaming.dir/link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX static library libstreaming.a"
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem && $(CMAKE_COMMAND) -P CMakeFiles/streaming.dir/cmake_clean_target.cmake
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/streaming.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
 libs/FileSystem/CMakeFiles/streaming.dir/build: libs/FileSystem/libstreaming.a
@@ -150,10 +150,10 @@ libs/FileSystem/CMakeFiles/streaming.dir/build: libs/FileSystem/libstreaming.a
 .PHONY : libs/FileSystem/CMakeFiles/streaming.dir/build
 
 libs/FileSystem/CMakeFiles/streaming.dir/clean:
-	cd /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem && $(CMAKE_COMMAND) -P CMakeFiles/streaming.dir/cmake_clean.cmake
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem && $(CMAKE_COMMAND) -P CMakeFiles/streaming.dir/cmake_clean.cmake
 .PHONY : libs/FileSystem/CMakeFiles/streaming.dir/clean
 
 libs/FileSystem/CMakeFiles/streaming.dir/depend:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/cfontas/Desktop/VulkanDemo /Users/cfontas/Desktop/VulkanDemo/libs/FileSystem /Users/cfontas/Desktop/VulkanDemo/build /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem/CMakeFiles/streaming.dir/DependInfo.cmake --color=$(COLOR)
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/cfontas/Desktop/PersonalProjects/VulkanDemo /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem/CMakeFiles/streaming.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : libs/FileSystem/CMakeFiles/streaming.dir/depend
 

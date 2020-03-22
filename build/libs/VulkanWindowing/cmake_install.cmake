@@ -1,4 +1,4 @@
-# Install script for directory: /Users/cfontas/Desktop/VulkanDemo/libs/VulkanWindowing
+# Install script for directory: /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/VulkanWindowing
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -34,7 +34,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/Users/cfontas/Desktop/VulkanDemo/build/libs/VulkanWindowing/display/cmake_install.cmake")
+  include("/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/VulkanWindowing/display/cmake_install.cmake")
 
 endif()
 

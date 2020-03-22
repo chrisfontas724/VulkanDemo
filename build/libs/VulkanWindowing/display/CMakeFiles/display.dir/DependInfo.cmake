@@ -4,9 +4,9 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/Users/cfontas/Desktop/VulkanDemo/libs/VulkanWindowing/display/glfw_window.cpp" "/Users/cfontas/Desktop/VulkanDemo/build/libs/VulkanWindowing/display/CMakeFiles/display.dir/glfw_window.cpp.o"
-  "/Users/cfontas/Desktop/VulkanDemo/libs/VulkanWindowing/display/input_manager.cpp" "/Users/cfontas/Desktop/VulkanDemo/build/libs/VulkanWindowing/display/CMakeFiles/display.dir/input_manager.cpp.o"
-  "/Users/cfontas/Desktop/VulkanDemo/libs/VulkanWindowing/display/window.cpp" "/Users/cfontas/Desktop/VulkanDemo/build/libs/VulkanWindowing/display/CMakeFiles/display.dir/window.cpp.o"
+  "/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/VulkanWindowing/display/glfw_window.cpp" "/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/VulkanWindowing/display/CMakeFiles/display.dir/glfw_window.cpp.o"
+  "/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/VulkanWindowing/display/input_manager.cpp" "/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/VulkanWindowing/display/CMakeFiles/display.dir/input_manager.cpp.o"
+  "/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/VulkanWindowing/display/window.cpp" "/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/VulkanWindowing/display/CMakeFiles/display.dir/window.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "AppleClang")
 

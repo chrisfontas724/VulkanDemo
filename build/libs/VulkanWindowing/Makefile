@@ -48,10 +48,10 @@ RM = /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packag
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/cfontas/Desktop/VulkanDemo
+CMAKE_SOURCE_DIR = /Users/cfontas/Desktop/PersonalProjects/VulkanDemo
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/cfontas/Desktop/VulkanDemo/build
+CMAKE_BINARY_DIR = /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,14 +80,14 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/cfontas/Desktop/VulkanDemo/build/CMakeFiles /Users/cfontas/Desktop/VulkanDemo/build/libs/VulkanWindowing/CMakeFiles/progress.marks
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/cfontas/Desktop/VulkanDemo/build/CMakeFiles 0
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/CMakeFiles /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/VulkanWindowing/CMakeFiles/progress.marks
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/clean
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/clean
 .PHONY : clean
 
 # The main clean target
@@ -97,22 +97,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/preinstall
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/preinstall
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/rule:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/rule
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/rule
 .PHONY : libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/rule
 
 # Convenience name for target.
@@ -122,7 +122,7 @@ WindowDemo: libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/rule
 
 # fast build rule for target.
 WindowDemo/fast:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/build.make libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/build
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/build.make libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/build
 .PHONY : WindowDemo/fast
 
 main.o: main.cpp.o
@@ -131,7 +131,7 @@ main.o: main.cpp.o
 
 # target to build an object file
 main.cpp.o:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/build.make libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/main.cpp.o
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/build.make libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/main.cpp.o
 .PHONY : main.cpp.o
 
 main.i: main.cpp.i
@@ -140,7 +140,7 @@ main.i: main.cpp.i
 
 # target to preprocess a source file
 main.cpp.i:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/build.make libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/main.cpp.i
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/build.make libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/main.cpp.i
 .PHONY : main.cpp.i
 
 main.s: main.cpp.s
@@ -149,7 +149,7 @@ main.s: main.cpp.s
 
 # target to generate assembly for a file
 main.cpp.s:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/build.make libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/main.cpp.s
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/build.make libs/VulkanWindowing/CMakeFiles/WindowDemo.dir/main.cpp.s
 .PHONY : main.cpp.s
 
 # Help Target
@@ -175,6 +175,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

@@ -48,10 +48,10 @@ RM = /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packag
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/cfontas/Desktop/VulkanDemo
+CMAKE_SOURCE_DIR = /Users/cfontas/Desktop/PersonalProjects/VulkanDemo
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/cfontas/Desktop/VulkanDemo/build
+CMAKE_BINARY_DIR = /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,14 +80,14 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/cfontas/Desktop/VulkanDemo/build/CMakeFiles /Users/cfontas/Desktop/VulkanDemo/build/libs/FileSystem/CMakeFiles/progress.marks
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/FileSystem/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/cfontas/Desktop/VulkanDemo/build/CMakeFiles 0
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/CMakeFiles /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem/CMakeFiles/progress.marks
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/FileSystem/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/FileSystem/clean
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/FileSystem/clean
 .PHONY : clean
 
 # The main clean target
@@ -97,22 +97,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/FileSystem/preinstall
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/FileSystem/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/FileSystem/preinstall
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/FileSystem/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 libs/FileSystem/CMakeFiles/streaming.dir/rule:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/FileSystem/CMakeFiles/streaming.dir/rule
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f CMakeFiles/Makefile2 libs/FileSystem/CMakeFiles/streaming.dir/rule
 .PHONY : libs/FileSystem/CMakeFiles/streaming.dir/rule
 
 # Convenience name for target.
@@ -122,7 +122,7 @@ streaming: libs/FileSystem/CMakeFiles/streaming.dir/rule
 
 # fast build rule for target.
 streaming/fast:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/build
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/build
 .PHONY : streaming/fast
 
 streaming/buffer.o: streaming/buffer.cpp.o
@@ -131,7 +131,7 @@ streaming/buffer.o: streaming/buffer.cpp.o
 
 # target to build an object file
 streaming/buffer.cpp.o:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/buffer.cpp.o
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/buffer.cpp.o
 .PHONY : streaming/buffer.cpp.o
 
 streaming/buffer.i: streaming/buffer.cpp.i
@@ -140,7 +140,7 @@ streaming/buffer.i: streaming/buffer.cpp.i
 
 # target to preprocess a source file
 streaming/buffer.cpp.i:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/buffer.cpp.i
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/buffer.cpp.i
 .PHONY : streaming/buffer.cpp.i
 
 streaming/buffer.s: streaming/buffer.cpp.s
@@ -149,7 +149,7 @@ streaming/buffer.s: streaming/buffer.cpp.s
 
 # target to generate assembly for a file
 streaming/buffer.cpp.s:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/buffer.cpp.s
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/buffer.cpp.s
 .PHONY : streaming/buffer.cpp.s
 
 streaming/file_stream.o: streaming/file_stream.cpp.o
@@ -158,7 +158,7 @@ streaming/file_stream.o: streaming/file_stream.cpp.o
 
 # target to build an object file
 streaming/file_stream.cpp.o:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_stream.cpp.o
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_stream.cpp.o
 .PHONY : streaming/file_stream.cpp.o
 
 streaming/file_stream.i: streaming/file_stream.cpp.i
@@ -167,7 +167,7 @@ streaming/file_stream.i: streaming/file_stream.cpp.i
 
 # target to preprocess a source file
 streaming/file_stream.cpp.i:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_stream.cpp.i
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_stream.cpp.i
 .PHONY : streaming/file_stream.cpp.i
 
 streaming/file_stream.s: streaming/file_stream.cpp.s
@@ -176,7 +176,7 @@ streaming/file_stream.s: streaming/file_stream.cpp.s
 
 # target to generate assembly for a file
 streaming/file_stream.cpp.s:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_stream.cpp.s
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_stream.cpp.s
 .PHONY : streaming/file_stream.cpp.s
 
 streaming/file_system.o: streaming/file_system.cpp.o
@@ -185,7 +185,7 @@ streaming/file_system.o: streaming/file_system.cpp.o
 
 # target to build an object file
 streaming/file_system.cpp.o:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_system.cpp.o
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_system.cpp.o
 .PHONY : streaming/file_system.cpp.o
 
 streaming/file_system.i: streaming/file_system.cpp.i
@@ -194,7 +194,7 @@ streaming/file_system.i: streaming/file_system.cpp.i
 
 # target to preprocess a source file
 streaming/file_system.cpp.i:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_system.cpp.i
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_system.cpp.i
 .PHONY : streaming/file_system.cpp.i
 
 streaming/file_system.s: streaming/file_system.cpp.s
@@ -203,7 +203,7 @@ streaming/file_system.s: streaming/file_system.cpp.s
 
 # target to generate assembly for a file
 streaming/file_system.cpp.s:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_system.cpp.s
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/file_system.cpp.s
 .PHONY : streaming/file_system.cpp.s
 
 streaming/memory_stream.o: streaming/memory_stream.cpp.o
@@ -212,7 +212,7 @@ streaming/memory_stream.o: streaming/memory_stream.cpp.o
 
 # target to build an object file
 streaming/memory_stream.cpp.o:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/memory_stream.cpp.o
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/memory_stream.cpp.o
 .PHONY : streaming/memory_stream.cpp.o
 
 streaming/memory_stream.i: streaming/memory_stream.cpp.i
@@ -221,7 +221,7 @@ streaming/memory_stream.i: streaming/memory_stream.cpp.i
 
 # target to preprocess a source file
 streaming/memory_stream.cpp.i:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/memory_stream.cpp.i
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/memory_stream.cpp.i
 .PHONY : streaming/memory_stream.cpp.i
 
 streaming/memory_stream.s: streaming/memory_stream.cpp.s
@@ -230,7 +230,7 @@ streaming/memory_stream.s: streaming/memory_stream.cpp.s
 
 # target to generate assembly for a file
 streaming/memory_stream.cpp.s:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/memory_stream.cpp.s
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/memory_stream.cpp.s
 .PHONY : streaming/memory_stream.cpp.s
 
 streaming/stream.o: streaming/stream.cpp.o
@@ -239,7 +239,7 @@ streaming/stream.o: streaming/stream.cpp.o
 
 # target to build an object file
 streaming/stream.cpp.o:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/stream.cpp.o
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/stream.cpp.o
 .PHONY : streaming/stream.cpp.o
 
 streaming/stream.i: streaming/stream.cpp.i
@@ -248,7 +248,7 @@ streaming/stream.i: streaming/stream.cpp.i
 
 # target to preprocess a source file
 streaming/stream.cpp.i:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/stream.cpp.i
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/stream.cpp.i
 .PHONY : streaming/stream.cpp.i
 
 streaming/stream.s: streaming/stream.cpp.s
@@ -257,7 +257,7 @@ streaming/stream.s: streaming/stream.cpp.s
 
 # target to generate assembly for a file
 streaming/stream.cpp.s:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/stream.cpp.s
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(MAKE) -f libs/FileSystem/CMakeFiles/streaming.dir/build.make libs/FileSystem/CMakeFiles/streaming.dir/streaming/stream.cpp.s
 .PHONY : streaming/stream.cpp.s
 
 # Help Target
@@ -295,6 +295,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /Users/cfontas/Desktop/VulkanDemo/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 
