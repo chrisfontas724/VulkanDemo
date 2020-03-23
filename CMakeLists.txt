@@ -15,11 +15,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_FLAGS "-std=gnu++17")
 
-# Set the include directories.
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/CoreClasses)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/VulkanWindowing)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/VulkanWrappers)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/FileSystem)
 
 
 # Create main executable.
@@ -37,7 +32,12 @@ if (NOT TARGET streaming)
 endif()
 
 
-
+# Set the include directories.
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/CoreClasses)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/VulkanWindowing)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/VulkanWrappers)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/FileSystem)
+include_directories(${VK_INCLUDE_DIRS})
 
 
 
