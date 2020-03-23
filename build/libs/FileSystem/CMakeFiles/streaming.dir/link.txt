@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc libstreaming.a  CMakeFiles/streaming.dir/streaming/buffer.cpp.o CMakeFiles/streaming.dir/streaming/file_stream.cpp.o CMakeFiles/streaming.dir/streaming/file_system.cpp.o CMakeFiles/streaming.dir/streaming/memory_stream.cpp.o CMakeFiles/streaming.dir/streaming/stream.cpp.o
-/Library/Developer/CommandLineTools/usr/bin/ranlib libstreaming.a

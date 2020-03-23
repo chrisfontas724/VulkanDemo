@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc libdisplay.a  CMakeFiles/display.dir/window.cpp.o CMakeFiles/display.dir/glfw_window.cpp.o CMakeFiles/display.dir/input_manager.cpp.o
-/Library/Developer/CommandLineTools/usr/bin/ranlib libdisplay.a
