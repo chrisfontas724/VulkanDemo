@@ -8,6 +8,10 @@
 #include "stdio.h"
 #include <iostream>
 
+#include "logging/logging.hpp"
+
+INITIALIZE_EASYLOGGINGPP
+
 // Example dummy delegate class.
 class Delegate : public display::WindowDelegate {
 public:
@@ -45,8 +49,9 @@ void checkInput(const display::InputManager* input) {
 }
 
 // Set up a window with the delegate and start polling.
-int main(int arg, char** argv) {
-    
+int main(int argc, char** argv) {
+    START_EASYLOGGINGPP(argc, argv);
+
     display::Window::Config config;
     config.name = "Vulkan Demo";
     config.width = 1024;

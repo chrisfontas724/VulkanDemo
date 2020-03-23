@@ -8,6 +8,8 @@ cmake_minimum_required (VERSION 3.7)
 project (VulkanDemo)
 
 # C++ Compiler Settings.
+set(_XOPEN_SOURCE 600)
+
 set (CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
@@ -23,8 +25,21 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/FileSystem)
 # Create main executable.
 add_executable(VulkanDemo main.cpp)
 
-add_subdirectory(libs/CoreClasses)
 add_subdirectory(libs/VulkanWrappers)
 add_subdirectory(libs/VulkanWindowing)
-add_subdirectory(libs/FileSystem)
-target_link_libraries(VulkanDemo display streaming core vulkan_wrappers)
+
+if (NOT TARGET core)
+    add_subdirectory(libs/CoreClasses)
+endif() 
+
+if (NOT TARGET streaming)
+    add_subdirectory(libs/FileSystem)
+endif()
+
+
+
+
+
+
+
+target_link_libraries(VulkanDemo display vulkan_wrappers)
