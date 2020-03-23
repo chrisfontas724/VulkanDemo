@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc libcore.a  CMakeFiles/core.dir/logging/easylogging++.cc.o CMakeFiles/core.dir/threading/dispatch_queue.cpp.o CMakeFiles/core.dir/utils/hasher.cpp.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib libcore.a

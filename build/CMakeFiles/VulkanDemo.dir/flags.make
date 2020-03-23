@@ -6,5 +6,5 @@ CXX_FLAGS = -std=gnu++17 -isysroot /Library/Developer/CommandLineTools/SDKs/MacO
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/VulkanWindowing -I/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem -I/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/VulkanWindowing/display -isystem /usr/local/include 
+CXX_INCLUDES = -I/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/CoreClasses -I/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/VulkanWindowing -I/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/VulkanWrappers -I/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/FileSystem -I/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/libs/VulkanWindowing/display -isystem /usr/local/include 
 

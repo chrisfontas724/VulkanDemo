@@ -10,7 +10,9 @@ set(CMAKE_CXX_COMPILER_ID "AppleClang")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
+  "../libs/CoreClasses"
   "../libs/VulkanWindowing"
+  "../libs/VulkanWrappers"
   "../libs/FileSystem"
   "../libs/VulkanWindowing/display"
   "/usr/local/include"
@@ -20,6 +22,8 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
 set(CMAKE_TARGET_LINKED_INFO_FILES
   "/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/VulkanWindowing/display/CMakeFiles/display.dir/DependInfo.cmake"
   "/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem/CMakeFiles/streaming.dir/DependInfo.cmake"
+  "/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/CoreClasses/CMakeFiles/core.dir/DependInfo.cmake"
+  "/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/VulkanWrappers/CMakeFiles/vulkan_wrappers.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.

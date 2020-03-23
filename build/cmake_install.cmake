@@ -34,6 +34,8 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
+  include("/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/CoreClasses/cmake_install.cmake")
+  include("/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/VulkanWrappers/cmake_install.cmake")
   include("/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/VulkanWindowing/cmake_install.cmake")
   include("/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/FileSystem/cmake_install.cmake")
 

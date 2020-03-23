@@ -216,6 +216,12 @@ VulkanDemo_BINARY_DIR:STATIC=/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/
 //Value Computed by CMake
 VulkanDemo_SOURCE_DIR:STATIC=/Users/cfontas/Desktop/PersonalProjects/VulkanDemo
 
+//Path to a file.
+Vulkan_INCLUDE_DIR:PATH=/usr/local/include
+
+//Path to a library.
+Vulkan_LIBRARY:FILEPATH=/usr/local/lib/libvulkan.dylib
+
 //Value Computed by CMake
 WindowDemo_BINARY_DIR:STATIC=/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/VulkanWindowing
 
@@ -227,6 +233,9 @@ display_LIB_DEPENDS:STATIC=general;glfw;
 
 //The directory containing a CMake configuration file for glfw3.
 glfw3_DIR:PATH=/usr/local/lib/cmake/glfw3
+
+//Dependencies for the target
+vulkan_wrappers_LIB_DEPENDS:STATIC=general;Vulkan::Vulkan;general;glslang;general;SPIRV;
 
 
 ########################
@@ -325,7 +334,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=4
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=6
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -368,4 +377,10 @@ CMAKE_STRIP-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+//Details about finding Vulkan
+FIND_PACKAGE_MESSAGE_DETAILS_Vulkan:INTERNAL=[/usr/local/lib/libvulkan.dylib][/usr/local/include][v()]
+//ADVANCED property for variable: Vulkan_INCLUDE_DIR
+Vulkan_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Vulkan_LIBRARY
+Vulkan_LIBRARY-ADVANCED:INTERNAL=1
 

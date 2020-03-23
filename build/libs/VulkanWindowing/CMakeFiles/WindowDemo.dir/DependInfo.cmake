@@ -10,7 +10,9 @@ set(CMAKE_CXX_COMPILER_ID "AppleClang")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
+  "../libs/CoreClasses"
   "../libs/VulkanWindowing"
+  "../libs/VulkanWrappers"
   "../libs/FileSystem"
   "../libs/VulkanWindowing/display"
   "/usr/local/include"

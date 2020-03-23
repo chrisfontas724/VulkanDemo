@@ -4,6 +4,7 @@
 
 #include "display/window.hpp"
 #include "streaming/file_system.hpp"
+#include "vk_wrappers/instance.hpp"
 #include "stdio.h"
 #include <iostream>
 
@@ -54,6 +55,9 @@ int main(int arg, char** argv) {
     auto delegate = std::make_shared<Delegate>();
     auto window = display::Window::create(config, std::move(delegate));
     std::cout << "Created window!" << std::endl;
+
+
+    auto instance = gfx::Instance::create("VulkanDemo", {}, true);
     
     auto fs = cxl::FileSystem::getDesktop();
     std::cout << fs->directory() << std::endl;

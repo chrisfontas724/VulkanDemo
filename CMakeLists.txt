@@ -14,13 +14,17 @@ set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_FLAGS "-std=gnu++17")
 
 # Set the include directories.
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/CoreClasses)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/VulkanWindowing)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/VulkanWrappers)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/FileSystem)
 
 
 # Create main executable.
 add_executable(VulkanDemo main.cpp)
 
+add_subdirectory(libs/CoreClasses)
+add_subdirectory(libs/VulkanWrappers)
 add_subdirectory(libs/VulkanWindowing)
 add_subdirectory(libs/FileSystem)
-target_link_libraries(VulkanDemo display streaming)
+target_link_libraries(VulkanDemo display streaming core vulkan_wrappers)

@@ -124,6 +124,32 @@ VulkanDemo/fast:
 .PHONY : VulkanDemo/fast
 
 #=============================================================================
+# Target rules for targets named core
+
+# Build rule for target.
+core: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 core
+.PHONY : core
+
+# fast build rule for target.
+core/fast:
+	$(MAKE) -f libs/CoreClasses/CMakeFiles/core.dir/build.make libs/CoreClasses/CMakeFiles/core.dir/build
+.PHONY : core/fast
+
+#=============================================================================
+# Target rules for targets named vulkan_wrappers
+
+# Build rule for target.
+vulkan_wrappers: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 vulkan_wrappers
+.PHONY : vulkan_wrappers
+
+# fast build rule for target.
+vulkan_wrappers/fast:
+	$(MAKE) -f libs/VulkanWrappers/CMakeFiles/vulkan_wrappers.dir/build.make libs/VulkanWrappers/CMakeFiles/vulkan_wrappers.dir/build
+.PHONY : vulkan_wrappers/fast
+
+#=============================================================================
 # Target rules for targets named WindowDemo
 
 # Build rule for target.
@@ -198,6 +224,8 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... VulkanDemo"
+	@echo "... core"
+	@echo "... vulkan_wrappers"
 	@echo "... WindowDemo"
 	@echo "... display"
 	@echo "... streaming"

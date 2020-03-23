@@ -1,6 +1,12 @@
 /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/CMakeFiles/rebuild_cache.dir
 /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/CMakeFiles/edit_cache.dir
 /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/CMakeFiles/VulkanDemo.dir
+/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/CoreClasses/CMakeFiles/rebuild_cache.dir
+/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/CoreClasses/CMakeFiles/edit_cache.dir
+/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/CoreClasses/CMakeFiles/core.dir
+/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/VulkanWrappers/CMakeFiles/rebuild_cache.dir
+/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/VulkanWrappers/CMakeFiles/edit_cache.dir
+/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/VulkanWrappers/CMakeFiles/vulkan_wrappers.dir
 /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/VulkanWindowing/CMakeFiles/rebuild_cache.dir
 /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/VulkanWindowing/CMakeFiles/edit_cache.dir
 /Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/libs/VulkanWindowing/CMakeFiles/WindowDemo.dir

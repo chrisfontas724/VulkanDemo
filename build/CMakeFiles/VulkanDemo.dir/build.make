@@ -81,7 +81,10 @@ VulkanDemo: CMakeFiles/VulkanDemo.dir/main.cpp.o
 VulkanDemo: CMakeFiles/VulkanDemo.dir/build.make
 VulkanDemo: libs/VulkanWindowing/display/libdisplay.a
 VulkanDemo: libs/FileSystem/libstreaming.a
+VulkanDemo: libs/CoreClasses/libcore.a
+VulkanDemo: libs/VulkanWrappers/libvulkan_wrappers.a
 VulkanDemo: /usr/local/lib/libglfw3.a
+VulkanDemo: /usr/local/lib/libvulkan.dylib
 VulkanDemo: CMakeFiles/VulkanDemo.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/cfontas/Desktop/PersonalProjects/VulkanDemo/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable VulkanDemo"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/VulkanDemo.dir/link.txt --verbose=$(VERBOSE)
