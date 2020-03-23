@@ -123,9 +123,8 @@ int main(int argc, char** argv) {
         CXL_DCHECK(frame_buffer);
 
 
-        gfx::CommandBuffer& graphics_buffer = graphics_command_buffers[buffer_index];
-
         // Record graphics commands.
+        gfx::CommandBuffer& graphics_buffer = graphics_command_buffers[buffer_index];
         graphics_buffer.reset();
         graphics_buffer.beginRecording();
         graphics_buffer.setViewPort(vk::Viewport(0, 0, config.width, config.height, 0.f, 1.f));
@@ -136,16 +135,14 @@ int main(int argc, char** argv) {
         // Submit graphics commands.
         vk::PipelineStageFlags graphicsWaitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
         vk::SubmitInfo submit_info(1U, &swap_chain->current_semaphore(), graphicsWaitStages, 1U, &graphics_buffer.vk(), 1U, &render_semaphores[fence_index]);
+        
+        
         auto& graphics_fence =  swap_chain->current_fence();
+
         logical_device->getQueue(gfx::Queue::Type::kGraphics).submit(submit_info, graphics_fence);
-        logical_device->waitForFence(graphics_fence);
 
         // Present swap chain.
         swap_chain->present({render_semaphores[fence_index]});
-
-        CXL_LOG(INFO) << "End frame!";
-
-
     }
 
     return 0;
