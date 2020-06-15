@@ -15,7 +15,10 @@
 #include  "vk_wrappers/utils/render_pass_utils.hpp"
 #include "vk_wrappers/swap_chain.hpp"
 #include "vk_wrappers/command_buffer.hpp"
+#include "vk_wrappers/frame_buffer.hpp"
+#include "vk_wrappers/forward_declarations.hpp"
 
+#include <glm/vec2.hpp>
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -82,17 +85,9 @@ int main(int argc, char** argv) {
     auto logical_device = std::make_shared<gfx::LogicalDevice>(physical_device, surface);
     CXL_VLOG(3) << "Successfully created a logical device!";
 
-    // Create display render pass
-    auto support_details = physical_device->querySwapChainSupport(surface);
-    auto display_format = gfx::SwapChain::chooseSwapSurfaceFormat(support_details.formats).format;
-    auto display_render_pass = gfx::RenderPassUtils::createPresentationRenderPass(logical_device, display_format);
-
     // Create swapchain.
     auto swap_chain = std::make_unique<gfx::SwapChain>(logical_device, surface, config.width, config.height);
-
-    // Create frame buffers.
-    swap_chain->createFrameBuffers(display_render_pass);
-    auto num_frame_buffers = swap_chain->frame_buffers().size();
+    auto num_frame_buffers = 3;
 
     // Create command buffers.
     auto graphics_command_buffers = gfx::CommandBuffer::create(logical_device, gfx::Queue::Type::kGraphics,
@@ -115,36 +110,37 @@ int main(int argc, char** argv) {
         window->poll();
         checkInput(window->input_manager());
 
+        glm::vec2 test;
 
-        gfx::FrameBufferPtr frame_buffer;
-        uint32_t buffer_index;
-        std::tie(frame_buffer, buffer_index) = swap_chain->beginFrame();
-        auto fence_index = swap_chain->current_frame();
-        CXL_DCHECK(frame_buffer);
+        gfx::SwapChain::RenderFunction function = [&](
+             gfx::FrameBufferPtr frame_buffer,
+             vk::Semaphore& semaphore, 
+             vk::Fence& fence, 
+             uint32_t image_index, 
+             uint32_t frame) -> std::vector<vk::Semaphore> {
 
+            // Record graphics commands.
+            gfx::CommandBuffer& graphics_buffer = graphics_command_buffers[image_index];
+            graphics_buffer.reset();
+            graphics_buffer.beginRecording();
+            graphics_buffer.setViewPort(vk::Viewport(0, 0, config.width, config.height, 0.f, 1.f));
+            graphics_buffer.beginRenderPass(frame_buffer->render_pass(), *frame_buffer.get(), {0, 1, 0, 1});
+            graphics_buffer.endRenderPass();
+            graphics_buffer.endRecording();
 
-        // Record graphics commands.
-        gfx::CommandBuffer& graphics_buffer = graphics_command_buffers[buffer_index];
-        graphics_buffer.reset();
-        graphics_buffer.beginRecording();
-        graphics_buffer.setViewPort(vk::Viewport(0, 0, config.width, config.height, 0.f, 1.f));
-        graphics_buffer.beginRenderPass(display_render_pass, *frame_buffer.get(), {0, 1, 0, 1});
-        graphics_buffer.endRenderPass();
-        graphics_buffer.endRecording();
-
-        // Submit graphics commands.
-        vk::PipelineStageFlags graphicsWaitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
-        vk::SubmitInfo submit_info(1U, &swap_chain->current_semaphore(), graphicsWaitStages, 1U, &graphics_buffer.vk(), 1U, &render_semaphores[fence_index]);
+            // Submit graphics commands.
+            vk::PipelineStageFlags graphicsWaitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
+            vk::SubmitInfo submit_info(1U, &semaphore, graphicsWaitStages, 1U, &graphics_buffer.vk(), 1U, &render_semaphores[frame]);
         
         
-        auto& graphics_fence =  swap_chain->current_fence();
+            logical_device->getQueue(gfx::Queue::Type::kGraphics).submit(submit_info, fence);
 
-        logical_device->getQueue(gfx::Queue::Type::kGraphics).submit(submit_info, graphics_fence);
+            return {render_semaphores[frame] };
+        };
 
-        // Present swap chain.
-        swap_chain->present({render_semaphores[fence_index]});
+        swap_chain->beginFrame(function);
+    
     }
-
     return 0;
 }
 

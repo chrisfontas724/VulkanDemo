@@ -8,7 +8,7 @@ cmake_minimum_required (VERSION 3.7)
 project (VulkanDemo)
 
 # C++ Compiler Settings.
-set(_XOPEN_SOURCE 600)
+#set(_XOPEN_SOURCE 600)
 
 set (CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -38,8 +38,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/VulkanWindowing)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/VulkanWrappers)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/FileSystem)
 include_directories(${VK_INCLUDE_DIRS})
-
-
 
 
 target_link_libraries(VulkanDemo display vulkan_wrappers)
