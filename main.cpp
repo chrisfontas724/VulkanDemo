@@ -72,13 +72,13 @@ int main(int argc, char** argv) {
     std::cout << "Created window!" << std::endl;
 
     // Create vulkan instance.
-    auto instance = gfx::Instance::create("VulkanDemo", window->getExtensions(), /*validation*/false);
+    auto instance = gfx::Instance::create("VulkanDemo", window->getExtensions(), /*validation*/true);
     
     // Create display surface KHR.
     vk::SurfaceKHR surface = window->createVKSurface(instance->vk());
 
     // Pick the best device given the provided surface.
-    auto physical_device = instance->pickBestDevice(surface);
+    auto physical_device = instance->pickBestDevice(surface, {VK_NV_RAY_TRACING_EXTENSION_NAME});
     CXL_VLOG(3) << "The best physical device is " << physical_device->name();
 
     // Make a logical device from the physical device.
