@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
     std::cout << "Created window!" << std::endl;
 
     // Create vulkan instance.
-    auto instance = gfx::Instance::create("VulkanDemo", window->getExtensions(), true);
+    auto instance = gfx::Instance::create("VulkanDemo", window->getExtensions(), /*validation*/false);
     
     // Create display surface KHR.
     vk::SurfaceKHR surface = window->createVKSurface(instance->vk());
@@ -134,8 +134,8 @@ int main(int argc, char** argv) {
         
         
             logical_device->getQueue(gfx::Queue::Type::kGraphics).submit(submit_info, fence);
-
-            return {render_semaphores[frame] };
+ 
+            return { render_semaphores[frame] };
         };
 
         swap_chain->beginFrame(function);
