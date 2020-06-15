@@ -113,9 +113,7 @@ int main(int argc, char** argv) {
         window->poll();
         checkInput(window->input_manager());
 
-        glm::vec2 test;
-
-        gfx::SwapChain::RenderFunction function = [&](
+        swap_chain->beginFrame([&](
              gfx::FrameBufferPtr frame_buffer,
              vk::Semaphore& semaphore, 
              vk::Fence& fence, 
@@ -127,7 +125,7 @@ int main(int argc, char** argv) {
             graphics_buffer.reset();
             graphics_buffer.beginRecording();
             graphics_buffer.setViewPort(vk::Viewport(0, 0, config.width, config.height, 0.f, 1.f));
-            graphics_buffer.beginRenderPass(frame_buffer->render_pass(), *frame_buffer.get(), {0, 1, 0, 1});
+            graphics_buffer.beginRenderPass(frame_buffer, vk::ClearColorValue());
             graphics_buffer.endRenderPass();
             graphics_buffer.endRecording();
 
@@ -135,13 +133,10 @@ int main(int argc, char** argv) {
             vk::PipelineStageFlags graphicsWaitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
             vk::SubmitInfo submit_info(1U, &semaphore, graphicsWaitStages, 1U, &graphics_buffer.vk(), 1U, &render_semaphores[frame]);
         
-        
             logical_device->getQueue(gfx::Queue::Type::kGraphics).submit(submit_info, fence);
  
             return { render_semaphores[frame] };
-        };
-
-        swap_chain->beginFrame(function);
+        });
     
     }
     return 0;
