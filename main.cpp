@@ -77,12 +77,15 @@ int main(int argc, char** argv) {
     // Create display surface KHR.
     vk::SurfaceKHR surface = window->createVKSurface(instance->vk());
 
+    // Create device extension list.
+    auto device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_NV_RAY_TRACING_EXTENSION_NAME};
+
     // Pick the best device given the provided surface.
-    auto physical_device = instance->pickBestDevice(surface, {VK_NV_RAY_TRACING_EXTENSION_NAME});
+    auto physical_device = instance->pickBestDevice(surface, device_extensions);
     CXL_VLOG(3) << "The best physical device is " << physical_device->name();
 
     // Make a logical device from the physical device.
-    auto logical_device = std::make_shared<gfx::LogicalDevice>(physical_device, surface);
+    auto logical_device = std::make_shared<gfx::LogicalDevice>(physical_device, surface, device_extensions);
     CXL_VLOG(3) << "Successfully created a logical device!";
 
     // Create swapchain.
