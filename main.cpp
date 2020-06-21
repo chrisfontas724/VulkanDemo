@@ -18,6 +18,7 @@
 #include "vk_wrappers/forward_declarations.hpp"
 #include "vk_wrappers/utils/shader_compiler.hpp"
 #include "vk_wrappers/shader_program.hpp"
+#include "vk_wrappers/utils/image_utils.hpp"
 
 #include <glm/vec2.hpp>
 
@@ -140,19 +141,28 @@ int main(int argc, char** argv) {
     gfx::RenderPassBuilder builder(logical_device);
     auto swapchain_textures = swap_chain->textures();
     std::vector<gfx::RenderPassInfo> render_passes;
+
+    gfx::ComputeTexturePtr depth_textures[3];
+    depth_textures[0] = gfx::ImageUtils::createDepthTexture(logical_device, 1024, 768);
+    depth_textures[1] = gfx::ImageUtils::createDepthTexture(logical_device, 1024, 768);
+    depth_textures[2] = gfx::ImageUtils::createDepthTexture(logical_device, 1024, 768);
+
+    uint32_t tex_index = 0;
     for (const auto& texture : swapchain_textures) {
         CXL_DCHECK(texture);
         builder.reset();
         builder.addColorAttachment(texture);
+        builder.addDepthAttachment(depth_textures[tex_index]);
         builder.addSubpass({
             .bind_point = vk::PipelineBindPoint::eGraphics,
             .input_indices = {},
             .color_indices = {0},
+            .depth_index = 0,
         });
+        tex_index++;
 
         render_passes.push_back(std::move(builder.build()));
     }    
-
 
     gfx::SpirV vertex_spirv, fragment_spirv;
     gfx::ShaderCompiler compiler;
@@ -171,11 +181,21 @@ int main(int argc, char** argv) {
 
     std::vector<Vertex> vertices;
     vertices.push_back({.pos = glm::vec4(0, -1, 0, 1), .col = glm::vec4(1,0,0,1)});
-    vertices.push_back({.pos = glm::vec4(1, 0, 0, 1),  .col = glm::vec4(0,1,0,1)});
+    vertices.push_back({.pos = glm::vec4(0.5, 0, 0, 1),  .col = glm::vec4(0,1,0,1)});
     vertices.push_back({.pos = glm::vec4(0, 1, 0, 1), .col = glm::vec4(1,1,1,1)});
     vertices.push_back({.pos = glm::vec4(-1, 0, 0, 1), .col = glm::vec4(1,0,1,1)});
     auto vertex_buffer = gfx::ComputeBuffer::createFromVector(logical_device, vertices, vk::BufferUsageFlagBits::eVertexBuffer);
     CXL_DCHECK(vertex_buffer);
+
+
+    std::vector<Vertex> vertices2;
+    vertices2.push_back({.pos = glm::vec4(0, -1, 0.5, 1), .col = glm::vec4(1,1,1,1)});
+    vertices2.push_back({.pos = glm::vec4(1, 0, 0.5, 1),  .col = glm::vec4(1,1,1,1)});
+    vertices2.push_back({.pos = glm::vec4(0, 1, 0.5, 1), .col = glm::vec4(1,1,1,1)});
+    vertices2.push_back({.pos = glm::vec4(-1, 0, 0.5, 1), .col = glm::vec4(1,1,1,1)});
+    auto vertex_buffer2 = gfx::ComputeBuffer::createFromVector(logical_device, vertices2, vk::BufferUsageFlagBits::eVertexBuffer);
+    CXL_DCHECK(vertex_buffer);
+
 
     std::vector<uint32_t> indices = {0, 1, 2, 0, 2, 3};
     auto index_buffer = gfx::ComputeBuffer::createFromVector(logical_device, indices, vk::BufferUsageFlagBits::eIndexBuffer);
@@ -198,13 +218,15 @@ int main(int argc, char** argv) {
             graphics_buffer.reset();
             graphics_buffer.beginRecording();
             graphics_buffer.beginRenderPass(render_passes[image_index], glm::vec4(0,0,0,1));
-            graphics_buffer.setVertexAttribute(/*binding*/0, /*location*/0, /*offset*/0, /*format*/vk::Format::eR32G32B32A32Sfloat);
-            graphics_buffer.setVertexAttribute(/*binding*/0, /*location*/1, /*offset*/16, /*format*/vk::Format::eR32G32B32A32Sfloat);
+            graphics_buffer.setVertexAttribute(/*binding*/0, /*location*/0, /*format*/vk::Format::eR32G32B32A32Sfloat);
+            graphics_buffer.setVertexAttribute(/*binding*/0, /*location*/1, /*format*/vk::Format::eR32G32B32A32Sfloat);
             graphics_buffer.setProgram(shader_program);
-            graphics_buffer.bindVertexBuffer(vertex_buffer.get());
-            graphics_buffer.bindIndexBuffer(index_buffer.get());
+            graphics_buffer.bindVertexBuffer(vertex_buffer);
+            graphics_buffer.bindIndexBuffer(index_buffer);
             graphics_buffer.setDefaultState(default_state_);
-            graphics_buffer.setDepth(/*test*/false, /*write*/false);
+            graphics_buffer.setDepth(/*test*/true, /*write*/true);
+            graphics_buffer.drawIndexed(6);
+            graphics_buffer.bindVertexBuffer(vertex_buffer2);
             graphics_buffer.drawIndexed(6);
             graphics_buffer.endRenderPass();
             graphics_buffer.endRecording();
