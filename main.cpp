@@ -171,11 +171,15 @@ int main(int argc, char** argv) {
 
     std::vector<Vertex> vertices;
     vertices.push_back({.pos = glm::vec4(0, -1, 0, 1), .col = glm::vec4(1,0,0,1)});
-    vertices.push_back({.pos = glm::vec4(1, 1, 0, 1),  .col = glm::vec4(0,1,0,1)});
-    vertices.push_back({.pos = glm::vec4(-1, 1, 0, 1), .col = glm::vec4(1,1,1,1)});
+    vertices.push_back({.pos = glm::vec4(1, 0, 0, 1),  .col = glm::vec4(0,1,0,1)});
+    vertices.push_back({.pos = glm::vec4(0, 1, 0, 1), .col = glm::vec4(1,1,1,1)});
+    vertices.push_back({.pos = glm::vec4(-1, 0, 0, 1), .col = glm::vec4(1,0,1,1)});
     auto vertex_buffer = gfx::ComputeBuffer::createFromVector(logical_device, vertices, vk::BufferUsageFlagBits::eVertexBuffer);
     CXL_DCHECK(vertex_buffer);
 
+    std::vector<uint32_t> indices = {0, 1, 2, 0, 2, 3};
+    auto index_buffer = gfx::ComputeBuffer::createFromVector(logical_device, indices, vk::BufferUsageFlagBits::eIndexBuffer);
+    CXL_DCHECK(index_buffer);
 
     std::cout << "Begin loop!" << std::endl;
     while (!window->shouldClose()) {
@@ -198,9 +202,10 @@ int main(int argc, char** argv) {
             graphics_buffer.setVertexAttribute(/*binding*/0, /*location*/1, /*offset*/16, /*format*/vk::Format::eR32G32B32A32Sfloat);
             graphics_buffer.setProgram(shader_program);
             graphics_buffer.bindVertexBuffer(vertex_buffer.get());
+            graphics_buffer.bindIndexBuffer(index_buffer.get());
             graphics_buffer.setDefaultState(default_state_);
             graphics_buffer.setDepth(/*test*/false, /*write*/false);
-            graphics_buffer.draw(3, 1, 0, 0);
+            graphics_buffer.drawIndexed(6);
             graphics_buffer.endRenderPass();
             graphics_buffer.endRecording();
 
