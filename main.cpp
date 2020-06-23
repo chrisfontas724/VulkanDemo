@@ -82,6 +82,7 @@ void checkInput(const display::InputManager* input) {
         default_state_ = gfx::CommandBufferState::DefaultState::kWireFrame;
     } else if (input->key(display::KeyCode::C)) {
         CXL_LOG(INFO) << "Pressed C";
+        default_state_ = gfx::CommandBufferState::DefaultState::kCustomRaytrace;
     }
     // etc...
 }
@@ -180,19 +181,19 @@ int main(int argc, char** argv) {
     };
 
     std::vector<Vertex> vertices;
-    vertices.push_back({.pos = glm::vec4(0, -1, 0, 1), .col = glm::vec4(1,0,0,1)});
+    vertices.push_back({.pos = glm::vec4(0, -0.99, 0, 1), .col = glm::vec4(1,0,0,1)});
     vertices.push_back({.pos = glm::vec4(0.5, 0, 0, 1),  .col = glm::vec4(0,1,0,1)});
-    vertices.push_back({.pos = glm::vec4(0, 1, 0, 1), .col = glm::vec4(1,1,1,1)});
-    vertices.push_back({.pos = glm::vec4(-1, 0, 0, 1), .col = glm::vec4(1,0,1,1)});
+    vertices.push_back({.pos = glm::vec4(0, 0.99, 0, 1), .col = glm::vec4(1,1,1,1)});
+    vertices.push_back({.pos = glm::vec4(-0.99, 0, 0, 1), .col = glm::vec4(1,0,1,1)});
     auto vertex_buffer = gfx::ComputeBuffer::createFromVector(logical_device, vertices, vk::BufferUsageFlagBits::eVertexBuffer);
     CXL_DCHECK(vertex_buffer);
 
 
     std::vector<Vertex> vertices2;
-    vertices2.push_back({.pos = glm::vec4(0, -1, 0.5, 1), .col = glm::vec4(1,1,1,1)});
-    vertices2.push_back({.pos = glm::vec4(1, 0, 0.5, 1),  .col = glm::vec4(1,1,1,1)});
-    vertices2.push_back({.pos = glm::vec4(0, 1, 0.5, 1), .col = glm::vec4(1,1,1,1)});
-    vertices2.push_back({.pos = glm::vec4(-1, 0, 0.5, 1), .col = glm::vec4(1,1,1,1)});
+    vertices2.push_back({.pos = glm::vec4(0, -0.99, 0.5, 1), .col = glm::vec4(1,1,1,1)});
+    vertices2.push_back({.pos = glm::vec4(0.99, 0, 0.5, 1),  .col = glm::vec4(1,1,1,1)});
+    vertices2.push_back({.pos = glm::vec4(0, 0.99, 0.5, 1), .col = glm::vec4(1,1,1,1)});
+    vertices2.push_back({.pos = glm::vec4(-0.99, 0, 0.5, 1), .col = glm::vec4(1,1,1,1)});
     auto vertex_buffer2 = gfx::ComputeBuffer::createFromVector(logical_device, vertices2, vk::BufferUsageFlagBits::eVertexBuffer);
     CXL_DCHECK(vertex_buffer);
 
@@ -217,7 +218,7 @@ int main(int argc, char** argv) {
             gfx::CommandBuffer& graphics_buffer = graphics_command_buffers[image_index];
             graphics_buffer.reset();
             graphics_buffer.beginRecording();
-            graphics_buffer.beginRenderPass(render_passes[image_index], glm::vec4(0,0,0,1));
+            graphics_buffer.beginRenderPass(render_passes[image_index]);
             graphics_buffer.setVertexAttribute(/*binding*/0, /*location*/0, /*format*/vk::Format::eR32G32B32A32Sfloat);
             graphics_buffer.setVertexAttribute(/*binding*/0, /*location*/1, /*format*/vk::Format::eR32G32B32A32Sfloat);
             graphics_buffer.setProgram(shader_program);
