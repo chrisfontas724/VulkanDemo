@@ -2,74 +2,121 @@
 // Use of this source code is governed by the license that can be
 // found in the LICENSE file.
 
-#include "display/window.hpp"
-#include "streaming/file_system.hpp"
-#include "stdio.h"
 #include <iostream>
 
+#include "display/window.hpp"
 #include "logging/logging.hpp"
-
-#include "vk_wrappers/instance.hpp"
-#include "vk_wrappers/physical_device.hpp"
-#include "vk_wrappers/logical_device.hpp"
-#include  "vk_wrappers/render_pass.hpp"
-#include "vk_wrappers/swap_chain.hpp"
+#include "stdio.h"
+#include "streaming/file_system.hpp"
 #include "vk_wrappers/command_buffer.hpp"
 #include "vk_wrappers/forward_declarations.hpp"
-#include "vk_wrappers/utils/shader_compiler.hpp"
+#include "vk_wrappers/instance.hpp"
+#include "vk_wrappers/logical_device.hpp"
+#include "vk_wrappers/physical_device.hpp"
+#include "vk_wrappers/render_pass.hpp"
 #include "vk_wrappers/shader_program.hpp"
+#include "vk_wrappers/swap_chain.hpp"
 #include "vk_wrappers/utils/image_utils.hpp"
+#include "vk_wrappers/utils/shader_compiler.hpp"
+#include <unordered_map>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+#define TINYOBJLOADER_IMPLEMENTATION
 #include <glm/vec2.hpp>
+#include <glm/gtx/hash.hpp>
+
+#include "tiny_obj_loader.h"
 
 INITIALIZE_EASYLOGGINGPP
 
+const uint32_t WIDTH = 800;
+const uint32_t HEIGHT = 600;
+
+const std::string MODEL_PATH = "../viking_room.obj";
+const std::string TEXTURE_PATH = "../viking_room.png";
 
 const char* kVertexShader = R"(
+
+    layout(set = 0, binding = 0) uniform UniformBufferObject {
+        mat4 model;
+        mat4 view;
+        mat4 proj;
+    } ubo;
+
+
     layout(location = 0) in vec4 in_position;
     layout(location = 1) in vec4 in_color;
+    layout(location = 2) in vec2 in_uvs;
 
     layout(location = 0) out vec4 out_color;
+    layout(location = 1) out vec2 out_uvs;
 
     void main() {
         out_color = in_color;
-        gl_Position = vec4(in_position.xy, 0.5, 1.0);
+        out_uvs = in_uvs;
+        gl_Position = ubo.proj * ubo.view * ubo.model * vec4(in_position.xyz, 1.0);
     }
 )";
-
 
 const char* kFragmentShader = R"(
     layout(location = 0) in vec4 in_color;
+    layout(location = 1) in vec2 in_uvs;
     layout(location = 0) out vec4 out_color;
+
+    layout(set = 0, binding = 1) uniform sampler2D image;
+
     void main() {
-        out_color = in_color;
+        out_color = in_color * texture(image, in_uvs);
     }
 )";
 
-gfx::CommandBufferState::DefaultState default_state_ = gfx::CommandBufferState::DefaultState::kOpaque;
+struct Vertex {
+    glm::vec4 pos;
+    glm::vec4 col;
+    glm::vec2 uvs;
+
+    bool operator==(const Vertex& other) const {
+        return pos == other.pos && col == other.col && uvs == other.uvs;
+    }
+
+};
+
+struct UniformBufferObject {
+    alignas(16) glm::mat4 model;
+    alignas(16) glm::mat4 view;
+    alignas(16) glm::mat4 proj;
+};
+
+
+namespace std {
+    template<> struct hash<Vertex> {
+        size_t operator()(Vertex const& vertex) const {
+            return ((hash<glm::vec3>()(vertex.pos) ^ (hash<glm::vec3>()(vertex.col) << 1)) >> 1) ^ (hash<glm::vec2>()(vertex.uvs) << 1);
+        }
+    };
+}
+
+std::vector<Vertex> vertices;
+std::vector<uint32_t> indices;
+
+gfx::CommandBufferState::DefaultState default_state_ =
+    gfx::CommandBufferState::DefaultState::kOpaque;
 
 // Example dummy delegate class.
 class Delegate : public display::WindowDelegate {
-public:
-    
+   public:
     // |WindowDelegate|
-    void onUpdate() override { }
-    
-    void onResize(int32_t width, int32_t height) override {
-        std::cout << "onResize" << std::endl;
-    }
-    
-    void onWindowMove(int32_t x, int32_t y) override {
-        std::cout << "onWindowMove" << std::endl;
-    }
-    
-    void onStart(display::Window*) override {
-        std::cout << "onStart" << std::endl;
-    }
-    
-    void onClose() override {
-        std::cout << "onClose" << std::endl;
-    }
+    void onUpdate() override {}
+
+    void onResize(int32_t width, int32_t height) override { std::cout << "onResize" << std::endl; }
+
+    void onWindowMove(int32_t x, int32_t y) override { std::cout << "onWindowMove" << std::endl; }
+
+    void onStart(display::Window*) override { std::cout << "onStart" << std::endl; }
+
+    void onClose() override { std::cout << "onClose" << std::endl; }
 };
 
 // Example InputManager checks.
@@ -87,6 +134,41 @@ void checkInput(const display::InputManager* input) {
     // etc...
 }
 
+void loadModel() {
+    tinyobj::attrib_t attrib;
+    std::vector<tinyobj::shape_t> shapes;
+    std::vector<tinyobj::material_t> materials;
+    std::string warn, err;
+
+    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, MODEL_PATH.c_str())) {
+        throw std::runtime_error(warn + err);
+    }
+
+    std::unordered_map<Vertex, uint32_t> uniqueVertices{};
+
+    for (const auto& shape : shapes) {
+        for (const auto& index : shape.mesh.indices) {
+            Vertex vertex{};
+
+            vertex.pos = {attrib.vertices[3 * index.vertex_index + 0],
+                          attrib.vertices[3 * index.vertex_index + 1],
+                          attrib.vertices[3 * index.vertex_index + 2], 1.0};
+
+            vertex.uvs = {attrib.texcoords[2 * index.texcoord_index + 0],
+                               1.0f - attrib.texcoords[2 * index.texcoord_index + 1]};
+
+            vertex.col = {1.0f, 1.0f, 1.0f, 1.0f};
+
+            if (uniqueVertices.count(vertex) == 0) {
+                uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
+                vertices.push_back(vertex);
+            }
+
+            indices.push_back(uniqueVertices[vertex]);
+        }
+    }
+}
+
 // Set up a window with the delegate and start polling.
 int main(int argc, char** argv) {
     START_EASYLOGGINGPP(argc, argv);
@@ -95,14 +177,15 @@ int main(int argc, char** argv) {
     config.name = "Vulkan Demo";
     config.width = 1024;
     config.height = 768;
-    config.type =  display::Window::Type::kGLFW;
+    config.type = display::Window::Type::kGLFW;
     auto delegate = std::make_shared<Delegate>();
     auto window = display::Window::create(config, std::move(delegate));
     std::cout << "Created window!" << std::endl;
 
     // Create vulkan instance.
-    auto instance = gfx::Instance::create("VulkanDemo", window->getExtensions(), /*validation*/true);
-    
+    auto instance =
+        gfx::Instance::create("VulkanDemo", window->getExtensions(), /*validation*/ true);
+
     // Create display surface KHR.
     vk::SurfaceKHR surface = window->createVKSurface(instance->vk());
 
@@ -114,18 +197,20 @@ int main(int argc, char** argv) {
     CXL_VLOG(3) << "The best physical device is " << physical_device->name();
 
     // Make a logical device from the physical device.
-    auto logical_device = std::make_shared<gfx::LogicalDevice>(physical_device, surface, device_extensions);
+    auto logical_device =
+        std::make_shared<gfx::LogicalDevice>(physical_device, surface, device_extensions);
     CXL_VLOG(3) << "Successfully created a logical device!";
 
     // Create swapchain.
-    auto swap_chain = std::make_unique<gfx::SwapChain>(logical_device, surface, config.width, config.height);
+    auto swap_chain =
+        std::make_unique<gfx::SwapChain>(logical_device, surface, config.width, config.height);
     auto num_frame_buffers = 3;
     CXL_VLOG(3) << "Successfully created a swapchain!";
 
     // Create command buffers.
-    auto graphics_command_buffers = gfx::CommandBuffer::create(logical_device, gfx::Queue::Type::kGraphics,
-                                                               vk::CommandBufferLevel::ePrimary,
-                                                                num_frame_buffers);
+    auto graphics_command_buffers =
+        gfx::CommandBuffer::create(logical_device, gfx::Queue::Type::kGraphics,
+                                   vk::CommandBufferLevel::ePrimary, num_frame_buffers);
     CXL_VLOG(3) << "Successfully created command buffers!";
 
     const int MAX_FRAMES_IN_FLIGHT = 2;
@@ -133,7 +218,7 @@ int main(int argc, char** argv) {
     CXL_VLOG(3) << "Created render semaphores!";
 
     auto fs = cxl::FileSystem::getDesktop();
-    
+
     if (!window->supports_vulkan()) {
         std::cerr << "Window doesn't support vulkan.";
         return 1;
@@ -163,44 +248,41 @@ int main(int argc, char** argv) {
         tex_index++;
 
         render_passes.push_back(std::move(builder.build()));
-    }    
+    }
 
     gfx::SpirV vertex_spirv, fragment_spirv;
     gfx::ShaderCompiler compiler;
-    compiler.compile(EShLanguage::EShLangVertex, kVertexShader, {}, {},  &vertex_spirv);
+    compiler.compile(EShLanguage::EShLangVertex, kVertexShader, {}, {}, &vertex_spirv);
     compiler.compile(EShLanguage::EShLangFragment, kFragmentShader, {}, {}, &fragment_spirv);
     CXL_DCHECK(vertex_spirv.size() > 0);
     CXL_DCHECK(fragment_spirv.size() > 0);
 
-    auto shader_program = gfx::ShaderProgram::createGraphics(logical_device, vertex_spirv, fragment_spirv);
+    auto shader_program =
+        gfx::ShaderProgram::createGraphics(logical_device, vertex_spirv, fragment_spirv);
     CXL_DCHECK(shader_program);
 
-    struct Vertex{
-        glm::vec4 pos;
-        glm::vec4 col;
-    };
+    loadModel();
 
-    std::vector<Vertex> vertices;
-    vertices.push_back({.pos = glm::vec4(0, -0.99, 0, 1), .col = glm::vec4(1,0,0,1)});
-    vertices.push_back({.pos = glm::vec4(0.5, 0, 0, 1),  .col = glm::vec4(0,1,0,1)});
-    vertices.push_back({.pos = glm::vec4(0, 0.99, 0, 1), .col = glm::vec4(1,1,1,1)});
-    vertices.push_back({.pos = glm::vec4(-0.99, 0, 0, 1), .col = glm::vec4(1,0,1,1)});
     auto vertex_buffer = gfx::ComputeBuffer::createFromVector(logical_device, vertices, vk::BufferUsageFlagBits::eVertexBuffer);
     CXL_DCHECK(vertex_buffer);
-
-
-    std::vector<Vertex> vertices2;
-    vertices2.push_back({.pos = glm::vec4(0, -0.99, 0.5, 1), .col = glm::vec4(1,1,1,1)});
-    vertices2.push_back({.pos = glm::vec4(0.99, 0, 0.5, 1),  .col = glm::vec4(1,1,1,1)});
-    vertices2.push_back({.pos = glm::vec4(0, 0.99, 0.5, 1), .col = glm::vec4(1,1,1,1)});
-    vertices2.push_back({.pos = glm::vec4(-0.99, 0, 0.5, 1), .col = glm::vec4(1,1,1,1)});
-    auto vertex_buffer2 = gfx::ComputeBuffer::createFromVector(logical_device, vertices2, vk::BufferUsageFlagBits::eVertexBuffer);
-    CXL_DCHECK(vertex_buffer);
-
-
-    std::vector<uint32_t> indices = {0, 1, 2, 0, 2, 3};
+   
     auto index_buffer = gfx::ComputeBuffer::createFromVector(logical_device, indices, vk::BufferUsageFlagBits::eIndexBuffer);
     CXL_DCHECK(index_buffer);
+
+    int texWidth, texHeight, texChannels;
+    stbi_uc* pixels =
+        stbi_load(TEXTURE_PATH.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    CXL_DCHECK(pixels);
+    auto texture =
+        gfx::ImageUtils::create8BitUnormImage(logical_device, texWidth, texHeight, 4, pixels);
+    CXL_DCHECK(texture);
+
+
+
+    auto ubo_buffer = gfx::ComputeBuffer::createHostAccessableUniform(logical_device, sizeof(UniformBufferObject));
+    CXL_DCHECK(ubo_buffer);
+
+    float degrees = 90;
 
     std::cout << "Begin loop!" << std::endl;
     while (!window->shouldClose()) {
@@ -208,39 +290,48 @@ int main(int argc, char** argv) {
         checkInput(window->input_manager());
 
 
-        swap_chain->beginFrame([&](
-             vk::Semaphore& semaphore, 
-             vk::Fence& fence, 
-             uint32_t image_index, 
-             uint32_t frame) -> std::vector<vk::Semaphore> {
+        UniformBufferObject ubo{};
+        ubo.model = glm::rotate(glm::mat4(1.0f), glm::radians(degrees), glm::vec3(0.0f, 0.0f, 1.0f));
+        ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        ubo.proj = glm::perspective(glm::radians(45.0f), 1024.f / 768.f, 0.1f, 10.0f);
+        ubo.proj[1][1] *= -1;
 
+        degrees += 0.01;
+        ubo_buffer->write(&ubo, 1);
+
+        swap_chain->beginFrame([&](vk::Semaphore& semaphore, vk::Fence& fence, uint32_t image_index,
+                                   uint32_t frame) -> std::vector<vk::Semaphore> {
             // Record graphics commands.
             gfx::CommandBuffer& graphics_buffer = graphics_command_buffers[image_index];
             graphics_buffer.reset();
             graphics_buffer.beginRecording();
             graphics_buffer.beginRenderPass(render_passes[image_index]);
-            graphics_buffer.setVertexAttribute(/*binding*/0, /*location*/0, /*format*/vk::Format::eR32G32B32A32Sfloat);
-            graphics_buffer.setVertexAttribute(/*binding*/0, /*location*/1, /*format*/vk::Format::eR32G32B32A32Sfloat);
+            graphics_buffer.setVertexAttribute(/*binding*/ 0, /*location*/ 0,
+                                               /*format*/ vk::Format::eR32G32B32A32Sfloat);
+            graphics_buffer.setVertexAttribute(/*binding*/ 0, /*location*/ 1,
+                                               /*format*/ vk::Format::eR32G32B32A32Sfloat);
+            graphics_buffer.setVertexAttribute(/*binding*/ 0, /*location*/ 2,
+                                               /*format*/ vk::Format::eR32G32Sfloat);
             graphics_buffer.setProgram(shader_program);
             graphics_buffer.bindVertexBuffer(vertex_buffer);
             graphics_buffer.bindIndexBuffer(index_buffer);
+            graphics_buffer.bindUniformBuffer(0, 0, ubo_buffer);
+            graphics_buffer.bindTexture(0, 1, texture);
             graphics_buffer.setDefaultState(default_state_);
-            graphics_buffer.setDepth(/*test*/true, /*write*/true);
-            graphics_buffer.drawIndexed(6);
-            graphics_buffer.bindVertexBuffer(vertex_buffer2);
-            graphics_buffer.drawIndexed(6);
+            graphics_buffer.setDepth(/*test*/ true, /*write*/ true);
+            graphics_buffer.drawIndexed(indices.size());
             graphics_buffer.endRenderPass();
             graphics_buffer.endRecording();
 
             // Submit graphics commands.
-            vk::PipelineStageFlags graphicsWaitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
-            vk::SubmitInfo submit_info(1U, &semaphore, graphicsWaitStages, 1U, &graphics_buffer.vk(), 1U, &render_semaphores[frame]);
+            vk::PipelineStageFlags graphicsWaitStages[] = {
+                vk::PipelineStageFlagBits::eColorAttachmentOutput};
+            vk::SubmitInfo submit_info(1U, &semaphore, graphicsWaitStages, 1U,
+                                       &graphics_buffer.vk(), 1U, &render_semaphores[frame]);
             logical_device->getQueue(gfx::Queue::Type::kGraphics).submit(submit_info, fence);
- 
-            return { render_semaphores[frame] };
+
+            return {render_semaphores[frame]};
         });
-    
     }
     return 0;
 }
-
