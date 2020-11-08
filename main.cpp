@@ -220,7 +220,7 @@ int main(int argc, char** argv) {
                                    vk::CommandBufferLevel::ePrimary, num_frame_buffers);
     CXL_VLOG(3) << "Successfully created command buffers!";
 
-    const int MAX_FRAMES_IN_FLIGHT = 4;
+    const int MAX_FRAMES_IN_FLIGHT = 2;
     auto render_semaphores = logical_device->createSemaphores(MAX_FRAMES_IN_FLIGHT);
     CXL_VLOG(3) << "Created render semaphores!";
 
