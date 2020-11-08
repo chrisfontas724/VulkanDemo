@@ -197,7 +197,7 @@ int main(int argc, char** argv) {
     vk::SurfaceKHR surface = window->createVKSurface(instance->vk());
 
     // Create device extension list.
-    auto device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_NV_RAY_TRACING_EXTENSION_NAME};
+    auto device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};//, VK_NV_RAY_TRACING_EXTENSION_NAME};
 
     // Pick the best device given the provided surface.
     auto physical_device = instance->pickBestDevice(surface, device_extensions);
@@ -211,7 +211,7 @@ int main(int argc, char** argv) {
     // Create swapchain.
     auto swap_chain =
         std::make_unique<gfx::SwapChain>(logical_device, surface, config.width, config.height);
-    auto num_frame_buffers = 3;
+    auto num_frame_buffers = 5;
     CXL_VLOG(3) << "Successfully created a swapchain!";
 
     // Create command buffers.
@@ -220,7 +220,7 @@ int main(int argc, char** argv) {
                                    vk::CommandBufferLevel::ePrimary, num_frame_buffers);
     CXL_VLOG(3) << "Successfully created command buffers!";
 
-    const int MAX_FRAMES_IN_FLIGHT = 2;
+    const int MAX_FRAMES_IN_FLIGHT = 4;
     auto render_semaphores = logical_device->createSemaphores(MAX_FRAMES_IN_FLIGHT);
     CXL_VLOG(3) << "Created render semaphores!";
 
@@ -235,24 +235,24 @@ int main(int argc, char** argv) {
     auto swapchain_textures = swap_chain->textures();
     std::vector<gfx::RenderPassInfo> render_passes;
 
-    vk::SampleCountFlagBits samples = vk::SampleCountFlagBits::e8;
+    vk::SampleCountFlagBits samples = vk::SampleCountFlagBits::e1;
 
-    gfx::ComputeTexturePtr color_textures[3];
-    for (uint32_t i = 0; i < 3; i++) {
+    CXL_VLOG(5) << "Creating color attachments";
+    gfx::ComputeTexturePtr color_textures[5];
+    for (uint32_t i = 0; i < 5; i++) {
         color_textures[i] = gfx::ImageUtils::createColorAttachment(logical_device, kDisplayWidth,
-        kDisplayHeight, samples);
+                                                                   kDisplayHeight, samples);
         CXL_DCHECK(color_textures[i]);
     }
 
-    gfx::ComputeTexturePtr depth_textures[3];
-    depth_textures[0] =
+    gfx::ComputeTexturePtr depth_textures[5];
+    for (uint32_t i = 0; i < 5; i++) {
+      depth_textures[i] =
         gfx::ImageUtils::createDepthTexture(logical_device, kDisplayWidth, kDisplayHeight, samples);
-    depth_textures[1] =
-        gfx::ImageUtils::createDepthTexture(logical_device, kDisplayWidth, kDisplayHeight, samples);
-    depth_textures[2] =
-        gfx::ImageUtils::createDepthTexture(logical_device, kDisplayWidth, kDisplayHeight, samples);
+    }
 
     uint32_t tex_index = 0;
+    CXL_VLOG(5) << "Working on render pass builder....: " << swapchain_textures.size();
     for (const auto& texture : swapchain_textures) {
         CXL_DCHECK(texture);
         auto info = gfx::RenderPassBuilder::kDefaultColorAttachment;
@@ -269,8 +269,10 @@ int main(int argc, char** argv) {
         tex_index++;
 
         render_passes.push_back(std::move(builder.build()));
+        CXL_VLOG(5) << "BUILT!!!!!";
     }
 
+    CXL_VLOG(5) << "Compiling shaders...";
     gfx::SpirV vertex_spirv, fragment_spirv;
     gfx::ShaderCompiler compiler;
     compiler.compile(EShLanguage::EShLangVertex, kVertexShader, {}, {}, &vertex_spirv);
@@ -278,10 +280,12 @@ int main(int argc, char** argv) {
     CXL_DCHECK(vertex_spirv.size() > 0);
     CXL_DCHECK(fragment_spirv.size() > 0);
 
+    CXL_VLOG(5) << "Creating shader program...";
     auto shader_program =
         gfx::ShaderProgram::createGraphics(logical_device, vertex_spirv, fragment_spirv);
     CXL_DCHECK(shader_program);
 
+    CXL_VLOG(5) << "Loading model...";
     loadModel();
 
     auto vertex_buffer = gfx::ComputeBuffer::createFromVector(
