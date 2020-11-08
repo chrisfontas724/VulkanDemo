@@ -211,7 +211,11 @@ int main(int argc, char** argv) {
     // Create swapchain.
     auto swap_chain =
         std::make_unique<gfx::SwapChain>(logical_device, surface, config.width, config.height);
-    auto num_frame_buffers = 5;
+    auto swapchain_textures = swap_chain->textures();
+
+    auto num_swap = swapchain_textures.size();
+
+    auto num_frame_buffers = num_swap;
     CXL_VLOG(3) << "Successfully created a swapchain!";
 
     // Create command buffers.
@@ -232,21 +236,20 @@ int main(int argc, char** argv) {
     }
 
     gfx::RenderPassBuilder builder(logical_device);
-    auto swapchain_textures = swap_chain->textures();
     std::vector<gfx::RenderPassInfo> render_passes;
 
     vk::SampleCountFlagBits samples = vk::SampleCountFlagBits::e1;
 
     CXL_VLOG(5) << "Creating color attachments";
-    gfx::ComputeTexturePtr color_textures[5];
-    for (uint32_t i = 0; i < 5; i++) {
+    gfx::ComputeTexturePtr color_textures[num_swap];
+    for (uint32_t i = 0; i < num_swap; i++) {
         color_textures[i] = gfx::ImageUtils::createColorAttachment(logical_device, kDisplayWidth,
                                                                    kDisplayHeight, samples);
         CXL_DCHECK(color_textures[i]);
     }
 
-    gfx::ComputeTexturePtr depth_textures[5];
-    for (uint32_t i = 0; i < 5; i++) {
+    gfx::ComputeTexturePtr depth_textures[num_swap];
+    for (uint32_t i = 0; i < num_swap; i++) {
       depth_textures[i] =
         gfx::ImageUtils::createDepthTexture(logical_device, kDisplayWidth, kDisplayHeight, samples);
     }
