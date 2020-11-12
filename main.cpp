@@ -203,8 +203,8 @@ int main(int argc, char** argv) {
 
     // Create device extension list.
     auto device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-                              VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME};
-                         //     VK_NV_RAY_TRACING_EXTENSION_NAME};
+                              VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME,
+                              VK_NV_RAY_TRACING_EXTENSION_NAME};
 
     // Pick the best device given the provided surface.
     auto physical_device = instance->pickBestDevice(surface, device_extensions);
