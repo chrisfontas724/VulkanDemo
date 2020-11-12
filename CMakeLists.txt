@@ -42,4 +42,4 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/FileSystem)
 include_directories(${VK_INCLUDE_DIRS})
 
 
-target_link_libraries(VulkanDemo display vulkan_wrappers)
+target_link_libraries(VulkanDemo display glslang vulkan_wrappers)
