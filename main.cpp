@@ -218,8 +218,7 @@ int main(int argc, char** argv) {
     // Create swapchain.
     auto swap_chain =
         std::make_unique<gfx::SwapChain>(logical_device, surface, config.width, config.height);
-    auto swapchain_textures = swap_chain->textures();
-
+    const auto& swapchain_textures = swap_chain->textures();
     auto num_swap = swapchain_textures.size();
 
     auto num_frame_buffers = num_swap;
@@ -373,5 +372,32 @@ int main(int argc, char** argv) {
             return {render_semaphores[frame]};
          });
     }
+
+    logical_device->waitIdle();
+
+    vertex_buffer.reset();
+    index_buffer.reset();
+    ubo_buffer.reset();
+
+    for (auto& pass : render_passes) {
+        logical_device->vk().destroyRenderPass(pass.render_pass);
+    }
+
+    for (auto& semaphore : render_semaphores) {
+        logical_device->vk().destroy(semaphore);
+    }
+
+    for (auto& texture: color_textures) {
+        texture.reset();
+    }
+    for (auto& texture: depth_textures) {
+        texture.reset();
+    }
+
+    texture.reset();
+
+    swap_chain.reset();
+
+    CXL_VLOG(5) << "Finished!!!";
     return 0;
 }
