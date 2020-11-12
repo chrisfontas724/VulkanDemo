@@ -243,7 +243,7 @@ int main(int argc, char** argv) {
     gfx::RenderPassBuilder builder(logical_device);
     std::vector<gfx::RenderPassInfo> render_passes;
 
-    vk::SampleCountFlagBits samples = vk::SampleCountFlagBits::e2;
+    vk::SampleCountFlagBits samples = vk::SampleCountFlagBits::e4;
 
     CXL_VLOG(5) << "Creating color attachments............................";
     gfx::ComputeTexturePtr color_textures[num_swap];
@@ -264,8 +264,6 @@ int main(int argc, char** argv) {
     CXL_VLOG(5) << "Working on render pass builder..........................: " << swapchain_textures.size();
     for (const auto& texture : swapchain_textures) {
         CXL_DCHECK(texture);
-        auto info = gfx::RenderPassBuilder::kDefaultColorAttachment;
-
         builder.reset();
         builder.addColorAttachment(color_textures[tex_index]);
         builder.addDepthAttachment(depth_textures[tex_index]);
