@@ -26,7 +26,7 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 
 #define GLM_ENABLE_EXPERIMENTAL
-//#include <glm/gtx/hash.hpp>
+#include <glm/gtx/hash.hpp>
 #include <glm/vec2.hpp>
 
 #include "tiny_obj_loader.h"
@@ -90,15 +90,15 @@ struct UniformBufferObject {
     alignas(16) glm::mat4 proj;
 };
 
-// namespace std {
-// template <>
-// struct hash<Vertex> {
-//     size_t operator()(Vertex const& vertex) const {
-//         return ((hash<glm::vec3>()(vertex.pos) ^ (hash<glm::vec3>()(vertex.col) << 1)) >> 1) ^
-//                (hash<glm::vec2>()(vertex.uvs) << 1);
-//     }
-// };
-//}  // namespace std
+namespace std {
+template <>
+struct hash<Vertex> {
+    size_t operator()(Vertex const& vertex) const {
+        return ((hash<glm::vec3>()(vertex.pos) ^ (hash<glm::vec3>()(vertex.col) << 1)) >> 1) ^
+               (hash<glm::vec2>()(vertex.uvs) << 1);
+    }
+};
+}  // namespace std
 
 std::vector<Vertex> vertices;
 std::vector<uint32_t> indices;
@@ -144,38 +144,41 @@ void checkInput(const display::InputManager* input) {
 }
 
 void loadModel() {
-    // tinyobj::attrib_t attrib;
-    // std::vector<tinyobj::shape_t> shapes;
-    // std::vector<tinyobj::material_t> materials;
-    // std::string warn, err;
+    tinyobj::attrib_t attrib;
+    std::vector<tinyobj::shape_t> shapes;
+    std::vector<tinyobj::material_t> materials;
+    std::string warn, err;
 
-    // if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, MODEL_PATH.c_str())) {
-    //     throw std::runtime_error(warn + err);
-    // }
+    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, MODEL_PATH.c_str())) {
+        throw std::runtime_error(warn + err);
+    }
 
-    // std::unordered_map<Vertex, uint32_t> uniqueVertices;
+    std::unordered_map<Vertex, uint32_t> uniqueVertices;
 
-    // for (const auto& shape : shapes) {
-    //     for (const auto& index : shape.mesh.indices) {
-    //         Vertex vertex{};
+    for (const auto& shape : shapes) {
+        for (const auto& index : shape.mesh.indices) {
+            Vertex vertex{};
 
-    //         vertex.pos = {attrib.vertices[3 * index.vertex_index + 0],
-    //                       attrib.vertices[3 * index.vertex_index + 1],
-    //                       attrib.vertices[3 * index.vertex_index + 2], 1.0};
+            vertex.pos = {attrib.vertices[3 * index.vertex_index + 0],
+                          attrib.vertices[3 * index.vertex_index + 1],
+                          attrib.vertices[3 * index.vertex_index + 2], 1.0};
 
-    //         vertex.uvs = {attrib.texcoords[2 * index.texcoord_index + 0],
-    //                       1.0f - attrib.texcoords[2 * index.texcoord_index + 1]};
+            vertex.uvs = {attrib.texcoords[2 * index.texcoord_index + 0],
+                          1.0f - attrib.texcoords[2 * index.texcoord_index + 1]};
 
-    //         vertex.col = {1.0f, 1.0f, 1.0f, 1.0f};
+            vertex.col = {1.0f, 1.0f, 1.0f, 1.0f};
 
-    //         if (uniqueVertices.count(vertex) == 0) {
-    //             uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
-    //             vertices.push_back(vertex);
-    //         }
+            if (uniqueVertices.count(vertex) == 0) {
+                uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
+                vertices.push_back(vertex);
+            }
 
-    //         indices.push_back(uniqueVertices[vertex]);
-    //     }
-    // }
+            indices.push_back(uniqueVertices[vertex]);
+        }
+    }
+
+    CXL_VLOG(5) << "INDICES: " << indices.size();
+    CXL_VLOG(5) << "VERTICES: " << vertices.size();
 }
 
 // Set up a window with the delegate and start polling.
@@ -194,7 +197,6 @@ int main(int argc, char** argv) {
     // Create vulkan instance.
     auto instance =
         gfx::Instance::create("VulkanDemo", window->getExtensions(), /*validation*/ true);
-
 
     // Create display surface KHR.
     vk::SurfaceKHR surface = window->createVKSurface(instance->vk());
@@ -264,13 +266,13 @@ int main(int argc, char** argv) {
         auto info = gfx::RenderPassBuilder::kDefaultColorAttachment;
 
         builder.reset();
-        builder.addColorAttachment(color_textures[tex_index]);
+        builder.addColorAttachment(texture);//color_textures[tex_index]);
         builder.addDepthAttachment(depth_textures[tex_index]);
-        builder.addResolveAttachment(texture);
+       // builder.addResolveAttachment(texture);
         builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
                             .input_indices = {},
                             .color_indices = {0},
-                            .resolve_index = 0,
+                          //  .resolve_index = 0,
                             .depth_index = 0});
         tex_index++;
 
@@ -291,46 +293,48 @@ int main(int argc, char** argv) {
         gfx::ShaderProgram::createGraphics(logical_device, vertex_spirv, fragment_spirv);
     CXL_DCHECK(shader_program);
 
-    // CXL_VLOG(5) << "Loading model...";
-    // loadModel();
+    CXL_VLOG(5) << "Loading model...";
+    loadModel();
 
-    // auto vertex_buffer = gfx::ComputeBuffer::createFromVector(
-    //     logical_device, vertices, vk::BufferUsageFlagBits::eVertexBuffer);
-    // CXL_DCHECK(vertex_buffer);
+    CXL_VLOG(5) << "Creating vertex buffer...";
+    auto vertex_buffer = gfx::ComputeBuffer::createFromVector(
+        logical_device, vertices, vk::BufferUsageFlagBits::eVertexBuffer);
+    CXL_DCHECK(vertex_buffer);
 
-    // auto index_buffer = gfx::ComputeBuffer::createFromVector(logical_device, indices,
-    //                                                          vk::BufferUsageFlagBits::eIndexBuffer);
-    // CXL_DCHECK(index_buffer);
+    CXL_VLOG(5) << "Creating index buffer...";
+    auto index_buffer = gfx::ComputeBuffer::createFromVector(logical_device, indices,
+                                                             vk::BufferUsageFlagBits::eIndexBuffer);
+    CXL_DCHECK(index_buffer);
 
-    // int texWidth, texHeight, texChannels;
-    // stbi_uc* pixels =
-    //     stbi_load(TEXTURE_PATH.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-    // CXL_DCHECK(pixels);
-    // auto texture = gfx::ImageUtils::create8BitUnormImage(logical_device, texWidth, texHeight, 4,
-    //                                                      vk::SampleCountFlagBits::e1, pixels);
-    // CXL_DCHECK(texture);
+    int texWidth, texHeight, texChannels;
+    stbi_uc* pixels =
+        stbi_load(TEXTURE_PATH.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    CXL_DCHECK(pixels);
+    auto texture = gfx::ImageUtils::create8BitUnormImage(logical_device, texWidth, texHeight, 4,
+                                                         vk::SampleCountFlagBits::e1, pixels);
+    CXL_DCHECK(texture);
 
-    // auto ubo_buffer = gfx::ComputeBuffer::createHostAccessableUniform(logical_device,
-    //                                                                   sizeof(UniformBufferObject));
-    // CXL_DCHECK(ubo_buffer);
+    auto ubo_buffer = gfx::ComputeBuffer::createHostAccessableUniform(logical_device,
+                                                                      sizeof(UniformBufferObject));
+    CXL_DCHECK(ubo_buffer);
 
-    // float degrees = 90;
+    float degrees = 90;
 
     std::cout << "Begin loop!" << std::endl;
     while (!window->shouldClose()) {
          window->poll();
          checkInput(window->input_manager());
 
-    //     UniformBufferObject ubo{};
-    //     ubo.model =
-    //         glm::rotate(glm::mat4(1.0f), glm::radians(degrees), glm::vec3(0.0f, 0.0f, 1.0f));
-    //     ubo.view = glm::lookAt(eye_pos, eye_pos + direction, glm::vec3(0.0f, 0.0f, 1.0f));
-    //     ubo.proj = glm::perspective(glm::radians(45.0f),
-    //                                 float(kDisplayWidth) / float(kDisplayHeight), 0.1f, 100.0f);
-    //     ubo.proj[1][1] *= -1;
+        UniformBufferObject ubo{};
+        ubo.model =
+            glm::rotate(glm::mat4(1.0f), glm::radians(degrees), glm::vec3(0.0f, 0.0f, 1.0f));
+        ubo.view = glm::lookAt(eye_pos, eye_pos + direction, glm::vec3(0.0f, 0.0f, 1.0f));
+        ubo.proj = glm::perspective(glm::radians(45.0f),
+                                    float(kDisplayWidth) / float(kDisplayHeight), 0.1f, 100.0f);
+        ubo.proj[1][1] *= -1;
 
-    //     degrees += 0.01;
-    //     ubo_buffer->write(&ubo, 1);
+        degrees += 0.01;
+        ubo_buffer->write(&ubo, 1);
 
         swap_chain->beginFrame([&](vk::Semaphore& semaphore, vk::Fence& fence, uint32_t image_index,
                                     uint32_t frame) -> std::vector<vk::Semaphore> {
@@ -339,24 +343,25 @@ int main(int argc, char** argv) {
             graphics_buffer.reset();
             graphics_buffer.beginRecording();
             graphics_buffer.beginRenderPass(render_passes[image_index]);
-    //         graphics_buffer.setVertexAttribute(/*binding*/ 0, /*location*/ 0,
-    //                                            /*format*/ vk::Format::eR32G32B32A32Sfloat);
-    //         graphics_buffer.setVertexAttribute(/*binding*/ 0, /*location*/ 1,
-    //                                            /*format*/ vk::Format::eR32G32B32A32Sfloat);
-    //         graphics_buffer.setVertexAttribute(/*binding*/ 0, /*location*/ 2,
-    //                                            /*format*/ vk::Format::eR32G32Sfloat);
-    //         graphics_buffer.setProgram(shader_program);
-    //         graphics_buffer.bindVertexBuffer(vertex_buffer);
-    //         graphics_buffer.bindIndexBuffer(index_buffer);
-    //         graphics_buffer.bindUniformBuffer(0, 0, ubo_buffer);
-    //         graphics_buffer.bindTexture(0, 1, texture);
-    //         graphics_buffer.setDefaultState(default_state_);
-    //         graphics_buffer.setDepth(/*test*/ true, /*write*/ true);
-    //         graphics_buffer.drawIndexed(indices.size());
+            graphics_buffer.setVertexAttribute(/*binding*/ 0, /*location*/ 0,
+                                               /*format*/ vk::Format::eR32G32B32A32Sfloat);
+            graphics_buffer.setVertexAttribute(/*binding*/ 0, /*location*/ 1,
+                                               /*format*/ vk::Format::eR32G32B32A32Sfloat);
+            graphics_buffer.setVertexAttribute(/*binding*/ 0, /*location*/ 2,
+                                               /*format*/ vk::Format::eR32G32Sfloat);
+            graphics_buffer.setProgram(shader_program);
+            graphics_buffer.bindVertexBuffer(vertex_buffer);
+            graphics_buffer.bindIndexBuffer(index_buffer);
+            graphics_buffer.bindUniformBuffer(0, 0, ubo_buffer);
+            graphics_buffer.bindTexture(0, 1, texture);
+            graphics_buffer.setDefaultState(default_state_);
+            graphics_buffer.setDepth(/*test*/ true, /*write*/ true);
+            graphics_buffer.drawIndexed(indices.size());
             graphics_buffer.endRenderPass();
             graphics_buffer.endRecording();
 
             // Submit graphics commands.
+            CXL_VLOG(5) << "Submitting command!";
             vk::PipelineStageFlags graphicsWaitStages[] = {
                 vk::PipelineStageFlagBits::eColorAttachmentOutput};
             vk::SubmitInfo submit_info(1U, &semaphore, graphicsWaitStages, 1U,
