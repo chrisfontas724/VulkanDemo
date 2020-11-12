@@ -243,9 +243,9 @@ int main(int argc, char** argv) {
     gfx::RenderPassBuilder builder(logical_device);
     std::vector<gfx::RenderPassInfo> render_passes;
 
-    vk::SampleCountFlagBits samples = vk::SampleCountFlagBits::e1;
+    vk::SampleCountFlagBits samples = vk::SampleCountFlagBits::e2;
 
-    CXL_VLOG(5) << "Creating color attachments";
+    CXL_VLOG(5) << "Creating color attachments............................";
     gfx::ComputeTexturePtr color_textures[num_swap];
     for (uint32_t i = 0; i < num_swap; i++) {
         color_textures[i] = gfx::ImageUtils::createColorAttachment(logical_device, kDisplayWidth,
@@ -253,6 +253,7 @@ int main(int argc, char** argv) {
         CXL_DCHECK(color_textures[i]);
     }
 
+    CXL_VLOG(5) << "Creating depth texture attachments.....................";
     gfx::ComputeTexturePtr depth_textures[num_swap];
     for (uint32_t i = 0; i < num_swap; i++) {
       depth_textures[i] =
@@ -260,19 +261,21 @@ int main(int argc, char** argv) {
     }
 
     uint32_t tex_index = 0;
-    CXL_VLOG(5) << "Working on render pass builder....: " << swapchain_textures.size();
+    CXL_VLOG(5) << "Working on render pass builder..........................: " << swapchain_textures.size();
     for (const auto& texture : swapchain_textures) {
         CXL_DCHECK(texture);
         auto info = gfx::RenderPassBuilder::kDefaultColorAttachment;
 
         builder.reset();
-        builder.addColorAttachment(texture);//color_textures[tex_index]);
+        builder.addColorAttachment(color_textures[tex_index]);
         builder.addDepthAttachment(depth_textures[tex_index]);
-       // builder.addResolveAttachment(texture);
+
+        CXL_VLOG(3) << "Calling add resolve attachment!";
+        builder.addResolveAttachment(texture);
         builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
                             .input_indices = {},
                             .color_indices = {0},
-                          //  .resolve_index = 0,
+                            .resolve_index = 0,
                             .depth_index = 0});
         tex_index++;
 
@@ -361,7 +364,6 @@ int main(int argc, char** argv) {
             graphics_buffer.endRecording();
 
             // Submit graphics commands.
-            CXL_VLOG(5) << "Submitting command!";
             vk::PipelineStageFlags graphicsWaitStages[] = {
                 vk::PipelineStageFlagBits::eColorAttachmentOutput};
             vk::SubmitInfo submit_info(1U, &semaphore, graphicsWaitStages, 1U,
