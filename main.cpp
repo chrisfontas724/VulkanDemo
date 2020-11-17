@@ -400,6 +400,8 @@ int main(int argc, char** argv) {
 
     graphics_command_buffers.clear();
 
+    shader_program.reset();
+
     CXL_VLOG(5) << "Finished!!!";
     return 0;
 }
