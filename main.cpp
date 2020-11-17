@@ -398,6 +398,8 @@ int main(int argc, char** argv) {
 
     swap_chain.reset();
 
+    graphics_command_buffers.clear();
+
     CXL_VLOG(5) << "Finished!!!";
     return 0;
 }
