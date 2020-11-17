@@ -341,7 +341,7 @@ int main(int argc, char** argv) {
         swap_chain->beginFrame([&](vk::Semaphore& semaphore, vk::Fence& fence, uint32_t image_index,
                                     uint32_t frame) -> std::vector<vk::Semaphore> {
             // Record graphics commands.
-            gfx::CommandBuffer& graphics_buffer = graphics_command_buffers[image_index];
+            gfx::CommandBuffer& graphics_buffer = *graphics_command_buffers[image_index].get();
             graphics_buffer.reset();
             graphics_buffer.beginRecording();
             graphics_buffer.beginRenderPass(render_passes[image_index]);
