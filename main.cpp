@@ -74,6 +74,44 @@ const char* kFragmentShader = R"(
     }
 )";
 
+const char* kFullScreenVertexShader = R"(
+// Harded values for a fullscreen quad in normalized device coordinates.
+// Instead of actually rendering a quad, we render an oversized triangle
+// that fits over the rendered screen.
+vec2 positions[3] = vec2[](
+    vec2(-1.0, -1.0),
+    vec2(-1.0, 3.0),
+    vec2(3.0, -1.0)
+);
+
+vec2 uv_coords[3] = vec2[](
+    vec2(0, 0),
+    vec2(0, 2),
+    vec2(2, 0)
+);
+
+layout(location = 0) out vec2 uv_coord;
+
+// Simply write out the position with no transformation.
+void main() {
+    gl_Position = vec4(positions[gl_VertexIndex], 0.0, 1.0);
+    uv_coord = uv_coords[gl_VertexIndex];
+}
+)";
+
+const char* kFullScreenFragmentShader = R"(
+layout(location = 0) in vec2 uv_coord;
+
+layout(location = 0) out vec4 outColor;
+
+layout(set = 0, binding = 0) uniform sampler2D scene_texture;
+void main() {
+   vec3 tex_col = max(vec3(0), texture(scene_texture, uv_coord).rgb);
+   float lum = dot(tex_col, vec3(.3, .6, .1));
+   outColor = vec4(vec3(lum), 1.0);
+}
+)";
+
 struct Vertex {
     glm::vec4 pos;
     glm::vec4 col;
@@ -204,6 +242,7 @@ int main(int argc, char** argv) {
     // Create device extension list.
     auto device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME,
                               VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME,
+                              VK_KHR_MAINTENANCE3_EXTENSION_NAME,
                               VK_NV_RAY_TRACING_EXTENSION_NAME};
 
     // Pick the best device given the provided surface.
@@ -243,8 +282,9 @@ int main(int argc, char** argv) {
 
     gfx::RenderPassBuilder builder(logical_device);
     std::vector<gfx::RenderPassInfo> render_passes;
+    std::vector<gfx::RenderPassInfo> display_render_passes;
 
-    vk::SampleCountFlagBits samples = vk::SampleCountFlagBits::e4;
+    vk::SampleCountFlagBits samples = vk::SampleCountFlagBits::e1;
 
     CXL_VLOG(5) << "Creating color attachments............................";
     gfx::ComputeTexturePtr color_textures[num_swap];
@@ -269,17 +309,24 @@ int main(int argc, char** argv) {
         builder.addColorAttachment(color_textures[tex_index]);
         builder.addDepthAttachment(depth_textures[tex_index]);
 
-        CXL_VLOG(3) << "Calling add resolve attachment!";
-        builder.addResolveAttachment(texture);
         builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
                             .input_indices = {},
                             .color_indices = {0},
-                            .resolve_index = 0,
                             .depth_index = 0});
         tex_index++;
 
         render_passes.push_back(std::move(builder.build()));
         CXL_VLOG(5) << "BUILT!!!!!";
+    }
+
+
+    for (const auto& texture : swapchain_textures) {
+        builder.reset();
+        builder.addColorAttachment(texture);
+        builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
+                            .input_indices = {},
+                            .color_indices = {0}});
+        display_render_passes.push_back(std::move(builder.build()));
     }
 
     CXL_VLOG(5) << "Compiling shaders...";
@@ -294,6 +341,18 @@ int main(int argc, char** argv) {
     auto shader_program =
         gfx::ShaderProgram::createGraphics(logical_device, vertex_spirv, fragment_spirv);
     CXL_DCHECK(shader_program);
+
+
+    compiler.compile(EShLanguage::EShLangVertex, kFullScreenVertexShader, {}, {}, &vertex_spirv);
+    compiler.compile(EShLanguage::EShLangFragment, kFullScreenFragmentShader, {}, {}, &fragment_spirv);
+    CXL_DCHECK(vertex_spirv.size() > 0);
+    CXL_DCHECK(fragment_spirv.size() > 0);
+
+    CXL_VLOG(5) << "Creating shader program...";
+    auto display_shader_program =
+        gfx::ShaderProgram::createGraphics(logical_device, vertex_spirv, fragment_spirv);
+    CXL_DCHECK(display_shader_program);
+
 
     CXL_VLOG(5) << "Loading model...";
     loadModel();
@@ -360,6 +419,17 @@ int main(int argc, char** argv) {
             graphics_buffer.setDepth(/*test*/ true, /*write*/ true);
             graphics_buffer.drawIndexed(indices.size());
             graphics_buffer.endRenderPass();
+
+            color_textures[image_index]->transitionImageLayout(graphics_buffer, vk::ImageLayout::eShaderReadOnlyOptimal);
+
+            graphics_buffer.beginRenderPass(display_render_passes[image_index]);
+            graphics_buffer.setProgram(display_shader_program);
+            graphics_buffer.bindTexture(0, 0, color_textures[image_index]);
+            graphics_buffer.setDepth(/*test*/ false, /*write*/ false);
+            graphics_buffer.draw(3);
+            graphics_buffer.endRenderPass();
+
+            color_textures[image_index]->transitionImageLayout(graphics_buffer, vk::ImageLayout::eColorAttachmentOptimal);
             graphics_buffer.endRecording();
 
             // Submit graphics commands.
@@ -383,6 +453,10 @@ int main(int argc, char** argv) {
         logical_device->vk().destroyRenderPass(pass.render_pass);
     }
 
+    for (auto& pass : display_render_passes) {
+        logical_device->vk().destroyRenderPass(pass.render_pass);
+    }
+
     for (auto& semaphore : render_semaphores) {
         logical_device->vk().destroy(semaphore);
     }
@@ -401,6 +475,7 @@ int main(int argc, char** argv) {
     graphics_command_buffers.clear();
 
     shader_program.reset();
+    display_shader_program.reset();
 
     CXL_VLOG(5) << "Finished!!!";
     return 0;
