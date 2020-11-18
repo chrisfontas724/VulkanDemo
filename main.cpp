@@ -284,7 +284,7 @@ int main(int argc, char** argv) {
     std::vector<gfx::RenderPassInfo> render_passes;
     std::vector<gfx::RenderPassInfo> display_render_passes;
 
-    vk::SampleCountFlagBits samples = vk::SampleCountFlagBits::e1;
+    vk::SampleCountFlagBits samples = vk::SampleCountFlagBits::e4;
 
     CXL_VLOG(5) << "Creating color attachments............................";
     gfx::ComputeTexturePtr color_textures[num_swap];
@@ -293,6 +293,16 @@ int main(int argc, char** argv) {
                                                                    kDisplayHeight, samples);
         CXL_DCHECK(color_textures[i]);
     }
+
+
+    CXL_VLOG(5) << "Creating resolve attachments............................";
+    gfx::ComputeTexturePtr resolve_textures[num_swap];
+    for (uint32_t i = 0; i < num_swap; i++) {
+        resolve_textures[i] = gfx::ImageUtils::createColorAttachment(logical_device, kDisplayWidth,
+                                                                   kDisplayHeight, vk::SampleCountFlagBits::e1);
+        CXL_DCHECK(resolve_textures[i]);
+    }
+
 
     CXL_VLOG(5) << "Creating depth texture attachments.....................";
     gfx::ComputeTexturePtr depth_textures[num_swap];
@@ -308,10 +318,12 @@ int main(int argc, char** argv) {
         builder.reset();
         builder.addColorAttachment(color_textures[tex_index]);
         builder.addDepthAttachment(depth_textures[tex_index]);
+        builder.addResolveAttachment(resolve_textures[tex_index]);
 
         builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
                             .input_indices = {},
                             .color_indices = {0},
+                            .resolve_index = 0,
                             .depth_index = 0});
         tex_index++;
 
@@ -420,16 +432,16 @@ int main(int argc, char** argv) {
             graphics_buffer.drawIndexed(indices.size());
             graphics_buffer.endRenderPass();
 
-            color_textures[image_index]->transitionImageLayout(graphics_buffer, vk::ImageLayout::eShaderReadOnlyOptimal);
+            resolve_textures[image_index]->transitionImageLayout(graphics_buffer, vk::ImageLayout::eShaderReadOnlyOptimal);
 
             graphics_buffer.beginRenderPass(display_render_passes[image_index]);
             graphics_buffer.setProgram(display_shader_program);
-            graphics_buffer.bindTexture(0, 0, color_textures[image_index]);
+            graphics_buffer.bindTexture(0, 0, resolve_textures[image_index]);
             graphics_buffer.setDepth(/*test*/ false, /*write*/ false);
             graphics_buffer.draw(3);
             graphics_buffer.endRenderPass();
 
-            color_textures[image_index]->transitionImageLayout(graphics_buffer, vk::ImageLayout::eColorAttachmentOptimal);
+            resolve_textures[image_index]->transitionImageLayout(graphics_buffer, vk::ImageLayout::eColorAttachmentOptimal);
             graphics_buffer.endRecording();
 
             // Submit graphics commands.
