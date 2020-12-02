@@ -20,6 +20,9 @@
 #include "vk_wrappers/utils/image_utils.hpp"
 #include "vk_wrappers/utils/shader_compiler.hpp"
 
+
+#include "applications/application.hpp"
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -243,7 +246,16 @@ int main(int argc, char** argv) {
     auto device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME,
                               VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME,
                               VK_KHR_MAINTENANCE3_EXTENSION_NAME,
-                              VK_NV_RAY_TRACING_EXTENSION_NAME};
+                              VK_NV_RAY_TRACING_EXTENSION_NAME, 
+                              
+                              // KHR Ray Tracing Extensions
+                              VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
+                              VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME,
+                              VK_KHR_MAINTENANCE3_EXTENSION_NAME,
+                              VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME,
+                              VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME,
+                              VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME};
+
 
     // Pick the best device given the provided surface.
     auto physical_device = instance->pickBestDevice(surface, device_extensions);

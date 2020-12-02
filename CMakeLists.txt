@@ -31,15 +31,21 @@ if (NOT TARGET streaming)
     add_subdirectory(libs/FileSystem)
 endif()
 
+if (NOT TARGET WindowDemo)
+    add_subdirectory(dali)
+    add_subdirectory(applications)
+endif()
 
 # Set the include directories.
 set(GLM_INCLUDE_DIR C:/glm)
 include_directories(${GLM_INCLUDE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/CoreClasses)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/VulkanWindowing)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/VulkanWrappers)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/FileSystem)
 include_directories(${VK_INCLUDE_DIRS})
+
 
 
 target_link_libraries(VulkanDemo display glslang vulkan_wrappers)
