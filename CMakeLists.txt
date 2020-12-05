@@ -29,12 +29,6 @@ endif()
 
 
 # Set the include directories.
-set(GLM_INCLUDE_DIR C:/glm)
-include_directories(${GLM_INCLUDE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/CoreClasses/include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/VulkanWindowing/include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/VulkanWrappers/include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/FileSystem)
 include_directories(${VULKAN_WRAPPER_INCLUDE_DIRS})
 
 
