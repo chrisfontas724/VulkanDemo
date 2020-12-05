@@ -6,7 +6,7 @@
 #define APPLICATIONS_APPLICATION_HPP_
 
 #include "streaming/file_system.hpp"
-#include "dali/engine_interface.hpp"
+#include "engine_interface.hpp"
 
 namespace christalz {
 class Application {

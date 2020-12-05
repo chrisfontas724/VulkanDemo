@@ -5,23 +5,23 @@
 #include <iostream>
 #include <unordered_map>
 
-#include "display/window.hpp"
-#include "logging/logging.hpp"
+#include <windowing/window.hpp>
+#include <core/logging.hpp>
 #include "stdio.h"
 #include "streaming/file_system.hpp"
-#include "vk_wrappers/command_buffer.hpp"
-#include "vk_wrappers/forward_declarations.hpp"
-#include "vk_wrappers/instance.hpp"
-#include "vk_wrappers/logical_device.hpp"
-#include "vk_wrappers/physical_device.hpp"
-#include "vk_wrappers/render_pass.hpp"
-#include "vk_wrappers/shader_program.hpp"
-#include "vk_wrappers/swap_chain.hpp"
-#include "vk_wrappers/utils/image_utils.hpp"
-#include "vk_wrappers/utils/shader_compiler.hpp"
+#include  <vk_wrappers/command_buffer.hpp>
+#include  <vk_wrappers/forward_declarations.hpp>
+#include  <vk_wrappers/instance.hpp>
+#include  <vk_wrappers/logical_device.hpp>
+#include  <vk_wrappers/physical_device.hpp>
+#include  <vk_wrappers/render_pass.hpp>
+#include  <vk_wrappers/shader_program.hpp>
+#include  <vk_wrappers/swap_chain.hpp>
+#include  <vk_wrappers/image_utils.hpp>
+#include  <vk_wrappers/shader_compiler.hpp>
 
 
-#include "applications/application.hpp"
+//#include "applications/application.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -36,8 +36,8 @@
 
 INITIALIZE_EASYLOGGINGPP
 
-const std::string MODEL_PATH = "../viking_room.obj";
-const std::string TEXTURE_PATH = "../viking_room.png";
+const std::string MODEL_PATH = "../../data/viking_room.obj";
+const std::string TEXTURE_PATH = "../../data/viking_room.png";
 
 const uint32_t kDisplayWidth = 1800;
 const uint32_t kDisplayHeight = 1100;

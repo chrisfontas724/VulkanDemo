@@ -6,7 +6,7 @@
 #define DALI_ENGINE_INTERFACE_HPP_
 
 #include "streaming/file_system.hpp"
-#include "display/window.hpp"
+#include  <windowing/window.hpp>
 
 namespace dali {
 
@@ -29,8 +29,15 @@ public:
 
     virtual void cleanup() = 0;
 
+    void set_screenshot_callback(std::function<void(uint8_t*, uint32_t, uint32_t)> screenshot_callback) {
+        screenshot_callback_ = std::move(screenshot_callback);
+    }
+
+    virtual API api() const = 0;
 
 protected:
+
+    std::function<void(uint8_t*, uint32_t, uint32_t)> screenshot_callback_;
 
 };
 } // dali

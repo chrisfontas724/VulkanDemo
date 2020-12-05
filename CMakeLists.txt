@@ -16,10 +16,6 @@ set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_FLAGS "-std=gnu++17")
 
 
-
-# Create main executable.
-add_executable(VulkanDemo main.cpp)
-
 add_subdirectory(libs/VulkanWrappers)
 add_subdirectory(libs/VulkanWindowing)
 
@@ -31,21 +27,16 @@ if (NOT TARGET streaming)
     add_subdirectory(libs/FileSystem)
 endif()
 
-if (NOT TARGET WindowDemo)
-    add_subdirectory(dali)
-    add_subdirectory(applications)
-endif()
 
 # Set the include directories.
 set(GLM_INCLUDE_DIR C:/glm)
 include_directories(${GLM_INCLUDE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/CoreClasses)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/VulkanWindowing)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/VulkanWrappers)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/CoreClasses/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/VulkanWindowing/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/VulkanWrappers/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/FileSystem)
-include_directories(${VK_INCLUDE_DIRS})
+include_directories(${VULKAN_WRAPPER_INCLUDE_DIRS})
 
 
-
-target_link_libraries(VulkanDemo display glslang vulkan_wrappers)
+add_subdirectory(src)
+add_subdirectory(apps)

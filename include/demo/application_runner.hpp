@@ -5,10 +5,11 @@
 #ifndef APPLICATION_APPLICATION_RUNNER_HPP_
 #define APPLICATION_APPLICATION_RUNNER_HPP_
 
-#include "applications/application.hpp"
-#include "applications/application_config.hpp"
-#include "display/window_delegate.hpp"
-#include "dali/engine_interface.hpp"
+#include "application.hpp"
+#include "application_config.hpp"
+#include "engine_interface.hpp"
+
+#include <windowing/window_delegate.hpp>
 
 namespace christalz {
 class ApplicationRunner : public display::WindowDelegate {
@@ -57,7 +58,7 @@ protected:
     std::shared_ptr<dali::Engine> engine_;
     Mode mode_;
 
-    timeval last_time_;
+    //timeval last_time_;
     uint64_t iteration_;
     uint32_t ticks_per_second_;
     uint32_t skip_ticks_;
