@@ -23,13 +23,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     set(CMAKE_C_COMPILE_OBJECT "${CMAKE_C_COMPILE_OBJECT}")
 endif()
 
-
 add_subdirectory(libs/VulkanWrappers)
 add_subdirectory(libs/VulkanWindowing)
-
-if (NOT TARGET streaming)
-    add_subdirectory(libs/FileSystem)
-endif()
 
 # Set the include directories.
 include_directories(${VULKAN_WRAPPER_INCLUDE_DIRS})

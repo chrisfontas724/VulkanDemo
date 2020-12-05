@@ -5,7 +5,7 @@
 #ifndef DALI_ENGINE_INTERFACE_HPP_
 #define DALI_ENGINE_INTERFACE_HPP_
 
-#include "streaming/file_system.hpp"
+#include <streaming/file_system.hpp>
 #include  <windowing/window.hpp>
 
 namespace dali {

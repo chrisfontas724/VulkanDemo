@@ -1,5 +1,5 @@
 #include "application.hpp"
-#include "streaming/file_stream.hpp"
+#include <streaming/file_stream.hpp>
 #include <core/logging.hpp>
 
 namespace christalz {
