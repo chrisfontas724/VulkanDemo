@@ -15,7 +15,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_FLAGS "-std=gnu++17")
 
-
 add_subdirectory(libs/VulkanWrappers)
 add_subdirectory(libs/VulkanWindowing)
 
@@ -27,10 +26,8 @@ if (NOT TARGET streaming)
     add_subdirectory(libs/FileSystem)
 endif()
 
-
 # Set the include directories.
 include_directories(${VULKAN_WRAPPER_INCLUDE_DIRS})
-
 
 add_subdirectory(src)
 add_subdirectory(apps)
