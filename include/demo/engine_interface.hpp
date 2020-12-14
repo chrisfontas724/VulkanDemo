@@ -7,6 +7,8 @@
 
 #include <streaming/file_system.hpp>
 #include  <windowing/window.hpp>
+#include <vulkan/vulkan.hpp>
+#include <functional>
 
 namespace dali {
 
@@ -29,15 +31,11 @@ public:
 
     virtual void cleanup() = 0;
 
-    void set_screenshot_callback(std::function<void(uint8_t*, uint32_t, uint32_t)> screenshot_callback) {
-        screenshot_callback_ = std::move(screenshot_callback);
-    }
+    // void set_screenshot_callback(std::function<void(uint8_t*, uint32_t, uint32_t)> screenshot_callback) {
+    //     screenshot_callback_ = std::move(screenshot_callback);
+    // }
 
-    virtual API api() const = 0;
-
-protected:
-
-    std::function<void(uint8_t*, uint32_t, uint32_t)> screenshot_callback_;
+  //  virtual API api() const = 0;
 
 };
 } // dali

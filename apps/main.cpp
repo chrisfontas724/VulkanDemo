@@ -21,7 +21,8 @@
 #include  <vk_wrappers/shader_compiler.hpp>
 
 
-//#include "applications/application.hpp"
+#include <demo/application_runner.hpp>
+#include <demo/vk_raytracer.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -226,6 +227,15 @@ void loadModel() {
 int main(int argc, char** argv) {
     START_EASYLOGGINGPP(argc, argv);
 
+
+      // auto app_runner = christalz::ApplicationRunner::create(engine);
+
+    // auto application = std::make_shared<christalz::Application>();
+    // app_runner->run(std::move(application));
+
+
+
+
     display::Window::Config config;
     config.name = "Vulkan Demo";
     config.width = kDisplayWidth;
@@ -235,40 +245,12 @@ int main(int argc, char** argv) {
     auto window = display::Window::create(config, std::move(delegate));
     std::cout << "Created window!" << std::endl;
 
-    // Create vulkan instance.
-    auto instance =
-        gfx::Instance::create("VulkanDemo", window->getExtensions(), /*validation*/ true);
-
-    // Create display surface KHR.
-    vk::SurfaceKHR surface = window->createVKSurface(instance->vk());
-
-    // Create device extension list.
-    auto device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-                              VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME,
-                              VK_KHR_MAINTENANCE3_EXTENSION_NAME,
-                              VK_NV_RAY_TRACING_EXTENSION_NAME, 
-                              
-                              // KHR Ray Tracing Extensions
-                              VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
-                              VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME,
-                              VK_KHR_MAINTENANCE3_EXTENSION_NAME,
-                              VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME,
-                              VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME,
-                              VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME};
-
-
-    // Pick the best device given the provided surface.
-    auto physical_device = instance->pickBestDevice(surface, device_extensions);
-    CXL_VLOG(3) << "The best physical device is " << physical_device->name();
-
-    // Make a logical device from the physical device.
-    auto logical_device =
-        std::make_shared<gfx::LogicalDevice>(physical_device, surface, device_extensions);
-    CXL_VLOG(3) << "Successfully created a logical device!";
-
-    // Create swapchain.
-    auto swap_chain =
-        std::make_unique<gfx::SwapChain>(logical_device, surface, config.width, config.height);
+  
+    auto engine = std::make_shared<dali::VKRayTracer>(/*validation*/true);
+    engine->linkToWindow(window.get());
+    
+    auto& logical_device = engine->logical_device_;
+    auto& swap_chain = engine->swap_chain_;
     const auto& swapchain_textures = swap_chain->textures();
     auto num_swap = swapchain_textures.size();
 
@@ -287,10 +269,6 @@ int main(int argc, char** argv) {
 
     auto fs = cxl::FileSystem::getDesktop();
 
-    if (!window->supports_vulkan()) {
-        std::cerr << "Window doesn't support vulkan.";
-        return 1;
-    }
 
     gfx::RenderPassBuilder builder(logical_device);
     std::vector<gfx::RenderPassInfo> render_passes;
