@@ -14,6 +14,7 @@ set(HEADER_LIST
 add_library(demo 
     application_runner.cpp
     application.cpp
+    model.cpp
     vk_raytracer.cpp
     ${HEADER_LIST})
 

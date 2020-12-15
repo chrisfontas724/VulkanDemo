@@ -23,17 +23,14 @@
 
 #include <demo/application_runner.hpp>
 #include <demo/vk_raytracer.hpp>
+#include <demo/model.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-#define TINYOBJLOADER_IMPLEMENTATION
-
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 #include <glm/vec2.hpp>
-
-#include "tiny_obj_loader.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -116,15 +113,6 @@ void main() {
 }
 )";
 
-struct Vertex {
-    glm::vec4 pos;
-    glm::vec4 col;
-    glm::vec2 uvs;
-
-    bool operator==(const Vertex& other) const {
-        return pos == other.pos && col == other.col && uvs == other.uvs;
-    }
-};
 
 struct UniformBufferObject {
     alignas(16) glm::mat4 model;
@@ -132,18 +120,6 @@ struct UniformBufferObject {
     alignas(16) glm::mat4 proj;
 };
 
-namespace std {
-template <>
-struct hash<Vertex> {
-    size_t operator()(Vertex const& vertex) const {
-        return ((hash<glm::vec3>()(vertex.pos) ^ (hash<glm::vec3>()(vertex.col) << 1)) >> 1) ^
-               (hash<glm::vec2>()(vertex.uvs) << 1);
-    }
-};
-}  // namespace std
-
-std::vector<Vertex> vertices;
-std::vector<uint32_t> indices;
 
 glm::vec3 eye_pos = glm::vec3(2, 2, 2);
 glm::vec3 direction = glm::normalize(glm::vec3(0) - eye_pos);
@@ -183,44 +159,6 @@ void checkInput(const display::InputManager* input) {
         eye_pos -= glm::vec3(0.01f) * direction;
     }
     // etc...
-}
-
-void loadModel() {
-    tinyobj::attrib_t attrib;
-    std::vector<tinyobj::shape_t> shapes;
-    std::vector<tinyobj::material_t> materials;
-    std::string warn, err;
-
-    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, MODEL_PATH.c_str())) {
-        throw std::runtime_error(warn + err);
-    }
-
-    std::unordered_map<Vertex, uint32_t> uniqueVertices;
-
-    for (const auto& shape : shapes) {
-        for (const auto& index : shape.mesh.indices) {
-            Vertex vertex{};
-
-            vertex.pos = {attrib.vertices[3 * index.vertex_index + 0],
-                          attrib.vertices[3 * index.vertex_index + 1],
-                          attrib.vertices[3 * index.vertex_index + 2], 1.0};
-
-            vertex.uvs = {attrib.texcoords[2 * index.texcoord_index + 0],
-                          1.0f - attrib.texcoords[2 * index.texcoord_index + 1]};
-
-            vertex.col = {1.0f, 1.0f, 1.0f, 1.0f};
-
-            if (uniqueVertices.count(vertex) == 0) {
-                uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
-                vertices.push_back(vertex);
-            }
-
-            indices.push_back(uniqueVertices[vertex]);
-        }
-    }
-
-    CXL_VLOG(5) << "INDICES: " << indices.size();
-    CXL_VLOG(5) << "VERTICES: " << vertices.size();
 }
 
 // Set up a window with the delegate and start polling.
@@ -347,17 +285,8 @@ int main(int argc, char** argv) {
 
 
     CXL_VLOG(5) << "Loading model...";
-    loadModel();
+    auto model = std::make_shared<christalz::Model>(logical_device, MODEL_PATH);
 
-    CXL_VLOG(5) << "Creating vertex buffer...";
-    auto vertex_buffer = gfx::ComputeBuffer::createFromVector(
-        logical_device, vertices, vk::BufferUsageFlagBits::eVertexBuffer);
-    CXL_DCHECK(vertex_buffer);
-
-    CXL_VLOG(5) << "Creating index buffer...";
-    auto index_buffer = gfx::ComputeBuffer::createFromVector(logical_device, indices,
-                                                             vk::BufferUsageFlagBits::eIndexBuffer);
-    CXL_DCHECK(index_buffer);
 
     int texWidth, texHeight, texChannels;
     stbi_uc* pixels =
@@ -403,13 +332,13 @@ int main(int argc, char** argv) {
             graphics_buffer.setVertexAttribute(/*binding*/ 0, /*location*/ 2,
                                                /*format*/ vk::Format::eR32G32Sfloat);
             graphics_buffer.setProgram(shader_program);
-            graphics_buffer.bindVertexBuffer(vertex_buffer);
-            graphics_buffer.bindIndexBuffer(index_buffer);
+            graphics_buffer.bindVertexBuffer(model->vertices());
+            graphics_buffer.bindIndexBuffer(model->indices());
             graphics_buffer.bindUniformBuffer(0, 0, ubo_buffer);
             graphics_buffer.bindTexture(0, 1, texture);
             graphics_buffer.setDefaultState(default_state_);
             graphics_buffer.setDepth(/*test*/ true, /*write*/ true);
-            graphics_buffer.drawIndexed(indices.size());
+            graphics_buffer.drawIndexed(model->num_indices());
             graphics_buffer.endRenderPass();
 
             resolve_textures[image_index]->transitionImageLayout(graphics_buffer, vk::ImageLayout::eShaderReadOnlyOptimal);
@@ -436,10 +365,8 @@ int main(int argc, char** argv) {
     }
 
     logical_device->waitIdle();
-
-    vertex_buffer.reset();
-    index_buffer.reset();
     ubo_buffer.reset();
+    model.reset();
 
     for (auto& pass : render_passes) {
         logical_device->vk().destroyRenderPass(pass.render_pass);
