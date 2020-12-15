@@ -27,51 +27,39 @@ uint64_t get_time_milliseconds() {
 } // anonymous namespace
 
 
-std::shared_ptr<ApplicationRunner> ApplicationRunner::create(std::shared_ptr<dali::Engine> engine) {
-//    auto result = std::make_shared<ApplicationRunner>();
-    // CXL_DCHECK(result);
+std::shared_ptr<ApplicationRunner> 
+ApplicationRunner::create(std::shared_ptr<display::Window> window,
+                          std::shared_ptr<dali::Engine> engine) {
+    auto result = std::make_shared<ApplicationRunner>();
+    CXL_DCHECK(result);
 
-    // if (!engine) {
-    //     CXL_LOG(ERROR) << "Invalid Engine!";
-    //     return nullptr;
-    // }
+    if (!engine) {
+        CXL_LOG(ERROR) << "Invalid Engine!";
+        return nullptr;
+    }
 
-    // auto screenshot_callback = [result](uint8_t* pixels, uint32_t width, uint32_t height) {
-    //     CXL_LOG(INFO) << "Taking screenshot!";
-    //     CXL_DCHECK(pixels);
-    //     CXL_DCHECK(width >= 0 && height >= 0);
-    //     auto app = result->application_.lock();
-    //     if (app) {
-    //         auto fs = app->file_system();
-    //         CXL_DCHECK(fs);
-    //         auto frames_fs = fs->getSubSystem("frames");
-    //         if (frames_fs) {
-    //             jade::DynamicTexture texture(width, height, pixels);
-    //             texture.writeToDisk(*frames_fs, "Screenshot.png");
-    //         }
-    //     }
-    // };
+    engine->linkToWindow(window.get());
 
-    // engine->set_screenshot_callback(std::move(screenshot_callback));
-    // result->engine_ = engine;
-    // return std::move(result);
+    result->window_ = window;
+    result->engine_ = engine;
+    return std::move(result);
 }
 
 ApplicationRunner::ApplicationRunner()
     : ticks_per_second_(kTicksPerSecond)
     , skip_ticks_(kSkipTicks)
     , max_frame_skips_(kMaxFrameSkips)  {
-    // config_.start_resolution_x = 1024;
-    // config_.start_resolution_y = 768;
+    config_.start_resolution_x = 1024;
+    config_.start_resolution_y = 768;
 }
 
 ApplicationRunner::~ApplicationRunner() {
- //   engine_.reset();
+     engine_.reset();
 }
 
 void ApplicationRunner::setTicksPerSecond(uint32_t ticks_per_second) {
-    // ticks_per_second_ = ticks_per_second;
-    // skip_ticks_ = 1000 / ticks_per_second_;
+    ticks_per_second_ = ticks_per_second;
+    skip_ticks_ = 1000 / ticks_per_second_;
 }
 
 
@@ -82,7 +70,7 @@ bool ApplicationRunner::setApplication(std::weak_ptr<Application> application) {
     // }
 
     // CXL_LOG(ERROR) << "Application pointer has expired.";
-    // return false;
+    return false;
 }
 
 int32_t ApplicationRunner::run(std::weak_ptr<Application> application) {
@@ -94,36 +82,29 @@ int32_t ApplicationRunner::run(std::weak_ptr<Application> application) {
     // auto app = application_.lock();
     // CXL_DCHECK(app);
 
-    // display::Window::Config config;
-    // config.name = app->package_name();
-    // config.width = config_.start_resolution_x;
-    // config.height = config_.start_resolution_y;
-    // config.type =  display::Window::Type::kGLFW; 
-    // auto window = display::Window::create(config, shared_from_this()); 
-
-    // // Begin looping.
-    // next_game_tick_ = get_time_milliseconds();
-    // while (!window->shouldClose()) {
-    //    window->poll();
-    // }
-    // return 0;
+    // Begin looping.
+    next_game_tick_ = get_time_milliseconds();
+    while (!window_->shouldClose()) {
+       window_->poll();
+    }
+    return 0;
 }
 
 void ApplicationRunner::onUpdate() {
-    // uint32_t loops = 0;
-    // while (get_time_milliseconds() > next_game_tick_ && loops < max_frame_skips_) {
-    //     update();
+    uint32_t loops = 0;
+    while (get_time_milliseconds() > next_game_tick_ && loops < max_frame_skips_) {
+        update();
 
-    //     calculateFrameRate();
+        calculateFrameRate();
 
-    //     next_game_tick_ += skip_ticks_;
-    //     loops++;
-    // }
+        next_game_tick_ += skip_ticks_;
+        loops++;
+    }
 
-    // float interpolation = float( get_time_milliseconds()  + skip_ticks_ - next_game_tick_ )
-    //                     / float( skip_ticks_ );
+    float interpolation = float( get_time_milliseconds()  + skip_ticks_ - next_game_tick_ )
+                        / float( skip_ticks_ );
 
-    // drawFrame(interpolation); 
+    drawFrame(interpolation); 
 }
 
 void ApplicationRunner::onResize(int32_t width, int32_t height) {
@@ -173,32 +154,7 @@ void ApplicationRunner::update() {
 }
 
 void ApplicationRunner::drawFrame(float delta) {
-    // if (auto app = application_.lock()) {
-    //     auto graph = app->scene_graph();
-    //     CXL_DCHECK(graph);
-
-    //     std::string message;
-    //     if (!engine_->data()->is_renderable(&message)) {
-    //         CXL_LOG(WARNING) << "Engine data is not renderable: " << message;
-    //         return;
-    //     }
-
-    //     engine_->render(delta, engine_->data()->has_changed(),
-    //         [&](uint32_t identifier, const ruby::ScriptAttribute& prev, const ruby::ScriptAttribute& post) {
-    //             // How to handle script call backs
-    //             auto node = graph->findByID(identifier);
-    //             CXL_DCHECK(node);
-    //             const auto& script_map = node->scripts();
-    //             for (auto& iter : script_map) {
-    //                 bool success = iter.second->runFunction("onRenderImage", prev, post).getBoolValue();
-    //                 if (success) {
-
-    //                 }
-    //             }
-    //         }
-    //     );
-
-    // }
+    engine_->render(delta, true, nullptr);
 }
 
 

@@ -19,7 +19,10 @@ public:
         kPlayback
     };
 
-    static std::shared_ptr<ApplicationRunner> create(std::shared_ptr<dali::Engine> engine);
+    static std::shared_ptr<ApplicationRunner> 
+        create(std::shared_ptr<display::Window> window,
+               std::shared_ptr<dali::Engine> engine);
+
     ApplicationRunner();
     ~ApplicationRunner();
 
@@ -56,6 +59,7 @@ protected:
 
     std::weak_ptr<Application> application_;
     std::shared_ptr<dali::Engine> engine_;
+    std::shared_ptr<display::Window> window_;
     Mode mode_;
 
     //timeval last_time_;

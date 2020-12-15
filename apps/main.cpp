@@ -227,27 +227,18 @@ void loadModel() {
 int main(int argc, char** argv) {
     START_EASYLOGGINGPP(argc, argv);
 
-
-    // auto app_runner = christalz::ApplicationRunner::create(engine);
-
-    // auto application = std::make_shared<christwalz::Application>();
-    // app_runner->run(std::move(application));
-
-
-
-
     display::Window::Config config;
     config.name = "Vulkan Demo";
     config.width = kDisplayWidth;
     config.height = kDisplayHeight;
     auto delegate = std::make_shared<Delegate>();
     auto window = std::make_shared<display::GLFWWindow>(config, std::move(delegate));
-    std::cout << "Created window!" << std::endl;
-
-  
     auto engine = std::make_shared<dali::VKRayTracer>(/*validation*/true);
-    engine->linkToWindow(window.get());
-    
+    auto app_runner = christalz::ApplicationRunner::create(window, engine);
+
+    // auto application = std::make_shared<christwalz::Application>();
+    // app_runner->run(std::move(application));
+
     auto& logical_device = engine->logical_device_;
     auto& swap_chain = engine->swap_chain_;
     const auto& swapchain_textures = swap_chain->textures();
