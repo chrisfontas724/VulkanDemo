@@ -20,12 +20,9 @@
 #include  <vk_wrappers/image_utils.hpp>
 #include  <vk_wrappers/shader_compiler.hpp>
 
-
 #include <demo/application_runner.hpp>
 #include <demo/vk_raytracer.hpp>
 #include <demo/model.hpp>
-
-
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
@@ -119,27 +116,11 @@ struct UniformBufferObject {
     alignas(16) glm::mat4 proj;
 };
 
-
 glm::vec3 eye_pos = glm::vec3(2, 2, 2);
 glm::vec3 direction = glm::normalize(glm::vec3(0) - eye_pos);
 
 gfx::CommandBufferState::DefaultState default_state_ =
     gfx::CommandBufferState::DefaultState::kOpaque;
-
-// Example dummy delegate class.
-class Delegate : public display::WindowDelegate {
-   public:
-    // |WindowDelegate|
-    void onUpdate() override {}
-
-    void onResize(int32_t width, int32_t height) override { std::cout << "onResize" << std::endl; }
-
-    void onWindowMove(int32_t x, int32_t y) override { std::cout << "onWindowMove" << std::endl; }
-
-    void onStart(display::Window*) override { std::cout << "onStart" << std::endl; }
-
-    void onClose() override { std::cout << "onClose" << std::endl; }
-};
 
 // Example InputManager checks.
 void checkInput(const display::InputManager* input) {
@@ -168,13 +149,9 @@ int main(int argc, char** argv) {
     config.name = "Vulkan Demo";
     config.width = kDisplayWidth;
     config.height = kDisplayHeight;
-    auto delegate = std::make_shared<Delegate>();
-    auto window = std::make_shared<display::GLFWWindow>(config, std::move(delegate));
+    auto window = std::make_shared<display::GLFWWindow>(config);
     auto engine = std::make_shared<dali::VKRayTracer>(/*validation*/true);
     auto app_runner = christalz::ApplicationRunner::create(window, engine);
-
-    // auto application = std::make_shared<christwalz::Application>();
-    // app_runner->run(std::move(application));
 
     auto& logical_device = engine->logical_device_;
     auto& swap_chain = engine->swap_chain_;
