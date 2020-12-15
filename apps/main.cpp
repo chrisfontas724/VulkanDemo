@@ -313,6 +313,7 @@ int main(int argc, char** argv) {
 
             graphics_buffer.beginRenderPass(display_render_passes[image_index]);
             graphics_buffer.setProgram(display_shader_program);
+            graphics_buffer.setDefaultState(gfx::CommandBufferState::DefaultState::kOpaque);
             graphics_buffer.bindTexture(0, 0, resolve_textures[image_index]);
             graphics_buffer.setDepth(/*test*/ false, /*write*/ false);
             graphics_buffer.draw(3);
