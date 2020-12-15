@@ -5,7 +5,6 @@
 #include <demo/vk_raytracer.hpp>
 #include <vk_wrappers/physical_device.hpp>
 #include <vk_wrappers/logical_device.hpp>
-#include <windowing/window_visitor.hpp>
 #include <windowing/glfw_window.hpp>
 #include <vk_wrappers/instance.hpp>
 #include <core/logging.hpp>
@@ -14,28 +13,6 @@
 namespace dali {
 
 namespace {
-
-struct VKWindowVisitor : public display::WindowVisitor {
-
-   VKWindowVisitor(VKRayTracer* in_engine)
-   : engine(in_engine) {}
-
-  void visit(display::GLFWWindow* window) override {
-      CXL_DCHECK(window);
-      CXL_DCHECK(window->supports_vulkan());
-      engine->createInstance(window->getExtensions());
-
-      const auto& instance = engine->vk_instance_->vk();
-      engine->setSurface(window->createVKSurface(instance));
-      
-      int32_t width, height;
-      window->getSize(&width, &height);
-      engine->resizeFramebuffer(width, height);
-  }
-
-  VKRayTracer* engine;
-};
-
 
 // Create device extension list.
 const std::vector<const char*> kDeviceExtensions = {
@@ -54,6 +31,22 @@ const std::vector<const char*> kDeviceExtensions = {
 };
 
 } // namespace
+
+
+void VKRayTracer::VKWindowVisitor::visit(display::GLFWWindow* window) {
+    CXL_DCHECK(window);
+    CXL_DCHECK(window->supports_vulkan());
+    engine->createInstance(window->getExtensions());
+
+    const auto& instance = engine->vk_instance_->vk();
+    engine->setSurface(window->createVKSurface(instance));
+      
+    int32_t width, height;
+    window->getSize(&width, &height);
+    engine->resizeFramebuffer(width, height);
+}
+
+
 
 void VKRayTracer::linkToWindow(display::Window* window) {
     VKWindowVisitor visitor(this);

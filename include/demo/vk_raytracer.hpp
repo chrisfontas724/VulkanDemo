@@ -6,8 +6,10 @@
 #define DALI_VK_RAY_TRACER_HPP_
 
 #include "engine_interface.hpp"
-#include <windowing/window.hpp>
 #include <vk_wrappers/swap_chain.hpp>
+
+#include <windowing/glfw_window.hpp>
+#include <windowing/window_visitor.hpp>
 
 
 namespace dali {
@@ -28,12 +30,24 @@ public:
 
     void cleanup() override;
 
-    std::unique_ptr<gfx::Instance> vk_instance_;
     std::unique_ptr<gfx::SwapChain> swap_chain_;
 
     std::shared_ptr<gfx::LogicalDevice> logical_device_;
     std::shared_ptr<gfx::PhysicalDevice> physical_device_;
     vk::SurfaceKHR surface_;
+
+private:
+    struct VKWindowVisitor : public display::WindowVisitor {
+        VKWindowVisitor(VKRayTracer* in_engine)
+        : engine(in_engine) {}
+
+        void visit(display::GLFWWindow* window) override;
+
+        VKRayTracer* engine;
+    };
+    friend VKWindowVisitor;
+
+    std::unique_ptr<gfx::Instance> vk_instance_;
 };
 } // dali
 
