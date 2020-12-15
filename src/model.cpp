@@ -3,14 +3,18 @@
 // found in the LICENSE file.
 
 #define TINYOBJLOADER_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
 
 #include <demo/model.hpp>
+#include <vk_wrappers/image_utils.hpp>
 #include "tiny_obj_loader.h"
-
+#include "stb_image.h"
 
 namespace christalz {
 
-Model::Model(const gfx::LogicalDevicePtr& device, const std::string& path)
+Model::Model(const gfx::LogicalDevicePtr& device,
+             const std::string& model_path,
+             const std::string& texture_path)
 : device_(device) {
 
     tinyobj::attrib_t attrib;
@@ -18,7 +22,7 @@ Model::Model(const gfx::LogicalDevicePtr& device, const std::string& path)
     std::vector<tinyobj::material_t> materials;
     std::string warn, err;
 
-    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, path.c_str())) {
+    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, model_path.c_str())) {
         throw std::runtime_error(warn + err);
     }
 
@@ -59,10 +63,19 @@ Model::Model(const gfx::LogicalDevicePtr& device, const std::string& path)
                                                              vk::BufferUsageFlagBits::eIndexBuffer);
     CXL_DCHECK(indices_);
 
+
+    int texWidth, texHeight, texChannels;
+    stbi_uc* pixels =
+        stbi_load(texture_path.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    CXL_DCHECK(pixels);
+    texture_ = gfx::ImageUtils::create8BitUnormImage(device, texWidth, texHeight, 4,
+                                                         vk::SampleCountFlagBits::e1, pixels);
+    CXL_DCHECK(texture_);
 }
 
 
 Model::~Model() {
+  texture_.reset();
   vertices_.reset();
   indices_.reset();
 }

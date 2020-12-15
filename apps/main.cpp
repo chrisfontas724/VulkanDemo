@@ -25,8 +25,7 @@
 #include <demo/vk_raytracer.hpp>
 #include <demo/model.hpp>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
@@ -285,16 +284,8 @@ int main(int argc, char** argv) {
 
 
     CXL_VLOG(5) << "Loading model...";
-    auto model = std::make_shared<christalz::Model>(logical_device, MODEL_PATH);
+    auto model = std::make_shared<christalz::Model>(logical_device, MODEL_PATH, TEXTURE_PATH);
 
-
-    int texWidth, texHeight, texChannels;
-    stbi_uc* pixels =
-        stbi_load(TEXTURE_PATH.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-    CXL_DCHECK(pixels);
-    auto texture = gfx::ImageUtils::create8BitUnormImage(logical_device, texWidth, texHeight, 4,
-                                                         vk::SampleCountFlagBits::e1, pixels);
-    CXL_DCHECK(texture);
 
     auto ubo_buffer = gfx::ComputeBuffer::createHostAccessableUniform(logical_device,
                                                                       sizeof(UniformBufferObject));
@@ -335,7 +326,7 @@ int main(int argc, char** argv) {
             graphics_buffer.bindVertexBuffer(model->vertices());
             graphics_buffer.bindIndexBuffer(model->indices());
             graphics_buffer.bindUniformBuffer(0, 0, ubo_buffer);
-            graphics_buffer.bindTexture(0, 1, texture);
+            graphics_buffer.bindTexture(0, 1, model->texture());
             graphics_buffer.setDefaultState(default_state_);
             graphics_buffer.setDepth(/*test*/ true, /*write*/ true);
             graphics_buffer.drawIndexed(model->num_indices());
@@ -387,7 +378,6 @@ int main(int argc, char** argv) {
         texture.reset();
     }
 
-    texture.reset();
 
     swap_chain.reset();
 

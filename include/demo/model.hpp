@@ -32,15 +32,19 @@ namespace christalz {
 class Model {
 public:
 
-Model(const gfx::LogicalDevicePtr& device, const std::string& path);
+Model(const gfx::LogicalDevicePtr& device,
+      const std::string& model_path,
+      const std::string& texture_path);
 ~Model();
 
+const gfx::ComputeTexturePtr& texture() const { return texture_; }
 const gfx::ComputeBufferPtr& vertices() const { return vertices_; }
 const gfx::ComputeBufferPtr& indices() const { return indices_; }
 uint32_t num_indices() const { return num_indices_; }
 
 private:
  gfx::LogicalDeviceWeakPtr device_;
+ gfx::ComputeTexturePtr texture_;
  gfx::ComputeBufferPtr vertices_;
  gfx::ComputeBufferPtr indices_;
  uint32_t num_indices_;
