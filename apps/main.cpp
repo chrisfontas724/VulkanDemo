@@ -228,9 +228,9 @@ int main(int argc, char** argv) {
     START_EASYLOGGINGPP(argc, argv);
 
 
-      // auto app_runner = christalz::ApplicationRunner::create(engine);
+    // auto app_runner = christalz::ApplicationRunner::create(engine);
 
-    // auto application = std::make_shared<christalz::Application>();
+    // auto application = std::make_shared<christwalz::Application>();
     // app_runner->run(std::move(application));
 
 
@@ -240,9 +240,8 @@ int main(int argc, char** argv) {
     config.name = "Vulkan Demo";
     config.width = kDisplayWidth;
     config.height = kDisplayHeight;
-    config.type = display::Window::Type::kGLFW;
     auto delegate = std::make_shared<Delegate>();
-    auto window = display::Window::create(config, std::move(delegate));
+    auto window = std::make_shared<display::GLFWWindow>(config, std::move(delegate));
     std::cout << "Created window!" << std::endl;
 
   
