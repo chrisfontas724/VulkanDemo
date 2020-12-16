@@ -22,6 +22,7 @@
 
 #include <demo/application_runner.hpp>
 #include <demo/vk_raytracer.hpp>
+#include <demo/shader_resource.hpp>
 #include <demo/model.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -35,80 +36,6 @@ const std::string TEXTURE_PATH = "../../data/viking_room.png";
 
 const uint32_t kDisplayWidth = 1800;
 const uint32_t kDisplayHeight = 1100;
-
-const char* kVertexShader = R"(
-
-    layout(set = 0, binding = 0) uniform UniformBufferObject {
-        mat4 model;
-        mat4 view;
-        mat4 proj;
-    } ubo;
-
-
-    layout(location = 0) in vec4 in_position;
-    layout(location = 1) in vec4 in_color;
-    layout(location = 2) in vec2 in_uvs;
-
-    layout(location = 0) out vec4 out_color;
-    layout(location = 1) out vec2 out_uvs;
-
-    void main() {
-        out_color = in_color;
-        out_uvs = in_uvs;
-        gl_Position = ubo.proj * ubo.view * ubo.model * vec4(in_position.xyz, 1.0);
-    }
-)";
-
-const char* kFragmentShader = R"(
-    layout(location = 0) in vec4 in_color;
-    layout(location = 1) in vec2 in_uvs;
-    layout(location = 0) out vec4 out_color;
-
-    layout(set = 0, binding = 1) uniform sampler2D image;
-
-    void main() {
-        out_color = in_color * texture(image, in_uvs);
-    }
-)";
-
-const char* kFullScreenVertexShader = R"(
-// Harded values for a fullscreen quad in normalized device coordinates.
-// Instead of actually rendering a quad, we render an oversized triangle
-// that fits over the rendered screen.
-vec2 positions[3] = vec2[](
-    vec2(-1.0, -1.0),
-    vec2(-1.0, 3.0),
-    vec2(3.0, -1.0)
-);
-
-vec2 uv_coords[3] = vec2[](
-    vec2(0, 0),
-    vec2(0, 2),
-    vec2(2, 0)
-);
-
-layout(location = 0) out vec2 uv_coord;
-
-// Simply write out the position with no transformation.
-void main() {
-    gl_Position = vec4(positions[gl_VertexIndex], 0.0, 1.0);
-    uv_coord = uv_coords[gl_VertexIndex];
-}
-)";
-
-const char* kFullScreenFragmentShader = R"(
-layout(location = 0) in vec2 uv_coord;
-
-layout(location = 0) out vec4 outColor;
-
-layout(set = 0, binding = 0) uniform sampler2D scene_texture;
-void main() {
-   vec3 tex_col = max(vec3(0), texture(scene_texture, uv_coord).rgb);
-   float lum = dot(tex_col, vec3(.3, .6, .1));
-   outColor = vec4(vec3(lum), 1.0);
-}
-)";
-
 
 struct UniformBufferObject {
     alignas(16) glm::mat4 model;
@@ -171,9 +98,6 @@ int main(int argc, char** argv) {
     auto render_semaphores = logical_device->createSemaphores(MAX_FRAMES_IN_FLIGHT);
     CXL_VLOG(3) << "Created render semaphores!";
 
-    auto fs = cxl::FileSystem::getDesktop();
-
-
     gfx::RenderPassBuilder builder(logical_device);
     std::vector<gfx::RenderPassInfo> render_passes;
     std::vector<gfx::RenderPassInfo> display_render_passes;
@@ -235,28 +159,10 @@ int main(int argc, char** argv) {
         display_render_passes.push_back(std::move(builder.build()));
     }
 
-    CXL_VLOG(5) << "Compiling shaders...";
-    gfx::SpirV vertex_spirv, fragment_spirv;
-    gfx::ShaderCompiler compiler;
-    compiler.compile(EShLanguage::EShLangVertex, kVertexShader, {}, {}, &vertex_spirv);
-    compiler.compile(EShLanguage::EShLangFragment, kFragmentShader, {}, {}, &fragment_spirv);
-    CXL_DCHECK(vertex_spirv.size() > 0);
-    CXL_DCHECK(fragment_spirv.size() > 0);
 
-    CXL_VLOG(5) << "Creating shader program...";
-    auto shader_program =
-        gfx::ShaderProgram::createGraphics(logical_device, vertex_spirv, fragment_spirv);
-    CXL_DCHECK(shader_program);
-
-    compiler.compile(EShLanguage::EShLangVertex, kFullScreenVertexShader, {}, {}, &vertex_spirv);
-    compiler.compile(EShLanguage::EShLangFragment, kFullScreenFragmentShader, {}, {}, &fragment_spirv);
-    CXL_DCHECK(vertex_spirv.size() > 0);
-    CXL_DCHECK(fragment_spirv.size() > 0);
-
-    CXL_VLOG(5) << "Creating shader program...";
-    auto display_shader_program =
-        gfx::ShaderProgram::createGraphics(logical_device, vertex_spirv, fragment_spirv);
-    CXL_DCHECK(display_shader_program);
+    cxl::FileSystem fs("./../../data/shaders");
+    auto model_shader = christalz::ShaderResource::createGraphics(logical_device, fs, "model");
+    auto post_shader = christalz::ShaderResource::createGraphics(logical_device, fs, "post");
 
     CXL_VLOG(5) << "Loading model...";
     auto model = std::make_shared<christalz::Model>(logical_device, MODEL_PATH, TEXTURE_PATH);
@@ -296,7 +202,7 @@ int main(int argc, char** argv) {
                                                /*format*/ vk::Format::eR32G32B32A32Sfloat);
             graphics_buffer.setVertexAttribute(/*binding*/ 0, /*location*/ 2,
                                                /*format*/ vk::Format::eR32G32Sfloat);
-            graphics_buffer.setProgram(shader_program);
+            graphics_buffer.setProgram(model_shader->program());
             graphics_buffer.bindVertexBuffer(model->vertices());
             graphics_buffer.bindIndexBuffer(model->indices());
             graphics_buffer.bindUniformBuffer(0, 0, ubo_buffer);
@@ -309,7 +215,7 @@ int main(int argc, char** argv) {
             resolve_textures[image_index]->transitionImageLayout(graphics_buffer, vk::ImageLayout::eShaderReadOnlyOptimal);
 
             graphics_buffer.beginRenderPass(display_render_passes[image_index]);
-            graphics_buffer.setProgram(display_shader_program);
+            graphics_buffer.setProgram(post_shader->program());
             graphics_buffer.setDefaultState(gfx::CommandBufferState::DefaultState::kOpaque);
             graphics_buffer.bindTexture(0, 0, resolve_textures[image_index]);
             graphics_buffer.setDepth(/*test*/ false, /*write*/ false);
@@ -358,8 +264,8 @@ int main(int argc, char** argv) {
 
     graphics_command_buffers.clear();
 
-    shader_program.reset();
-    display_shader_program.reset();
+    model_shader.reset();
+    post_shader.reset();
 
     CXL_VLOG(5) << "Finished!!!";
     return 0;
