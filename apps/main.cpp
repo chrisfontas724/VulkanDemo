@@ -248,7 +248,6 @@ int main(int argc, char** argv) {
         gfx::ShaderProgram::createGraphics(logical_device, vertex_spirv, fragment_spirv);
     CXL_DCHECK(shader_program);
 
-
     compiler.compile(EShLanguage::EShLangVertex, kFullScreenVertexShader, {}, {}, &vertex_spirv);
     compiler.compile(EShLanguage::EShLangFragment, kFullScreenFragmentShader, {}, {}, &fragment_spirv);
     CXL_DCHECK(vertex_spirv.size() > 0);
@@ -259,10 +258,8 @@ int main(int argc, char** argv) {
         gfx::ShaderProgram::createGraphics(logical_device, vertex_spirv, fragment_spirv);
     CXL_DCHECK(display_shader_program);
 
-
     CXL_VLOG(5) << "Loading model...";
     auto model = std::make_shared<christalz::Model>(logical_device, MODEL_PATH, TEXTURE_PATH);
-
 
     auto ubo_buffer = gfx::ComputeBuffer::createHostAccessableUniform(logical_device,
                                                                       sizeof(UniformBufferObject));

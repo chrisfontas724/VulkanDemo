@@ -15,6 +15,7 @@ add_library(demo
     application_runner.cpp
     application.cpp
     model.cpp
+    shader_resource.cpp
     vk_raytracer.cpp
     ${HEADER_LIST})
 
