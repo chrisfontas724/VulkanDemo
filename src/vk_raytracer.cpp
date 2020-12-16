@@ -5,6 +5,7 @@
 #include <demo/vk_raytracer.hpp>
 #include <vk_wrappers/physical_device.hpp>
 #include <vk_wrappers/logical_device.hpp>
+#include <vk_wrappers/image_utils.hpp>
 #include <windowing/glfw_window.hpp>
 #include <vk_wrappers/instance.hpp>
 #include <core/logging.hpp>
@@ -46,8 +47,6 @@ void VKRayTracer::VKWindowVisitor::visit(display::GLFWWindow* window) {
     engine->resizeFramebuffer(width, height);
 }
 
-
-
 void VKRayTracer::linkToWindow(display::Window* window) {
     VKWindowVisitor visitor(this);
     window->accept(&visitor);
@@ -83,6 +82,36 @@ void VKRayTracer::resizeFramebuffer(uint32_t width, uint32_t height) {
     // Make a new swapchain.
     swap_chain_ = std::make_unique<gfx::SwapChain>(logical_device_, surface_, width, height);
     CXL_VLOG(3) << "Successfully created the swap chain!";
+
+    const auto& swapchain_textures = swap_chain_->textures();
+    auto num_swap = swapchain_textures.size();
+
+    auto num_frame_buffers = num_swap;
+    CXL_VLOG(3) << "Successfully created a swapchain!";
+
+    vk::SampleCountFlagBits samples = vk::SampleCountFlagBits::e4;
+
+    gfx::ComputeTexturePtr color_textures[num_swap];
+    for (uint32_t i = 0; i < num_swap; i++) {
+        color_textures[i] = gfx::ImageUtils::createColorAttachment(logical_device_, width,
+                                                                   height, samples);
+        CXL_DCHECK(color_textures[i]);
+    }
+
+
+    gfx::ComputeTexturePtr resolve_textures[num_swap];
+    for (uint32_t i = 0; i < num_swap; i++) {
+        resolve_textures[i] = gfx::ImageUtils::createColorAttachment(logical_device_, width,
+                                                                   height, vk::SampleCountFlagBits::e1);
+        CXL_DCHECK(resolve_textures[i]);
+    }
+
+
+    gfx::ComputeTexturePtr depth_textures[num_swap];
+    for (uint32_t i = 0; i < num_swap; i++) {
+      depth_textures[i] =
+        gfx::ImageUtils::createDepthTexture(logical_device_, width, height, samples);
+    } 
 }
 
 

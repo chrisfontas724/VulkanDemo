@@ -10,15 +10,11 @@
 #include "stdio.h"
 #include <streaming/file_system.hpp>
 #include  <vk_wrappers/command_buffer.hpp>
-#include  <vk_wrappers/forward_declarations.hpp>
 #include  <vk_wrappers/instance.hpp>
 #include  <vk_wrappers/logical_device.hpp>
 #include  <vk_wrappers/physical_device.hpp>
 #include  <vk_wrappers/render_pass.hpp>
-#include  <vk_wrappers/shader_program.hpp>
 #include  <vk_wrappers/swap_chain.hpp>
-#include  <vk_wrappers/image_utils.hpp>
-#include  <vk_wrappers/shader_compiler.hpp>
 
 #include <demo/application_runner.hpp>
 #include <demo/vk_raytracer.hpp>
@@ -163,8 +159,6 @@ int main(int argc, char** argv) {
     cxl::FileSystem fs("./../../data/shaders");
     auto model_shader = christalz::ShaderResource::createGraphics(logical_device, fs, "model");
     auto post_shader = christalz::ShaderResource::createGraphics(logical_device, fs, "post");
-
-    CXL_VLOG(5) << "Loading model...";
     auto model = std::make_shared<christalz::Model>(logical_device, MODEL_PATH, TEXTURE_PATH);
 
     auto ubo_buffer = gfx::ComputeBuffer::createHostAccessableUniform(logical_device,

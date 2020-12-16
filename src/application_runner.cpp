@@ -97,20 +97,20 @@ int32_t ApplicationRunner::run(std::weak_ptr<Application> application) {
 }
 
 void ApplicationRunner::onUpdate() {
-    // uint32_t loops = 0;
-    // while (get_time_milliseconds() > next_game_tick_ && loops < max_frame_skips_) {
-    //     update();
+    uint32_t loops = 0;
+    while (get_time_milliseconds() > next_game_tick_ && loops < max_frame_skips_) {
+        update();
 
-    //     calculateFrameRate();
+        calculateFrameRate();
 
-    //     next_game_tick_ += skip_ticks_;
-    //     loops++;
-    // }
+        next_game_tick_ += skip_ticks_;
+        loops++;
+    }
 
-    // float interpolation = float( get_time_milliseconds()  + skip_ticks_ - next_game_tick_ )
-    //                     / float( skip_ticks_ );
+    float interpolation = float( get_time_milliseconds()  + skip_ticks_ - next_game_tick_ )
+                        / float( skip_ticks_ );
 
-    // drawFrame(interpolation); 
+    drawFrame(interpolation); 
 }
 
 void ApplicationRunner::onResize(int32_t width, int32_t height) {
