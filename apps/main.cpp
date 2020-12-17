@@ -10,6 +10,7 @@
 #include "stdio.h"
 #include <streaming/file_system.hpp>
 #include  <vk_wrappers/command_buffer.hpp>
+#include  <vk_wrappers/forward_declarations.hpp>
 #include  <vk_wrappers/instance.hpp>
 #include  <vk_wrappers/logical_device.hpp>
 #include  <vk_wrappers/physical_device.hpp>

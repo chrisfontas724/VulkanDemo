@@ -51,6 +51,7 @@ private:
     std::vector<gfx::ComputeTexturePtr> color_textures_;
     std::vector<gfx::ComputeTexturePtr> resolve_textures_;
     std::vector<gfx::ComputeTexturePtr> depth_textures_;
+    std::vector<gfx::CommandBufferPtr> graphics_command_buffers_;
 };
 } // dali
 

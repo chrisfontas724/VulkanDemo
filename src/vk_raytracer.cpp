@@ -6,6 +6,7 @@
 #include <vk_wrappers/physical_device.hpp>
 #include <vk_wrappers/logical_device.hpp>
 #include <vk_wrappers/image_utils.hpp>
+#include <vk_wrappers/command_buffer.hpp>
 #include <windowing/glfw_window.hpp>
 #include <vk_wrappers/instance.hpp>
 #include <core/logging.hpp>
@@ -112,6 +113,11 @@ void VKRayTracer::resizeFramebuffer(uint32_t width, uint32_t height) {
       depth_textures_[i] =
         gfx::ImageUtils::createDepthTexture(logical_device_, width, height, samples);
     } 
+
+    // Create command buffers.
+    graphics_command_buffers_ =
+        gfx::CommandBuffer::create(logical_device_, gfx::Queue::Type::kGraphics,
+                                   vk::CommandBufferLevel::ePrimary, num_swap);
 }
 
 
