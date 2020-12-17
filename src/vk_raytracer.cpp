@@ -114,6 +114,27 @@ void VKRayTracer::resizeFramebuffer(uint32_t width, uint32_t height) {
         gfx::ImageUtils::createDepthTexture(logical_device_, width, height, samples);
     } 
 
+
+    gfx::RenderPassBuilder builder(logical_device_);
+    for (uint32_t tex_index = 0; tex_index < num_swap; tex_index++) {
+        builder.reset();
+        builder.addColorAttachment(color_textures_[tex_index]);
+        builder.addDepthAttachment(depth_textures_[tex_index]);
+        builder.addResolveAttachment(resolve_textures_[tex_index]);
+
+        builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
+                            .input_indices = {},
+                            .color_indices = {0},
+                            .resolve_index = 0,
+                            .depth_index = 0});
+        tex_index++;
+
+        model_render_passes_.push_back(std::move(builder.build()));
+        CXL_VLOG(5) << "BUILT!!!!!";
+    }
+
+
+
     // Create command buffers.
     graphics_command_buffers_ =
         gfx::CommandBuffer::create(logical_device_, gfx::Queue::Type::kGraphics,
@@ -126,6 +147,51 @@ VKRayTracer::~VKRayTracer() {
 
 void VKRayTracer::render(float delta, bool clear_frame, std::function<void(uint32_t, bool, bool)> func) {
 
+    // swap_chain_->beginFrame([&](vk::Semaphore& semaphore, vk::Fence& fence, uint32_t image_index,
+    //                                 uint32_t frame) -> std::vector<vk::Semaphore> {
+        // Record graphics commands.
+        // gfx::CommandBuffer& graphics_buffer = *graphics_command_buffers_[image_index].get();
+        // graphics_buffer.reset();
+        // graphics_buffer.beginRecording();
+            // graphics_buffer.beginRenderPass(render_passes[image_index]);
+            // graphics_buffer.setVertexAttribute(/*binding*/ 0, /*location*/ 0,
+            //                                    /*format*/ vk::Format::eR32G32B32A32Sfloat);
+            // graphics_buffer.setVertexAttribute(/*binding*/ 0, /*location*/ 1,
+            //                                    /*format*/ vk::Format::eR32G32B32A32Sfloat);
+            // graphics_buffer.setVertexAttribute(/*binding*/ 0, /*location*/ 2,
+            //                                    /*format*/ vk::Format::eR32G32Sfloat);
+            // graphics_buffer.setProgram(model_shader->program());
+            // graphics_buffer.bindVertexBuffer(model->vertices());
+            // graphics_buffer.bindIndexBuffer(model->indices());
+            // graphics_buffer.bindUniformBuffer(0, 0, ubo_buffer);
+            // graphics_buffer.bindTexture(0, 1, model->texture());
+            // graphics_buffer.setDefaultState(default_state_);
+            // graphics_buffer.setDepth(/*test*/ true, /*write*/ true);
+            // graphics_buffer.drawIndexed(model->num_indices());
+            // graphics_buffer.endRenderPass();
+
+            // resolve_textures[image_index]->transitionImageLayout(graphics_buffer, vk::ImageLayout::eShaderReadOnlyOptimal);
+
+            // graphics_buffer.beginRenderPass(display_render_passes[image_index]);
+            // graphics_buffer.setProgram(post_shader->program());
+            // graphics_buffer.setDefaultState(gfx::CommandBufferState::DefaultState::kOpaque);
+            // graphics_buffer.bindTexture(0, 0, resolve_textures[image_index]);
+            // graphics_buffer.setDepth(/*test*/ false, /*write*/ false);
+            // graphics_buffer.draw(3);
+            // graphics_buffer.endRenderPass();
+
+            // resolve_textures[image_index]->transitionImageLayout(graphics_buffer, vk::ImageLayout::eColorAttachmentOptimal);
+            // graphics_buffer.endRecording();
+
+            // // Submit graphics commands.
+            // vk::PipelineStageFlags graphicsWaitStages[] = {
+            //     vk::PipelineStageFlagBits::eColorAttachmentOutput};
+            // vk::SubmitInfo submit_info(1U, &semaphore, graphicsWaitStages, 1U,
+            //                            &graphics_buffer.vk(), 1U, &render_semaphores[frame]);
+            // logical_device->getQueue(gfx::Queue::Type::kGraphics).submit(submit_info, fence);
+
+            // return {render_semaphores[frame]};
+       //  });
 }
 
 void VKRayTracer::cleanup() {

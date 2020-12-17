@@ -7,6 +7,7 @@
 
 #include "engine_interface.hpp"
 #include <vk_wrappers/swap_chain.hpp>
+#include <vk_wrappers/render_pass.hpp>
 
 #include <windowing/glfw_window.hpp>
 #include <windowing/window_visitor.hpp>
@@ -52,6 +53,10 @@ private:
     std::vector<gfx::ComputeTexturePtr> resolve_textures_;
     std::vector<gfx::ComputeTexturePtr> depth_textures_;
     std::vector<gfx::CommandBufferPtr> graphics_command_buffers_;
+
+    std::vector<gfx::RenderPassInfo> model_render_passes_;
+    std::vector<gfx::RenderPassInfo> display_render_passes;
+
 };
 } // dali
 
