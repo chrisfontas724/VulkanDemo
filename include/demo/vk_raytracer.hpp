@@ -48,6 +48,9 @@ private:
     friend VKWindowVisitor;
 
     std::unique_ptr<gfx::Instance> vk_instance_;
+    std::vector<gfx::ComputeTexturePtr> color_textures_;
+    std::vector<gfx::ComputeTexturePtr> resolve_textures_;
+    std::vector<gfx::ComputeTexturePtr> depth_textures_;
 };
 } // dali
 

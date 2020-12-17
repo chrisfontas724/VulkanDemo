@@ -91,25 +91,25 @@ void VKRayTracer::resizeFramebuffer(uint32_t width, uint32_t height) {
 
     vk::SampleCountFlagBits samples = vk::SampleCountFlagBits::e4;
 
-    gfx::ComputeTexturePtr color_textures[num_swap];
+    color_textures_.resize(num_swap);
     for (uint32_t i = 0; i < num_swap; i++) {
-        color_textures[i] = gfx::ImageUtils::createColorAttachment(logical_device_, width,
+        color_textures_[i] = gfx::ImageUtils::createColorAttachment(logical_device_, width,
                                                                    height, samples);
-        CXL_DCHECK(color_textures[i]);
+        CXL_DCHECK(color_textures_[i]);
     }
 
 
-    gfx::ComputeTexturePtr resolve_textures[num_swap];
+    resolve_textures_.resize(num_swap);
     for (uint32_t i = 0; i < num_swap; i++) {
-        resolve_textures[i] = gfx::ImageUtils::createColorAttachment(logical_device_, width,
+        resolve_textures_[i] = gfx::ImageUtils::createColorAttachment(logical_device_, width,
                                                                    height, vk::SampleCountFlagBits::e1);
-        CXL_DCHECK(resolve_textures[i]);
+        CXL_DCHECK(resolve_textures_[i]);
     }
 
 
-    gfx::ComputeTexturePtr depth_textures[num_swap];
+    depth_textures_.resize(num_swap);
     for (uint32_t i = 0; i < num_swap; i++) {
-      depth_textures[i] =
+      depth_textures_[i] =
         gfx::ImageUtils::createDepthTexture(logical_device_, width, height, samples);
     } 
 }
