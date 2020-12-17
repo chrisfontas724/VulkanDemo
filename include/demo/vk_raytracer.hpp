@@ -55,7 +55,7 @@ private:
     std::vector<gfx::CommandBufferPtr> graphics_command_buffers_;
 
     std::vector<gfx::RenderPassInfo> model_render_passes_;
-    std::vector<gfx::RenderPassInfo> display_render_passes;
+    std::vector<gfx::RenderPassInfo> display_render_passes_;
 
 };
 } // dali

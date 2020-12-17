@@ -133,7 +133,14 @@ void VKRayTracer::resizeFramebuffer(uint32_t width, uint32_t height) {
         CXL_VLOG(5) << "BUILT!!!!!";
     }
 
-
+    for (const auto& texture : swap_chain_->textures()) {
+        builder.reset();
+        builder.addColorAttachment(texture);
+        builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
+                            .input_indices = {},
+                            .color_indices = {0}});
+        display_render_passes_.push_back(std::move(builder.build()));
+    }
 
     // Create command buffers.
     graphics_command_buffers_ =
