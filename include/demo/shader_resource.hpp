@@ -5,7 +5,7 @@
 #ifndef INCLUDE_DEMO_SHADER_RESOURCE_HPP_
 #define INCLUDE_DEMO_SHADER_RESOURCE_HPP_
 
-#include <streaming/file_system.hpp>
+#include <FileStreaming/file_system.hpp>
 #include <vk_wrappers/shader_program.hpp>
 
 namespace christalz {

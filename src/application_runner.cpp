@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 #include "application_runner.hpp"
-#include <core/logging.hpp>
+#include <UsefulUtils/logging.hpp>
 #include <chrono>
 
 namespace christalz {

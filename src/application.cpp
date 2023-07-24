@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 #include "application.hpp"
-#include <streaming/file_stream.hpp>
-#include <core/logging.hpp>
+#include <FileStreaming/file_stream.hpp>
+#include <UsefulUtils/logging.hpp>
 
 namespace christalz {
 

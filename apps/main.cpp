@@ -6,9 +6,9 @@
 #include <unordered_map>
 
 #include <windowing/window.hpp>
-#include <core/logging.hpp>
+#include <UsefulUtils/logging.hpp>
 #include "stdio.h"
-#include <streaming/file_system.hpp>
+#include <FileStreaming/file_system.hpp>
 #include  <vk_wrappers/command_buffer.hpp>
 #include  <vk_wrappers/forward_declarations.hpp>
 #include  <vk_wrappers/instance.hpp>
@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
     config.name = "Vulkan Demo";
     config.width = kDisplayWidth;
     config.height = kDisplayHeight;
-    auto window = std::make_shared<display::GLFWWindow>(config);
+    auto window = std::make_shared<display::GLFWWindow>(config, nullptr);
     auto engine = std::make_shared<dali::VKRayTracer>(/*validation*/true);
     auto app_runner = christalz::ApplicationRunner::create(window, engine);
 

@@ -9,7 +9,7 @@
 #include <vk_wrappers/command_buffer.hpp>
 #include <windowing/glfw_window.hpp>
 #include <vk_wrappers/instance.hpp>
-#include <core/logging.hpp>
+#include <UsefulUtils/logging.hpp>
 
 
 namespace dali {
