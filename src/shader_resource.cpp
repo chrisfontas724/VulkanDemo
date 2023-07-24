@@ -12,7 +12,7 @@ std::shared_ptr<ShaderResource> ShaderResource::createGraphics(
   cxl::FileStream frag_shader;
 
   bool result = vert_shader.load(&fs, program_name + ".vert");
-  CXL_DCHECK(result);
+  CXL_DCHECK(result) << "Directory: " << fs.directory() << ", " << program_name + ".vert";
 
   result = frag_shader.load(&fs, program_name + ".frag");
   CXL_DCHECK(result);

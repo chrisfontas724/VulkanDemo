@@ -47,7 +47,7 @@ ApplicationRunner::create(std::shared_ptr<display::Window> window,
 
     result->window_ = window;
     result->engine_ = engine;
-    window->set_delegate(result);
+    //window->set_delegate(result);
     return std::move(result);
 }
 

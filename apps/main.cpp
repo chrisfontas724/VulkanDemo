@@ -28,8 +28,8 @@
 
 INITIALIZE_EASYLOGGINGPP
 
-const std::string MODEL_PATH = "../../data/viking_room.obj";
-const std::string TEXTURE_PATH = "../../data/viking_room.png";
+const std::string MODEL_PATH = "<FileStreaming/data/viking_room.obj";
+const std::string TEXTURE_PATH = "<FileStreaming/data/viking_room.png";
 
 const uint32_t kDisplayWidth = 1800;
 const uint32_t kDisplayHeight = 1100;
@@ -45,6 +45,31 @@ glm::vec3 direction = glm::normalize(glm::vec3(0) - eye_pos);
 
 gfx::CommandBufferState::DefaultState default_state_ =
     gfx::CommandBufferState::DefaultState::kOpaque;
+
+// Example dummy delegate class.
+class Delegate : public display::WindowDelegate {
+public:
+    
+    // |WindowDelegate|
+    void onUpdate() override { std::cout << "onUpdate" << std::endl; }
+    
+    void onResize(int32_t width, int32_t height) override {
+        std::cout << "onResize" << std::endl;
+    }
+    
+    void onWindowMove(int32_t x, int32_t y) override {
+        std::cout << "onWindowMove" << std::endl;
+    }
+    
+    void onStart(display::Window*) override {
+        std::cout << "onStart" << std::endl;
+    }
+    
+    void onClose() override {
+        std::cout << "onClose" << std::endl;
+    }
+};
+
 
 // Example InputManager checks.
 void checkInput(const display::InputManager* input) {
@@ -68,17 +93,27 @@ void checkInput(const display::InputManager* input) {
 // Set up a window with the delegate and start polling.
 int main(int argc, char** argv) {
     START_EASYLOGGINGPP(argc, argv);
+    CXL_VLOG(3) << "Start app!";
 
     display::Window::Config config;
     config.name = "Vulkan Demo";
     config.width = kDisplayWidth;
     config.height = kDisplayHeight;
-    auto window = std::make_shared<display::GLFWWindow>(config, nullptr);
+    auto delegate = std::make_shared<Delegate>();
+    auto window = std::make_shared<display::GLFWWindow>(config, delegate);
     auto engine = std::make_shared<dali::VKRayTracer>(/*validation*/true);
-    auto app_runner = christalz::ApplicationRunner::create(window, engine);
+
+    CXL_VLOG(3) << "Made window!";
+
+    CXL_DCHECK(engine);
+
+    engine->linkToWindow(window.get());
+
 
     auto& logical_device = engine->logical_device_;
     auto& swap_chain = engine->swap_chain_;
+    CXL_DCHECK(swap_chain);
+
     const auto& swapchain_textures = swap_chain->textures();
     auto num_swap = swapchain_textures.size();
 
@@ -157,10 +192,12 @@ int main(int argc, char** argv) {
     }
 
 
-    cxl::FileSystem fs("./../../data/shaders");
+    cxl::FileSystem fs("c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/shaders");
     auto model_shader = christalz::ShaderResource::createGraphics(logical_device, fs, "model");
     auto post_shader = christalz::ShaderResource::createGraphics(logical_device, fs, "post");
-    auto model = std::make_shared<christalz::Model>(logical_device, MODEL_PATH, TEXTURE_PATH);
+    auto model = std::make_shared<christalz::Model>(logical_device, 
+    "C:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/viking_room.obj", 
+    "C:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/viking_room.png");
 
     auto ubo_buffer = gfx::ComputeBuffer::createHostAccessableUniform(logical_device,
                                                                       sizeof(UniformBufferObject));
@@ -170,8 +207,10 @@ int main(int argc, char** argv) {
 
     std::cout << "Begin loop!" << std::endl;
     while (!window->shouldClose()) {
-         window->poll();
-         checkInput(window->input_manager());
+        window->poll();
+        // std::cout << "Checked poll" << std::endl;
+        // checkInput(window->input_manager());
+        // std::cout << "Checked input" << std::endl;
 
         UniformBufferObject ubo{};
         ubo.model =
