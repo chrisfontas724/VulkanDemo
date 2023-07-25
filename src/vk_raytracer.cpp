@@ -2,13 +2,13 @@
 // Use of this source code is governed by our license that can be
 // found in the LICENSE file.
 
-#include <demo/vk_raytracer.hpp>
-#include <vk_wrappers/physical_device.hpp>
-#include <vk_wrappers/logical_device.hpp>
-#include <vk_wrappers/image_utils.hpp>
-#include <vk_wrappers/command_buffer.hpp>
+#include <vk_raytracer.hpp>
+#include <physical_device.hpp>
+#include <logical_device.hpp>
+#include <image_utils.hpp>
+#include <command_buffer.hpp>
 #include <windowing/glfw_window.hpp>
-#include <vk_wrappers/instance.hpp>
+#include <instance.hpp>
 #include <UsefulUtils/logging.hpp>
 
 

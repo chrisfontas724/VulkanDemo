@@ -5,9 +5,14 @@
 set(LIBRARY_NAME demo)
 
 set(HEADER_LIST 
-    "${VulkanDemo_SOURCE_DIR}/include/demo/application_config.hpp" 
-    "${VulkanDemo_SOURCE_DIR}/include/demo/application_runner.hpp"
-    "${VulkanDemo_SOURCE_DIR}/include/demo/application.hpp")
+    "${VulkanDemo_SOURCE_DIR}/src/application_config.hpp" 
+    "${VulkanDemo_SOURCE_DIR}/src/application_runner.hpp"
+    "${VulkanDemo_SOURCE_DIR}/src/application.hpp")
+
+set(INCLUDE_DIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    PARENT_SCOPE
+ )
 
 
 # Make an automatic library - will be static or dynamic based on user setting
@@ -28,15 +33,9 @@ target_include_directories(${LIBRARY_NAME} PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-target_include_directories(demo PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(demo PUBLIC vk_wrappers windowing)
+target_link_libraries(demo PUBLIC VulkanWrappers display::Windowing cxl::UsefulUtils cxl::FileStreaming)
 
 # All users of this library will need at least C++11
 target_compile_features(demo PUBLIC cxx_std_11)
-
-# IDEs should put the headers in a nice place
-source_group(
-  TREE "${PROJECT_SOURCE_DIR}/include"
-  PREFIX "Header Files"
-  FILES ${HEADER_LIST})

@@ -5,8 +5,7 @@
 #ifndef DALI_ENGINE_INTERFACE_HPP_
 #define DALI_ENGINE_INTERFACE_HPP_
 
-#include <FileStreaming/file_system.hpp>
-#include  <windowing/window.hpp>
+#include <Windowing/window.hpp>
 #include <vulkan/vulkan.hpp>
 #include <functional>
 

@@ -5,8 +5,8 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
 
-#include <demo/model.hpp>
-#include <vk_wrappers/image_utils.hpp>
+#include <model.hpp>
+#include <image_utils.hpp>
 #include "tiny_obj_loader.h"
 #include "stb_image.h"
 

@@ -5,22 +5,22 @@
 #include <iostream>
 #include <unordered_map>
 
-#include <windowing/window.hpp>
+#include <Windowing/window.hpp>
 #include <UsefulUtils/logging.hpp>
 #include "stdio.h"
 #include <FileStreaming/file_system.hpp>
-#include  <vk_wrappers/command_buffer.hpp>
-#include  <vk_wrappers/forward_declarations.hpp>
-#include  <vk_wrappers/instance.hpp>
-#include  <vk_wrappers/logical_device.hpp>
-#include  <vk_wrappers/physical_device.hpp>
-#include  <vk_wrappers/render_pass.hpp>
-#include  <vk_wrappers/swap_chain.hpp>
+#include  <command_buffer.hpp>
+#include  <forward_declarations.hpp>
+#include  <instance.hpp>
+#include  <logical_device.hpp>
+#include  <physical_device.hpp>
+#include  <render_pass.hpp>
+#include  <swap_chain.hpp>
 
-#include <demo/application_runner.hpp>
-#include <demo/vk_raytracer.hpp>
-#include <demo/shader_resource.hpp>
-#include <demo/model.hpp>
+#include "application_runner.hpp"
+#include <vk_raytracer.hpp>
+#include <shader_resource.hpp>
+#include <model.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
@@ -208,9 +208,7 @@ int main(int argc, char** argv) {
     std::cout << "Begin loop!" << std::endl;
     while (!window->shouldClose()) {
         window->poll();
-        // std::cout << "Checked poll" << std::endl;
-        // checkInput(window->input_manager());
-        // std::cout << "Checked input" << std::endl;
+        checkInput(window->input_manager());
 
         UniformBufferObject ubo{};
         ubo.model =
@@ -254,6 +252,7 @@ int main(int argc, char** argv) {
             graphics_buffer.bindTexture(0, 0, resolve_textures[image_index]);
             graphics_buffer.setDepth(/*test*/ false, /*write*/ false);
             graphics_buffer.draw(3);
+            
             graphics_buffer.endRenderPass();
 
             resolve_textures[image_index]->transitionImageLayout(graphics_buffer, vk::ImageLayout::eColorAttachmentOptimal);
@@ -268,6 +267,7 @@ int main(int argc, char** argv) {
 
             return {render_semaphores[frame]};
          });
+         std::cout << "One loop!" << std::endl;
     }
 
     logical_device->waitIdle();

@@ -5,8 +5,8 @@
 #ifndef APPLICATIONS_APPLICATION_HPP_
 #define APPLICATIONS_APPLICATION_HPP_
 
-#include <FileStreaming/file_system.hpp>
 #include "engine_interface.hpp"
+#include <FileStreaming/file_system.hpp>
 
 namespace christalz {
 class Application {

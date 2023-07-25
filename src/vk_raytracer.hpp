@@ -6,8 +6,8 @@
 #define DALI_VK_RAY_TRACER_HPP_
 
 #include "engine_interface.hpp"
-#include <vk_wrappers/swap_chain.hpp>
-#include <vk_wrappers/render_pass.hpp>
+#include <swap_chain.hpp>
+#include <render_pass.hpp>
 
 #include <windowing/glfw_window.hpp>
 #include <windowing/window_visitor.hpp>

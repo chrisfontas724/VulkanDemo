@@ -1,5 +1,5 @@
-#include <demo/shader_resource.hpp>
-#include <vk_wrappers/shader_compiler.hpp>
+#include <shader_resource.hpp>
+#include <shader_compiler.hpp>
 
 namespace christalz {
 

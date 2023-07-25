@@ -2,7 +2,7 @@
 // Use of this source code is governed by our license that can be
 // found in the LICENSE file.
 
-#include <vk_wrappers/compute_buffer.hpp>
+#include <compute_buffer.hpp>
 #include <functional>
 #include <glm/gtx/hash.hpp>
 #include <glm/vec2.hpp>
