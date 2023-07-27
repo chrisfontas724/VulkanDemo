@@ -16,6 +16,7 @@
 #include  <physical_device.hpp>
 #include  <render_pass.hpp>
 #include  <swap_chain.hpp>
+#include "text_renderer.hpp"
 
 #include "application_runner.hpp"
 #include <vk_raytracer.hpp>
@@ -51,7 +52,7 @@ class Delegate : public display::WindowDelegate {
 public:
     
     // |WindowDelegate|
-    void onUpdate() override { std::cout << "onUpdate" << std::endl; }
+    void onUpdate() override { /*std::cout << "onUpdate" << std::endl;*/ }
     
     void onResize(int32_t width, int32_t height) override {
         std::cout << "onResize" << std::endl;
@@ -130,6 +131,8 @@ int main(int argc, char** argv) {
     auto render_semaphores = logical_device->createSemaphores(MAX_FRAMES_IN_FLIGHT);
     CXL_VLOG(3) << "Created render semaphores!";
 
+    TextRenderer text_renderer(logical_device);
+
     gfx::RenderPassBuilder builder(logical_device);
     std::vector<gfx::RenderPassInfo> render_passes;
     std::vector<gfx::RenderPassInfo> display_render_passes;
@@ -196,7 +199,7 @@ int main(int argc, char** argv) {
     auto model_shader = christalz::ShaderResource::createGraphics(logical_device, fs, "model");
     auto post_shader = christalz::ShaderResource::createGraphics(logical_device, fs, "post");
     auto model = std::make_shared<christalz::Model>(logical_device, 
-    "C:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/viking_room.obj", 
+    "C:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/lucy_resized.obj", //viking_room.obj", 
     "C:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/viking_room.png");
 
     auto ubo_buffer = gfx::ComputeBuffer::createHostAccessableUniform(logical_device,
@@ -205,7 +208,9 @@ int main(int argc, char** argv) {
 
     float degrees = 90;
 
+
     std::cout << "Begin loop!" << std::endl;
+    uint32_t sample = 1;
     while (!window->shouldClose()) {
         window->poll();
         checkInput(window->input_manager());
@@ -224,50 +229,57 @@ int main(int argc, char** argv) {
         swap_chain->beginFrame([&](vk::Semaphore& semaphore, vk::Fence& fence, uint32_t image_index,
                                     uint32_t frame) -> std::vector<vk::Semaphore> {
             // Record graphics commands.
-            gfx::CommandBuffer& graphics_buffer = *graphics_command_buffers[image_index].get();
-            graphics_buffer.reset();
-            graphics_buffer.beginRecording();
-            graphics_buffer.beginRenderPass(render_passes[image_index]);
-            graphics_buffer.setVertexAttribute(/*binding*/ 0, /*location*/ 0,
+            auto graphics_buffer = graphics_command_buffers[image_index];
+            graphics_buffer->reset();
+            graphics_buffer->beginRecording();
+            graphics_buffer->beginRenderPass(render_passes[image_index]);
+
+            graphics_buffer->setVertexAttribute(/*binding*/ 0, /*location*/ 0,
                                                /*format*/ vk::Format::eR32G32B32A32Sfloat);
-            graphics_buffer.setVertexAttribute(/*binding*/ 0, /*location*/ 1,
+            graphics_buffer->setVertexAttribute(/*binding*/ 0, /*location*/ 1,
                                                /*format*/ vk::Format::eR32G32B32A32Sfloat);
-            graphics_buffer.setVertexAttribute(/*binding*/ 0, /*location*/ 2,
+            graphics_buffer->setVertexAttribute(/*binding*/ 0, /*location*/ 2,
                                                /*format*/ vk::Format::eR32G32Sfloat);
-            graphics_buffer.setProgram(model_shader->program());
-            graphics_buffer.bindVertexBuffer(model->vertices());
-            graphics_buffer.bindIndexBuffer(model->indices());
-            graphics_buffer.bindUniformBuffer(0, 0, ubo_buffer);
-            graphics_buffer.bindTexture(0, 1, model->texture());
-            graphics_buffer.setDefaultState(default_state_);
-            graphics_buffer.setDepth(/*test*/ true, /*write*/ true);
-            graphics_buffer.drawIndexed(model->num_indices());
-            graphics_buffer.endRenderPass();
+            graphics_buffer->setProgram(model_shader->program());
+            graphics_buffer->bindVertexBuffer(model->vertices());
+            graphics_buffer->bindIndexBuffer(model->indices());
+            graphics_buffer->bindUniformBuffer(0, 0, ubo_buffer);
+            graphics_buffer->bindTexture(0, 1, model->texture());
+            graphics_buffer->setDefaultState(default_state_);
+            graphics_buffer->setDepth(/*test*/ true, /*write*/ true);
+            graphics_buffer->drawIndexed(model->num_indices());
 
-            resolve_textures[image_index]->transitionImageLayout(graphics_buffer, vk::ImageLayout::eShaderReadOnlyOptimal);
-
-            graphics_buffer.beginRenderPass(display_render_passes[image_index]);
-            graphics_buffer.setProgram(post_shader->program());
-            graphics_buffer.setDefaultState(gfx::CommandBufferState::DefaultState::kOpaque);
-            graphics_buffer.bindTexture(0, 0, resolve_textures[image_index]);
-            graphics_buffer.setDepth(/*test*/ false, /*write*/ false);
-            graphics_buffer.draw(3);
             
-            graphics_buffer.endRenderPass();
+            std::string text = "sa";//mple: " + sample;
+            graphics_buffer->setDefaultState(default_state_);
+            text_renderer.renderText(graphics_buffer, text, {-0.5, -0.5}, {0, 0}, 1);
+            sample++;
 
-            resolve_textures[image_index]->transitionImageLayout(graphics_buffer, vk::ImageLayout::eColorAttachmentOptimal);
-            graphics_buffer.endRecording();
+            graphics_buffer->endRenderPass();
+
+            resolve_textures[image_index]->transitionImageLayout(*graphics_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal);
+
+            graphics_buffer->beginRenderPass(display_render_passes[image_index]);
+            graphics_buffer->setProgram(post_shader->program());
+            graphics_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kOpaque);
+            graphics_buffer->bindTexture(0, 0, resolve_textures[image_index]);
+            graphics_buffer->setDepth(/*test*/ false, /*write*/ false);
+            graphics_buffer->draw(3);
+            
+            graphics_buffer->endRenderPass();
+
+            resolve_textures[image_index]->transitionImageLayout(*graphics_buffer.get(), vk::ImageLayout::eColorAttachmentOptimal);
+            graphics_buffer->endRecording();
 
             // Submit graphics commands.
             vk::PipelineStageFlags graphicsWaitStages[] = {
                 vk::PipelineStageFlagBits::eColorAttachmentOutput};
             vk::SubmitInfo submit_info(1U, &semaphore, graphicsWaitStages, 1U,
-                                       &graphics_buffer.vk(), 1U, &render_semaphores[frame]);
-            logical_device->getQueue(gfx::Queue::Type::kGraphics).submit(submit_info, fence);
+                                       &graphics_buffer->vk(), 1U, &render_semaphores[frame]);
+            logical_device->getQueue(gfx::Queue::Type::kPresent).submit(submit_info, fence);
 
             return {render_semaphores[frame]};
          });
-         std::cout << "One loop!" << std::endl;
     }
 
     logical_device->waitIdle();

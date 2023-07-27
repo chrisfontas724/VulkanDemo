@@ -21,6 +21,7 @@ add_library(demo
     application.cpp
     model.cpp
     shader_resource.cpp
+    text_renderer.cpp
     vk_raytracer.cpp
     ${HEADER_LIST})
 

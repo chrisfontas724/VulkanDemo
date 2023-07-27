@@ -39,8 +39,13 @@ Model::Model(const gfx::LogicalDevicePtr& device,
                           attrib.vertices[3 * index.vertex_index + 1],
                           attrib.vertices[3 * index.vertex_index + 2], 1.0};
 
-            vertex.uvs = {attrib.texcoords[2 * index.texcoord_index + 0],
-                          1.0f - attrib.texcoords[2 * index.texcoord_index + 1]};
+     
+            if (attrib.texcoords.size() > 0) {
+                vertex.uvs = {attrib.texcoords[2 * index.texcoord_index + 0],
+                              1.0f - attrib.texcoords[2 * index.texcoord_index + 1]};
+            } else {
+                vertex.uvs = {0,0};
+            }
 
             vertex.col = {1.0f, 1.0f, 1.0f, 1.0f};
 

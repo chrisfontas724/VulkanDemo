@@ -1,4 +1,4 @@
-// Harded values for a fullscreen quad in normalized device coordinates.
+// Harded values for a fullscreen quad in clip space coordinates.
 // Instead of actually rendering a quad, we render an oversized triangle
 // that fits over the rendered screen.
 vec2 positions[3] = vec2[](
