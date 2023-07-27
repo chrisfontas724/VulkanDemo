@@ -21,7 +21,7 @@ public:
                     glm::vec2 bottom_right,
                     uint32_t num_per_row);
 
-//private:
+private:
 
     gfx::LogicalDeviceWeakPtr device_;
     gfx::ShaderProgramPtr shader_;

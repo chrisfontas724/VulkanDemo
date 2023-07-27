@@ -9,5 +9,5 @@ layout(set = 0, binding = 0) uniform sampler2D bitmap;
 
 
 void main() {
-  outColor =  texture(bitmap, uvCoords);
+  outColor = texture(bitmap, uvCoords);
 }

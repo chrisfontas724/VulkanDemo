@@ -11,6 +11,7 @@ namespace {
 
 const std::map<char, glm::vec2> kGlyphMap = 
 {
+    // Ordered by (row, column)
     {' ', {0,0} },
     {'!', {0,1} },
     // TODO
@@ -90,6 +91,7 @@ void TextRenderer::renderText(gfx::CommandBufferPtr cmd_buffer,
     cmd_buffer->setProgram(shader_);
     cmd_buffer->bindTexture(0, 0, glyph_texture_);
     cmd_buffer->setDepth(/*test*/ false, /*write*/ false);
+    cmd_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kTranslucent);
 
     for (int i = 0; i < text.size(); i++) {
         auto glyph = text[i];
@@ -104,21 +106,14 @@ void TextRenderer::renderText(gfx::CommandBufferPtr cmd_buffer,
         positions[3] = { top_left.x + curr_col * glyph_width, top_left.y + (curr_row + 1) * glyph_height};
 
         glm::vec2 uvs[4];
-        uvs[0] = { glyph_coords.x / kWidth, glyph_coords.y / kHeight};
-        uvs[1] = { (glyph_coords.x + 1) / kWidth, glyph_coords.y / kHeight};
-        uvs[2] = { (glyph_coords.x + 1) / kWidth, (glyph_coords.y + 1) / kHeight};
-        uvs[3] = { glyph_coords.x / kWidth, (glyph_coords.y + 1) / kHeight};
+        uvs[0] = glm::vec2(glyph_coords.y / kWidth, glyph_coords.x / kHeight);
+        uvs[1] = glm::vec2((glyph_coords.y + 1) / kWidth, glyph_coords.x / kHeight);
+        uvs[2] = glm::vec2((glyph_coords.y + 1) / kWidth, (glyph_coords.x + 1) / kHeight);
+        uvs[3] = glm::vec2(glyph_coords.y / kWidth, (glyph_coords.x + 1) / kHeight);
 
-        std::cout << "UVS: " << uvs[0].x << " " << uvs[0].y << ", " << uvs[1].x << " " << uvs[1].y << std::endl;
-        std::cout << "UVS: " << uvs[2].x << " " << uvs[2].y << ", " << uvs[3].x << " " << uvs[3].y << std::endl;
-
-        std::cout << "POS: " << positions[0].x << " " << positions[0].y << ", " << positions[1].x << " " << positions[1].y << std::endl;
-        std::cout << "POS: " << positions[2].x << " " << positions[2].y << ", " << positions[3].x << " " << positions[3].y << std::endl;
-
-
-       cmd_buffer->pushConstants(&positions[0], 0u, sizeof(glm::vec2)*4);
-       cmd_buffer->pushConstants(&uvs[0], 32u, sizeof(glm::vec2)*4);
-       // cmd_buffer->pushConstants(glm::vec4(1,1,1,1), 64);
+        cmd_buffer->pushConstants(&positions[0], 0u, sizeof(glm::vec2)*4);
+        cmd_buffer->pushConstants(&uvs[0], 32u, sizeof(glm::vec2)*4);
+       // cmd_buffer->pushConstants(glm::vec4(1,0,1,1), 64);
         cmd_buffer->draw(6);
     }
 

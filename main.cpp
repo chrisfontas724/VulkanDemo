@@ -250,9 +250,9 @@ int main(int argc, char** argv) {
             graphics_buffer->drawIndexed(model->num_indices());
 
             
-            std::string text = "sa";//mple: " + sample;
+            std::string text = "sample: " + std::to_string(sample);
             graphics_buffer->setDefaultState(default_state_);
-            text_renderer.renderText(graphics_buffer, text, {-0.5, -0.5}, {0, 0}, 1);
+            text_renderer.renderText(graphics_buffer, text, {-0.9, 0.8}, {-0.5, 0.9}, text.size());
             sample++;
 
             graphics_buffer->endRenderPass();
