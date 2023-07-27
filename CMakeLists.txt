@@ -10,11 +10,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(${PROJECT_NAME})
 
-target_sources(${PROJECT_NAME}
-    PRIVATE
-        main.cpp
-)
-
 find_package(Windowing CONFIG REQUIRED)
 
 find_package(Vulkan REQUIRED)
@@ -26,7 +21,15 @@ find_package(FileStreaming CONFIG REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
 
 add_subdirectory(libs/VulkanWrappers)
+add_subdirectory(demos)
 add_subdirectory(src)
+
+
+target_sources(${PROJECT_NAME}
+    PRIVATE
+        main.cpp
+    ${SOURCE}
+)
 
 # Set the include directories.
 include_directories(${VULKAN_WRAPPER_INCLUDE_DIRS})

@@ -36,6 +36,7 @@ const std::map<char, glm::vec2> kGlyphMap =
 };
 
 const float kWidth = 10, kHeight = 10;
+const float kEpsilon = 0.005;
 
 } // anonymous namespace
 
@@ -106,14 +107,14 @@ void TextRenderer::renderText(gfx::CommandBufferPtr cmd_buffer,
         positions[3] = { top_left.x + curr_col * glyph_width, top_left.y + (curr_row + 1) * glyph_height};
 
         glm::vec2 uvs[4];
-        uvs[0] = glm::vec2(glyph_coords.y / kWidth, glyph_coords.x / kHeight);
-        uvs[1] = glm::vec2((glyph_coords.y + 1) / kWidth, glyph_coords.x / kHeight);
-        uvs[2] = glm::vec2((glyph_coords.y + 1) / kWidth, (glyph_coords.x + 1) / kHeight);
-        uvs[3] = glm::vec2(glyph_coords.y / kWidth, (glyph_coords.x + 1) / kHeight);
+        uvs[0] = glm::vec2(glyph_coords.y / kWidth, kEpsilon + glyph_coords.x / kHeight);
+        uvs[1] = glm::vec2((glyph_coords.y + 1) / kWidth, kEpsilon + glyph_coords.x / kHeight);
+        uvs[2] = glm::vec2((glyph_coords.y + 1) / kWidth, kEpsilon + (glyph_coords.x + 1) / kHeight);
+        uvs[3] = glm::vec2(glyph_coords.y / kWidth, kEpsilon + (glyph_coords.x + 1) / kHeight);
 
         cmd_buffer->pushConstants(&positions[0], 0u, sizeof(glm::vec2)*4);
         cmd_buffer->pushConstants(&uvs[0], 32u, sizeof(glm::vec2)*4);
-       // cmd_buffer->pushConstants(glm::vec4(1,0,1,1), 64);
+        cmd_buffer->pushConstants(glm::vec4(1,0,1,1), 64);
         cmd_buffer->draw(6);
     }
 

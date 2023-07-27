@@ -80,6 +80,7 @@
         "format": "cpp",
         "forward_list": "cpp",
         "random": "cpp",
-        "stop_token": "cpp"
+        "stop_token": "cpp",
+        "shared_mutex": "cpp"
     }
 }

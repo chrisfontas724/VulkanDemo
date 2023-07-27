@@ -7,6 +7,8 @@
 #include <glm/gtx/hash.hpp>
 #include <glm/vec2.hpp>
 
+#ifndef MODEL_HPP_
+#define MODEL_HPP_
 
 struct Vertex {
     glm::vec4 pos;
@@ -52,3 +54,5 @@ private:
 };
 
 } // christalz
+
+#endif // MODEL_HPP_
