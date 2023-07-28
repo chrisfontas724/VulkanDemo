@@ -15,7 +15,7 @@ class Demo {
 public:
     ~Demo();
 
-    virtual void run() = 0;
+    virtual int32_t run() = 0;
 
 protected:
     Demo(const std::string& name, uint32_t width, uint32_t height);

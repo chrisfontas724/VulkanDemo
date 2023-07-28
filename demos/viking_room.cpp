@@ -62,8 +62,6 @@ VikingRoom::VikingRoom(uint32_t width, uint32_t height)
       CXL_DCHECK(depth_textures_[i]);
     }
 
-    std::cout << "Maybe here??" << std::endl;
-
     uint32_t tex_index = 0;
     for (const auto& texture : swapchain_textures) {
         CXL_DCHECK(texture);
@@ -92,8 +90,6 @@ VikingRoom::VikingRoom(uint32_t width, uint32_t height)
         display_render_passes_.push_back(std::move(builder.build()));
     }
 
-    std::cout << "HERE?" << std::endl;
-
 
     cxl::FileSystem fs("c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/shaders");
     model_shader_ = christalz::ShaderResource::createGraphics(logical_device_, fs, "model");
@@ -112,6 +108,8 @@ VikingRoom::VikingRoom(uint32_t width, uint32_t height)
 
 
 VikingRoom::~VikingRoom() {
+    logical_device_->waitIdle();
+
     for (auto& pass : render_passes_) {
         logical_device_->vk().destroyRenderPass(pass.render_pass);
     }
@@ -142,7 +140,7 @@ VikingRoom::~VikingRoom() {
 }
 
 
-void VikingRoom::run() {
+int32_t VikingRoom::run() {
    std::cout << "Run!" << std::endl;
    uint32_t sample = 1;
     while (!window_->shouldClose()) {
@@ -219,4 +217,5 @@ void VikingRoom::run() {
             return {render_semaphores_[frame]};
          });
     }
+    return 0;
 }

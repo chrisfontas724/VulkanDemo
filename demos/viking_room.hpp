@@ -19,7 +19,7 @@ public:
     VikingRoom(uint32_t width, uint32_t height);
     ~VikingRoom();
 
-    void run() override;
+    int32_t run() override;
 
 private:
 

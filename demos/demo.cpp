@@ -57,25 +57,17 @@ Demo::Demo(const std::string& name, uint32_t width, uint32_t height) {
     physical_device_ = instance_->pickBestDevice(surface_, kDeviceExtensions);
     CXL_DCHECK(physical_device_);
 
-    std::cout << "Seriously...." << std::endl;
-
     // Make a logical device from the physical device.
     logical_device_ =
         std::make_shared<gfx::LogicalDevice>(physical_device_, surface_, kDeviceExtensions);
     CXL_DCHECK(logical_device_);
 
-    std::cout << "Hmm...." << std::endl;
-
     int32_t display_width, display_height;
     window_->getSize(&display_width, &display_height);
-    std::cout << "meow" << std::endl;
     swap_chain_ = std::make_unique<gfx::SwapChain>(logical_device_, surface_, display_width, display_height);
     CXL_DCHECK(swap_chain_);
-    std::cout << "ugh...." << std::endl;
 }
 
 Demo::~Demo() {
-    logical_device_->waitIdle();
-
     swap_chain_.reset();
 }
