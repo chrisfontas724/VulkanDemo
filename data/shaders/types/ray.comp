@@ -1,0 +1,44 @@
+// Copyright 2019 Sic Studios. All rights reserved.
+// Use of this source code is governed by our license that can be
+// found in the LICENSE file.
+
+#ifndef RAY_INFO_COMP_
+#define RAY_INFO_COMP_
+
+/**
+ * Ray Struct
+ * ------------
+ * Represents a ray of light. Rays have
+ * a starting point 'o' and a a normalized
+ * direction 'd'.
+ */
+struct Ray {
+  vec4 origin;
+  vec4 direction;
+  vec4 weight;
+  ivec2 coord;
+  uint material_id;
+  uint wavelength;
+  uint is_monochromatic;
+  float time;
+};
+
+// This function transforms a ray by an arbitrary 4x4 matrix.
+// Since matrix operations cannot be performed directly on a
+// vector, the new vector direction is computed by transforming
+// the origin and another random point on the ray and subtracting
+// their values.
+Ray transform_ray(in Ray ray, in mat4 matrix) {
+  vec4 newO = ray.origin;
+  vec4 newE = newO + ray.direction;
+
+  newO = matrix * newO;
+  newE = matrix * newE;
+  vec4 newD = normalize(newE - newO);
+        
+  ray.origin = newO;
+  ray.direction = newD;
+  return ray;
+}
+
+#endif // RAY_INFO_COMP_

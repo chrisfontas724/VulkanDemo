@@ -1,0 +1,32 @@
+// Copyright 2019 Sic Studios. All rights reserved.
+// Use of this source code is governed by our license that can be
+// found in the LICENSE file.
+
+#ifndef INTERSECTION_INFO_COMP_
+#define INTERSECTION_INFO_COMP_
+
+#include "types/shape.comp"
+
+struct Intersection {
+    vec4 world_pos;
+    vec4 local_pos;
+    vec4 norm;
+    vec4 tan;
+    vec4 col;
+    vec4 texture3D_coord;
+    vec2 uv_coord;
+    float t; // Hit distance.
+    float noise;
+};
+
+struct PreintersectData {
+    vec4 local_origin;
+    vec4 local_direction;
+    float local_hit_dist;
+    float world_hit_dist;
+    int hit_index;
+    ivec3 indices;
+    uint mat_group;
+};
+
+#endif // INTERSECTION_INFO_COMP_

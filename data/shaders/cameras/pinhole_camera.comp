@@ -1,0 +1,78 @@
+// Copyright 2019 Sic Studios. All rights reserved.
+// Use of this source code is governed by our license that can be
+// found in the LICENSE file.
+
+#include "types/camera.comp"
+#include "types/ray.comp"
+#include "sampling/random.comp"
+#define WORKGROUP_SIZE 16
+
+layout (local_size_x = WORKGROUP_SIZE, local_size_y = WORKGROUP_SIZE, local_size_z = 1 ) in;
+
+layout(std430, set = 0, binding = 0) buffer buf {
+   Ray rays[];
+};
+
+layout(std430, set = 0, binding = 1) buffer buf2 {
+   float seeds[];
+};
+
+layout(push_constant) uniform PushBlock {
+    Camera camera;
+};
+
+vec4 origin(in uint x_coord, in uint y_coord) {
+  const float f = 1.0;
+  const float aspect = float(camera.extent.y) / float(camera.extent.x);
+  const float xLength = sqrt((f*f)/(aspect*aspect + 1.0));
+  const float yLength = sqrt((f*f) - xLength*xLength);
+  const float filmZ = -0.5;
+
+  const float pixel_width = xLength / float(camera.extent.x);
+  const float pixel_height = yLength / float(camera.extent.y);
+
+  // Get the normalized pixel value from (0,1) by dividing the x_coord and
+  // y_coord by the camera.extent property, which is the total size of the
+  // framebuffer in pixels, and the shifting over by half of a pixel's
+  // dimensions in camera-film-buffer space, to get to the center of the pixel.
+  const float x = float(camera.extent.x - x_coord) / camera.extent.x + camera.pixel_offset.x*pixel_width;
+  const float y = float(y_coord) / camera.extent.y + camera.pixel_offset.y*pixel_height;
+
+  vec4 corner = vec4(-0.5 * xLength, -0.5 * yLength, filmZ, 1.0);
+  return vec4(corner.x + x*xLength, corner.y + y*yLength, filmZ, 1.0);
+}
+
+
+vec2 diskSample(float k1, float k2){
+    const float TWO_PI = 3.14159265*2.0;
+    float r = sqrt(k1); /*Avoids clumping*/
+    float theta = TWO_PI*k2;
+            
+    float u = r*cos(theta);
+    float v = r*sin(theta);
+            
+    return vec2(u, v);
+}
+
+
+void main() {
+  const uint x_coord = gl_GlobalInvocationID.x;
+  const uint y_coord = gl_GlobalInvocationID.y;
+  if (x_coord >= camera.extent.x || y_coord >= camera.extent.y) {
+    return;
+  }
+
+  uint index = camera.extent.x * gl_GlobalInvocationID.y + gl_GlobalInvocationID.x;
+  float seed = seeds[index];
+  float rand1 = getRand(seed);
+
+  Ray result;
+  result.origin = origin(x_coord, y_coord);
+  result.direction = normalize(vec4(0,0,0,1) - result.origin);
+  result.weight = vec4(1,1,1,1);
+  result.coord = ivec2(x_coord, y_coord);
+  result.material_id = 0xFFFFFFFF;
+  result = transform_ray(result, camera.matrix);
+  rays[index] = result;
+  seeds[index] = seed;
+}

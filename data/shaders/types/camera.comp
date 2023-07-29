@@ -1,0 +1,18 @@
+// Copyright 2019 Sic Studios. All rights reserved.
+// Use of this source code is governed by our license that can be
+// found in the LICENSE file.
+
+#ifndef CAMERA_INFO_COMP_
+#define CAMERA_INFO_COMP_
+
+// Represents a camera.
+struct Camera {
+    mat4 matrix;
+    vec4 clear_color;
+    ivec2 extent;
+    vec2 pixel_offset;
+    float focal_length;
+    float aperture_width;
+};
+
+#endif // CAMERA_INFO_COMP_

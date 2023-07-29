@@ -5,6 +5,7 @@
 
 #include <UsefulUtils/logging.hpp>
 #include "demos/viking_room.hpp"
+#include "demos/naive_path_tracer.hpp"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -14,8 +15,8 @@ const uint32_t kDisplayHeight = 1100;
 std::shared_ptr<Demo> createDemo(const std::string& name) {
     if (name == "VikingRoom") {
         return std::make_shared<VikingRoom>(kDisplayWidth, kDisplayHeight);
-    } else if (name == "NaivePathtracer") {
-
+    } else if (name == "NaivePathTracer") {
+        return std::make_shared<NaivePathTracer>(kDisplayWidth, kDisplayHeight);
     }
     return nullptr;
 }
@@ -24,7 +25,7 @@ std::shared_ptr<Demo> createDemo(const std::string& name) {
 int main(int argc, char** argv) {
     START_EASYLOGGINGPP(argc, argv);
 
-    auto demo = createDemo("VikingRoom");
+    auto demo = createDemo("NaivePathTracer");
     CXL_DCHECK(demo);
     return demo->run();
 }

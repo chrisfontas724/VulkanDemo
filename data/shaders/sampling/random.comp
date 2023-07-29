@@ -1,0 +1,70 @@
+// Copyright 2019 Sic Studios. All rights reserved.
+// Use of this source code is governed by our license that can be
+// found in the LICENSE file.
+
+#ifndef VULKAN_HEADER_FILES_SAMPLING_RANDOM_COMP_
+#define VULKAN_HEADER_FILES_SAMPLING_RANDOM_COMP_
+
+// The random number generator algorithm found here has been adapted
+// from code on ShaderToy (https://www.shadertoy.com/view/lltBWX)
+// which itself is a port of the Loki library for Metal onto GLSL.
+
+// Helper function for |getRand|.
+uint tausStep(uint z,int s1,int s2,int s3,uint M){
+    uint b=(((z << s1) ^ z) >> s2);
+    return (((z & M) << s3) ^ b);
+}
+
+// Returns a random number in the range [0,1]. Takes in and
+// modifies a seed value, which was originally created using
+// |initRandom| down below.
+float getRand(inout float randSeed) {
+    uint hashed_seed = uint(randSeed * float(1099087573U));
+
+    uint z1 = tausStep(hashed_seed,13,19,12,429496729U);
+    uint z2 = tausStep(hashed_seed,2,25,4,4294967288U);
+    uint z3 = tausStep(hashed_seed,3,11,17,429496280U);
+    uint z4 = (1664525U*hashed_seed + 1013904223U);
+
+    float old_seed = randSeed;
+
+    randSeed = float(z1^z2^z3^z4) * 2.3283064365387e-10;
+
+    return old_seed;
+}
+
+// Initializes the random seed used for |getRand|. Only needs
+// to be called once per seed, and then from there, each call
+// to |getRand| modifies the seed, so getRand can be called
+// successively on the same seed value.
+float initRandom(uint seed1,uint seed2,uint seed3){
+    uint seed = seed1 * 1099087573U;
+    uint seedb = seed2 * 1099087573U;
+    uint seedc = seed3 * 1099087573U;
+
+    // Round 1: Randomise seed
+    uint z1 = tausStep(seed,13,19,12,429496729U);
+    uint z2 = tausStep(seed,2,25,4,4294967288U);
+    uint z3 = tausStep(seed,3,11,17,429496280U);
+    uint z4 = (1664525U*seed + 1013904223U);
+
+    // Round 2: Randomise seed again using second seed
+    uint r1 = (z1^z2^z3^z4^seedb);
+
+    z1 = tausStep(r1,13,19,12,429496729U);
+    z2 = tausStep(r1,2,25,4,4294967288U);
+    z3 = tausStep(r1,3,11,17,429496280U);
+    z4 = (1664525U*r1 + 1013904223U);
+
+    // Round 3: Randomise seed again using third seed
+    r1 = (z1^z2^z3^z4^seedc);
+
+    z1 = tausStep(r1,13,19,12,429496729U);
+    z2 = tausStep(r1,2,25,4,4294967288U);
+    z3 = tausStep(r1,3,11,17,429496280U);
+    z4 = (1664525U*r1 + 1013904223U);
+
+    return float(z1^z2^z3^z4) * 2.3283064365387e-10;
+}
+
+#endif // VULKAN_HEADER_FILES_SAMPLING_RANDOM_COMP_

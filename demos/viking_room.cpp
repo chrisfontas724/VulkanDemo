@@ -95,8 +95,8 @@ VikingRoom::VikingRoom(uint32_t width, uint32_t height)
     model_shader_ = christalz::ShaderResource::createGraphics(logical_device_, fs, "model");
     post_shader_ = christalz::ShaderResource::createGraphics(logical_device_, fs, "post");
     model_ = std::make_shared<christalz::Model>(logical_device_, 
-        "C:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/viking_room.obj", 
-        "C:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/viking_room.png");
+        "C:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/models/viking_room.obj", 
+        "C:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/textures/viking_room.png");
     CXL_DCHECK(model_shader_);
     CXL_DCHECK(post_shader_);
     CXL_DCHECK(model_);
@@ -141,7 +141,6 @@ VikingRoom::~VikingRoom() {
 
 
 int32_t VikingRoom::run() {
-   std::cout << "Run!" << std::endl;
    uint32_t sample = 1;
     while (!window_->shouldClose()) {
         window_->poll();
@@ -183,6 +182,7 @@ int32_t VikingRoom::run() {
                 graphics_buffer->drawIndexed(model_->num_indices());
             }
             
+            // Render Debug Text.
             {
                 std::string text = "sample: " + std::to_string(sample);
                 graphics_buffer->setDefaultState(default_state_);

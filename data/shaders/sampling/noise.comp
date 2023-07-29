@@ -1,0 +1,176 @@
+// Copyright 2019 Sic Studios. All rights reserved.
+// Use of this source code is governed by our license that can be
+// found in the LICENSE file.
+
+// This file contains functions that are used to generate pseudo-random
+// textures in 3 dimensions in order to simulate natural looking materials
+// such as wood, marble, etc.
+
+// Code inspired by this tutorial:
+// https://lodev.org/cgtutor/randomnoise.html
+
+#define NOISE_WIDTH     3000
+#define NOISE_HEIGHT    3000
+#define NOISE_DEPTH     3000
+
+#ifdef __cplusplus
+#include <stdio.h>
+#include <stdlib.h>
+#include "geometry/util/types.hpp"
+namespace geom {
+#endif // __cplusplus
+
+// These numbers are used to generate turbulence at
+// various levels of zoom for the perlin noise.
+const ivec4 prime_numbers[] = {
+    ivec4(15731, 789221, 1376312513, 1073741827),
+    ivec4(17909, 202639, 1073741827, 1376312513),
+    ivec4(18481, 423803, 1073741827, 1073741827),
+    ivec4(19927, 388259, 1376312513, 1073741827),
+    ivec4(53017, 594911, 1073741827, 1376312513),
+    ivec4(69929, 643469, 1073741827, 1376312513),
+    ivec4(79301, 706897, 1073741827, 1376312513),
+    ivec4(43319, 731359, 1073741827, 1376312513),
+    ivec4(85237, 901273, 1073741827, 1376312513),
+    ivec4(20747, 874487, 1073741827, 1376312513),
+    ivec4(73259, 929953, 1073741827, 1376312513)
+};
+
+
+// 3D Noise function. The same inputs always result in
+// the same return value -- This is key.
+//
+// |i| determines which ivec4 of prime numbers to use,
+// and x,y,z are the noise coordinate values which should
+// be in the ranges [0, NOISE_WIDTH), [0, NOISE_HEIGHT) and
+// [0, NOISE_DEPTH) respectively.
+float noise3D(uint i, int x, int y, int z) {
+    int n = x+y*57 + 100*z;
+    n = (n<<13) ^ n;
+    ivec4 vals = prime_numbers[i];
+    return (float(1.0) - ( (n * (n * n * vals.x + vals.y) + vals.z) & 0x7fffffff) / vals.w);
+}
+
+
+// Cosine interpolation function for smooth interpolation.
+// Much better results can be generated this way than by
+// using a basic linear interpolater.
+float interpolate(float a, float b, float x) {
+    const float PI = 3.15159265;
+    float ft = x*PI;
+    float f = (float(1.0) - cos(ft)) * float(0.5);
+    return a*(float(1.0)-f)+b*f;
+}
+
+// Trilinear interpolation function used to figure out the noise value
+// at any arbitrary 3D point by interpolating the values of the integer
+// points surrounding it.
+float interpolatedNoise3D(int i, float x, float y, float z) {
+    int integer_X = int(x);
+    float fractional_X = x - integer_X;
+    
+    int integer_Y = int(y);
+    float fractional_Y = y - integer_Y;
+    
+    int integer_Z = int(z);
+    float fractional_Z = z - integer_Z;
+    
+    float v1 = noise3D(i, integer_X, integer_Y, integer_Z);
+    float v2 = noise3D(i, integer_X+1, integer_Y, integer_Z);
+    float v3 = noise3D(i, integer_X, integer_Y+1, integer_Z);
+    float v4 = noise3D(i, integer_X+1, integer_Y+1, integer_Z);
+    float v5 = noise3D(i, integer_X, integer_Y, integer_Z+1);
+    float v6 = noise3D(i, integer_X+1, integer_Y, integer_Z+1);
+    float v7 = noise3D(i, integer_X, integer_Y+1, integer_Z+1);
+    float v8 = noise3D(i, integer_X+1, integer_Y+1, integer_Z+1);
+    
+    float c00 = interpolate(v1, v2, fractional_X);
+    float c01 = interpolate(v3, v4, fractional_X);
+    float c10 = interpolate(v5, v6, fractional_X);
+    float c11 = interpolate(v7, v8, fractional_X);
+    
+    float c0 = interpolate(c00, c10, fractional_Z);
+    float c1 = interpolate(c01, c11, fractional_Z);
+    
+    return interpolate(c0, c1, fractional_Y);
+}
+
+
+// The turbulence function is responsible for adding together layers of
+// noise at different frequencies and interpolating the results. The values
+// for |vec3 pos| must be in the range [0,0,0] to (WIDTH, HEIGHT, DEPTH).
+float turbulence3D(vec3 pos, float size) {
+    float total = 0.0, initialSize = size;
+    float n = log2(size);
+    for (int i = 0; i < n - 1; i++) {
+        size /= 2;
+        total += interpolatedNoise3D(i, pos.x/size, pos.y/size, pos.z/size)*size;
+    }
+    return total / initialSize;
+
+}
+
+
+// Uses a 3D sine function to determine the noise value. By increasing
+// the period values, the frequency of black lines in the marble will
+// increase and increasing the turbulence power will increase the
+// "twistiness" of the lines.
+// |pos| here must be normalized values in the range [0,1].
+float marble3D(vec3 normalized_pos, float noise, float xPeriod, float yPeriod, float zPeriod, float power) {
+    const float PI = 3.14159265;
+    float xyzValue = normalized_pos.x*xPeriod +
+                     normalized_pos.y*yPeriod +
+                     normalized_pos.z*zPeriod +
+                     power*noise;
+    // Absolute sine is between [0,1].
+    return abs(sin(xyzValue*PI));
+}
+
+// Creates realistic 3D wood texture. The period determines how many
+// rings the wood will have and the turbulence power makes each ring
+// twist. If the turbulence power gets too high, however, the twisting
+// will be too great and the rings will no longer be distinguishable.
+float wood3D(vec3 normalized_pos, float noise, float power, float period) {
+    const float PI = 3.14159265;
+    float distValue = length(float(2.0)*normalized_pos-float(1.0)) + power * noise;
+
+    // Absolute sine is between [0,1].
+    return abs(sin(2.0 * period * distValue * PI));
+}
+
+// Slightly modifies the base turbulence function in order to account for
+// drooping due to gravity that one would see on a bubble. To do this, we
+// need extra information than what we would use for other noise types
+float bubble3D(vec3 normalized_pos, float noise) {
+    float phi = atan(normalized_pos.y / normalized_pos.x);
+    float theta = acos(normalized_pos.z);
+    return abs(sin(7.0*cos(phi) -  4.0*theta + 1.5*noise));
+}
+
+// Used to create a very nice grainy wood texture.
+float grain3D(float noise, float turbPower) {
+    float g = turbPower * noise;
+    return (g - int(g));
+}
+
+// Creates a 3D texture that can be "carved away at" in order to texture
+// an arbitrary mesh and not have to worry about the distortions associated
+// with mapping a 2D texture. Based on the input position and the min/max
+// bounding box position, a 3D (u,v,w) texture coordinate is given to look
+// into the noise map.
+float noiseTexture(vec4 tex3D_coord, uint size) {
+    vec3 noise_coord = vec3(tex3D_coord * vec4(NOISE_WIDTH, NOISE_HEIGHT, NOISE_DEPTH, 1.0));
+    return turbulence3D(noise_coord, float(size));
+}
+
+// Returns a normalized 3D texture uvw coordinate based on
+// the hit position relative to its encapsulating bounding box.
+vec4 tex3DCoord(vec4 min, vec4 max, vec4 pos) {
+    return (pos - min) / (max - min);
+}
+
+
+#ifdef __cplusplus
+#include "geometry/util/types.hpp"
+} // geom
+#endif // __cplusplus

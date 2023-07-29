@@ -1,0 +1,54 @@
+// Copyright 2019 Sic Studios. All rights reserved.
+// Use of this source code is governed by our license that can be
+// found in the LICENSE file.
+
+#ifndef SHAPE_INFO_COMP_
+#define SHAPE_INFO_COMP_
+
+// These must match the enum found in shape_info.hpp exactly.
+const uint ShapeSphere = 0;
+const uint ShapePlane  = 1;
+const uint ShapeCube   = 2;
+const uint ShapeCone   = 3;
+const uint ShapeTorus  = 4;
+const uint ShapeCylinder = 5;
+const uint ShapeModel = 6;
+
+const uint VTX_NONE_FLAG = 0;
+const uint VTX_POS_FLAG = 1;
+const uint VTX_NRM_FLAG = 2;
+const uint VTX_TAN_FLAG = 4;
+const uint VTX_UV0_FLAG = 8;
+const uint VTX_COL_FLAG = 16;
+const uint VTX_BLEND_WEIGHTS_FLAG = 32;
+const uint VTX_BLEND_INDICES_FLAG = 64;
+
+struct Shape {
+    mat4 matrix;
+    vec4 world_min;
+    vec4 world_max;
+    uint identifier;
+    uint type;
+    int material_index;
+    uint model_identifier;
+    int vertex_start;
+    int triangle_start;
+    int num_triangles;
+    uint vertex_flags;
+    uint interpolate_normals;
+    uint turbulence_size;
+};
+
+struct Model {
+    vec4 min_bounds;
+    vec4 max_bounds;
+    uint triangle_start; // Triangle object index
+    uint vertex_start;   // Triangle vertices
+    uint vertex_flags;
+    uint grid_start;
+    uint grid_indices_start;
+    uint material_start;
+    uint grid_resolution;
+};
+
+#endif // SHAPE_INFO_COMP_
