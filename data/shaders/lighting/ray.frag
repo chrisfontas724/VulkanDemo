@@ -4,8 +4,8 @@
 
 // Outputs
 layout (location = 0) in vec4 light;
-layout (location = 0) in vec4 weight;
-layout(location = 0) out vec4 outColor
+layout (location = 1) in vec4 weight;
+layout(location = 0) out vec4 outColor;
 
 
 // Simply write out the position with no transformation.

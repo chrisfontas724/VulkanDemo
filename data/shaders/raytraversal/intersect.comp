@@ -1,0 +1,36 @@
+// Copyright 2019 Sic Studios. All rights reserved.
+// Use of this source code is governed by our license that can be
+// found in the LICENSE file.
+
+#include "types/shape.comp"
+#include "types/intersection.comp"
+#include "types/ray.comp"
+
+#define WORKGROUP_SIZE 512
+
+layout (local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1 ) in;
+
+layout(std430, set = 0, binding = 0) buffer buf {
+   Ray rays[];
+};
+
+layout(std140, set = 0, binding = 1) buffer buf2 {
+	Shape shapes[];
+};
+
+layout(std140, set = 0, binding = 2) buffer buf3 {
+	vec4 vertex_positions[];
+};
+
+layout(std140, set = 0, binding = 3) buffer buf4 {
+	ivec4 triangles[];
+};
+
+layout(std140, push_constant) uniform PushBlock {
+    uint num_shapes;
+};
+
+void main() {
+  const uint index = gl_GlobalInvocationID.x;
+
+}

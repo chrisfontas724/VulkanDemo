@@ -53,11 +53,21 @@ NaivePathTracer::NaivePathTracer(uint32_t width, uint32_t height)
     CXL_DCHECK(text_renderer_);
 
     cxl::FileSystem fs("c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/shaders");
+    CXL_LOG(INFO) << "Create camera shader";
     ray_generator_ = christalz::ShaderResource::createCompute(logical_device_, fs, "cameras/pinhole_camera", {fs.directory()});
     CXL_DCHECK(ray_generator_);
 
+    CXL_LOG(INFO) << "Create lighting shader";
     lighter_ = christalz::ShaderResource::createGraphics(logical_device_, fs, "lighting/ray", {fs.directory()});
     CXL_DCHECK(lighter_);
+
+    CXL_LOG(INFO) << "Create intersection shader";
+    hit_tester_ = christalz::ShaderResource::createCompute(logical_device_, fs, "raytraversal/intersect", {fs.directory()});
+    CXL_DCHECK(hit_tester_);
+
+    CXL_LOG(INFO) << "Create bounce shader";
+    bouncer_ = christalz::ShaderResource::createCompute(logical_device_, fs, "raytraversal/bounce", {fs.directory()});
+    CXL_DCHECK(bouncer_);
 
     for (uint32_t i = 0; i < num_swap; i++) {
         rays_.push_back(gfx::ComputeBuffer::createUniformBuffer(logical_device_, sizeof(Ray) * width * height));
@@ -136,6 +146,7 @@ int32_t NaivePathTracer::run() {
 
             // Generate rays.
             compute_buffer->reset();
+            compute_buffer->beginRecording();
             compute_buffer->setProgram(ray_generator_->program());
             compute_buffer->bindUniformBuffer(0, 0, rays_[image_index]);
             compute_buffer->bindUniformBuffer(0, 1, random_seeds_[image_index]);
@@ -150,22 +161,35 @@ int32_t NaivePathTracer::run() {
                 }
             }
 
+            compute_buffer->endRecording();
+
             // Submit compute commands.
 
 
 
-            // Render to a framebuffer.
-            graphics_buffer->reset();
-            graphics_buffer->beginRenderPass(render_passes_[image_index]);
-            graphics_buffer->setProgram(lighter_->program());
-            graphics_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kCustomRaytrace);
-            graphics_buffer->setDepth(/*test*/ false, /*write*/ false);
-            graphics_buffer->setProgram(lighter_->program());
-            graphics_buffer->bindUniformBuffer(0, 0, rays_[image_index]);
-            graphics_buffer->bindUniformBuffer(0, 1, hits_[image_index]);
-            graphics_buffer->pushConstants(glm::vec2(window_config_.width, window_config_.height));
-            graphics_buffer->draw(window_config_.width * window_config_.height);
-            graphics_buffer->endRenderPass();
+            // // Render to a framebuffer.
+            // graphics_buffer->reset();
+            // graphics_buffer->beginRecording();
+            // graphics_buffer->beginRenderPass(render_passes_[image_index]);
+            // graphics_buffer->setProgram(lighter_->program());
+            // graphics_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kCustomRaytrace);
+            // graphics_buffer->setDepth(/*test*/ false, /*write*/ false);
+            // graphics_buffer->setProgram(lighter_->program());
+            // graphics_buffer->bindUniformBuffer(0, 0, rays_[image_index]);
+            // graphics_buffer->bindUniformBuffer(0, 1, hits_[image_index]);
+            // graphics_buffer->pushConstants(glm::vec2(window_config_.width, window_config_.height));
+            // graphics_buffer->draw(window_config_.width * window_config_.height);
+            // graphics_buffer->endRenderPass();
+            // graphics_buffer->endRecording();
+
+            // Submit graphics commands.
+            vk::PipelineStageFlags graphicsWaitStages[] = {
+                vk::PipelineStageFlagBits::eColorAttachmentOutput};
+            vk::SubmitInfo submit_info(1U, &semaphore, graphicsWaitStages, 1U,
+                                       &graphics_buffer->vk(), 1U, &render_semaphores_[frame]);
+            logical_device_->getQueue(gfx::Queue::Type::kPresent).submit(submit_info, fence);
+
+            return {render_semaphores_[frame]};
         });        
     }
 

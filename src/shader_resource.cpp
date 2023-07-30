@@ -43,7 +43,7 @@ std::shared_ptr<ShaderResource> ShaderResource::createCompute(
 
   cxl::FileStream shader;
   bool result = shader.load(&fs, program_name + ".comp");
-  CXL_DCHECK(result);
+  CXL_DCHECK(result) << "Could not load shader " << program_name << ".comp";
 
   gfx::SpirV spirv;
   gfx::ShaderCompiler compiler;

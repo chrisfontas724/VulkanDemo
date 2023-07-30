@@ -39,16 +39,4 @@ struct Shape {
     uint turbulence_size;
 };
 
-struct Model {
-    vec4 min_bounds;
-    vec4 max_bounds;
-    uint triangle_start; // Triangle object index
-    uint vertex_start;   // Triangle vertices
-    uint vertex_flags;
-    uint grid_start;
-    uint grid_indices_start;
-    uint material_start;
-    uint grid_resolution;
-};
-
 #endif // SHAPE_INFO_COMP_
