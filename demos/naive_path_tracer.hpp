@@ -46,6 +46,7 @@ private:
     std::shared_ptr<christalz::ShaderResource> hit_tester_;
     std::shared_ptr<christalz::ShaderResource> bouncer_;
     std::shared_ptr<christalz::ShaderResource> lighter_;
+    std::shared_ptr<christalz::ShaderResource> post_shader_;
 
     std::vector<gfx::ComputeTexturePtr> color_textures_;
     std::vector<gfx::ComputeTexturePtr> resolve_textures_;

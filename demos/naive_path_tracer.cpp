@@ -69,6 +69,9 @@ NaivePathTracer::NaivePathTracer(uint32_t width, uint32_t height)
     bouncer_ = christalz::ShaderResource::createCompute(logical_device_, fs, "raytraversal/bounce", {fs.directory()});
     CXL_DCHECK(bouncer_);
 
+    post_shader_ = christalz::ShaderResource::createGraphics(logical_device_, fs, "posteffects/post");
+    CXL_DCHECK(post_shader_);
+
     for (uint32_t i = 0; i < num_swap; i++) {
         rays_.push_back(gfx::ComputeBuffer::createUniformBuffer(logical_device_, sizeof(Ray) * width * height));
         random_seeds_.push_back(gfx::ComputeBuffer::createUniformBuffer(logical_device_, sizeof(float) * width * height));
@@ -131,6 +134,33 @@ NaivePathTracer::NaivePathTracer(uint32_t width, uint32_t height)
 
 NaivePathTracer::~NaivePathTracer() {
     logical_device_->waitIdle();
+
+    for (auto& pass : render_passes_) {
+        logical_device_->vk().destroyRenderPass(pass.render_pass);
+    }
+
+    for (auto& pass : display_render_passes_) {
+        logical_device_->vk().destroyRenderPass(pass.render_pass);
+    }
+
+    for (auto& semaphore : render_semaphores_) {
+        logical_device_->vk().destroy(semaphore);
+    }
+
+    for (auto& semaphore : compute_semaphores_) {
+        logical_device_->vk().destroy(semaphore);
+    }
+
+    for (auto& texture: color_textures_) {
+        texture.reset();
+    }
+    for (auto& texture: resolve_textures_) {
+        texture.reset();
+    }
+
+    graphics_command_buffers_.clear();
+    compute_command_buffers_.clear();
+    post_shader_.reset();
 }
 
 
@@ -167,9 +197,9 @@ int32_t NaivePathTracer::run() {
 
 
 
-            // // Render to a framebuffer.
-            // graphics_buffer->reset();
-            // graphics_buffer->beginRecording();
+            // Render to a framebuffer.
+            graphics_buffer->reset();
+            graphics_buffer->beginRecording();
             // graphics_buffer->beginRenderPass(render_passes_[image_index]);
             // graphics_buffer->setProgram(lighter_->program());
             // graphics_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kCustomRaytrace);
@@ -180,7 +210,21 @@ int32_t NaivePathTracer::run() {
             // graphics_buffer->pushConstants(glm::vec2(window_config_.width, window_config_.height));
             // graphics_buffer->draw(window_config_.width * window_config_.height);
             // graphics_buffer->endRenderPass();
-            // graphics_buffer->endRecording();
+
+            resolve_textures_[image_index]->transitionImageLayout(*graphics_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal);
+
+            {
+                graphics_buffer->beginRenderPass(display_render_passes_[image_index]);
+                graphics_buffer->setProgram(post_shader_->program());
+                graphics_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kOpaque);
+                graphics_buffer->bindTexture(0, 0, resolve_textures_[image_index]);
+                graphics_buffer->setDepth(/*test*/ false, /*write*/ false);
+                graphics_buffer->draw(3);
+                graphics_buffer->endRenderPass();
+            }
+
+            resolve_textures_[image_index]->transitionImageLayout(*graphics_buffer.get(), vk::ImageLayout::eColorAttachmentOptimal);
+            graphics_buffer->endRecording();
 
             // Submit graphics commands.
             vk::PipelineStageFlags graphicsWaitStages[] = {
