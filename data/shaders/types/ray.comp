@@ -17,10 +17,6 @@ struct Ray {
   vec4 direction;
   vec4 weight;
   ivec2 coord;
-  uint material_id;
-  uint wavelength;
-  uint is_monochromatic;
-  float time;
 };
 
 // This function transforms a ray by an arbitrary 4x4 matrix.

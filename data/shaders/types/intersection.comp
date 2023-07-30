@@ -9,14 +9,10 @@
 
 struct Intersection {
     vec4 world_pos;
-    vec4 local_pos;
     vec4 norm;
     vec4 tan;
     vec4 col;
-    vec4 texture3D_coord;
-    vec2 uv_coord;
-    float t; // Hit distance.
-    float noise;
+    vec4 emission;
 };
 
 struct PreintersectData {

@@ -14,15 +14,20 @@ struct Ray {
     glm::vec4 origin;
     glm::vec4 direction;
     glm::vec4 weight;
+    glm::ivec2 coord;
 };
  
-
 struct HitPoint {
     alignas(16) glm::vec4 pos;
     alignas(16) glm::vec4 norm;
     alignas(16) glm::vec4 tan;
     alignas(16) glm::vec4 col;
     alignas(8)  glm::vec2 uv_coord;
+};
+
+struct Material {
+    glm::vec4 diffuse_color;
+    glm::vec4 emissive_color;
 };
 
 } // anonymous namespace
@@ -51,10 +56,65 @@ NaivePathTracer::NaivePathTracer(uint32_t width, uint32_t height)
     ray_generator_ = christalz::ShaderResource::createCompute(logical_device_, fs, "cameras/pinhole_camera", {fs.directory()});
     CXL_DCHECK(ray_generator_);
 
+    lighter_ = christalz::ShaderResource::createGraphics(logical_device_, fs, "lighting/ray", {fs.directory()});
+    CXL_DCHECK(lighter_);
+
     for (uint32_t i = 0; i < num_swap; i++) {
         rays_.push_back(gfx::ComputeBuffer::createUniformBuffer(logical_device_, sizeof(Ray) * width * height));
         random_seeds_.push_back(gfx::ComputeBuffer::createUniformBuffer(logical_device_, sizeof(float) * width * height));
         hits_.push_back(gfx::ComputeBuffer::createUniformBuffer(logical_device_, sizeof(HitPoint) * width * height));
+    }
+
+    camera_ = Camera {
+        .position = glm::vec4(278, 273, -800, 1.0),
+        .direction = glm::vec4(0,0,1,0),
+        .up = glm::vec4(0,1,0,0),
+        .focal_length = 0.035,
+        .width = 0.025,
+        .height = 0.025,
+    };
+
+
+    gfx::RenderPassBuilder builder(logical_device_);
+    vk::SampleCountFlagBits samples = vk::SampleCountFlagBits::e4;
+
+    color_textures_.resize(num_swap);
+    for (uint32_t i = 0; i < num_swap; i++) {
+        color_textures_[i] = gfx::ImageUtils::createColorAttachment(logical_device_, width, height, samples);
+        CXL_DCHECK(color_textures_[i]);
+    }
+    
+    resolve_textures_.resize(num_swap);
+    for (uint32_t i = 0; i < num_swap; i++) {
+        resolve_textures_[i] = gfx::ImageUtils::createColorAttachment(logical_device_, width,
+                                                                     height, vk::SampleCountFlagBits::e1);
+        CXL_DCHECK(resolve_textures_[i]);
+    }
+
+    uint32_t tex_index = 0;
+    for (const auto& texture : swapchain_textures) {
+        CXL_DCHECK(texture);
+        builder.reset();
+        builder.addColorAttachment(color_textures_[tex_index]);
+        builder.addResolveAttachment(resolve_textures_[tex_index]);
+
+        builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
+                            .input_indices = {},
+                            .color_indices = {0},
+                            .resolve_index = 0});
+        tex_index++;
+
+        render_passes_.push_back(std::move(builder.build()));
+    }
+
+
+    for (const auto& texture : swapchain_textures) {
+        builder.reset();
+        builder.addColorAttachment(texture);
+        builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
+                            .input_indices = {},
+                            .color_indices = {0}});
+        display_render_passes_.push_back(std::move(builder.build()));
     }
 }
 
@@ -93,32 +153,21 @@ int32_t NaivePathTracer::run() {
             // Submit compute commands.
 
 
+
             // Render to a framebuffer.
             graphics_buffer->reset();
             graphics_buffer->beginRenderPass(render_passes_[image_index]);
             graphics_buffer->setProgram(lighter_->program());
             graphics_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kCustomRaytrace);
             graphics_buffer->setDepth(/*test*/ false, /*write*/ false);
-
-            // Position
-            graphics_buffer->setVertexAttribute(/*binding*/ 0, /*location*/ 0,
-                                                    /*format*/ vk::Format::eR32G32B32A32Sfloat);
-            // Normal                                        
-            graphics_buffer->setVertexAttribute(/*binding*/ 0, /*location*/ 1,
-                                                    /*format*/ vk::Format::eR32G32B32A32Sfloat);
-            // Tangent
-            graphics_buffer->setVertexAttribute(/*binding*/ 0, /*location*/ 2,
-                                                /*format*/ vk::Format::eR32G32B32A32Sfloat);
-            // Color
-            graphics_buffer->setVertexAttribute(/*binding*/ 0, /*location*/ 2,
-                                                /*format*/ vk::Format::eR32G32B32A32Sfloat);
-            // UV Coord
-            graphics_buffer->setVertexAttribute(/*binding*/ 0, /*location*/ 2,
-                                                /*format*/ vk::Format::eR32G32Sfloat);   
-
-            graphics_buffer->bindVertexBuffer(hits_[image_index]);
+            graphics_buffer->setProgram(lighter_->program());
+            graphics_buffer->bindUniformBuffer(0, 0, rays_[image_index]);
+            graphics_buffer->bindUniformBuffer(0, 1, hits_[image_index]);
+            graphics_buffer->pushConstants(glm::vec2(window_config_.width, window_config_.height));
+            graphics_buffer->draw(window_config_.width * window_config_.height);
+            graphics_buffer->endRenderPass();
         });        
-
     }
+
     return 0;
 }

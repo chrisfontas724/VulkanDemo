@@ -28,6 +28,7 @@ private:
         glm::vec4 position;
         glm::vec4 direction;
         glm::vec4 up;
+        glm::vec2 sensor_size;
         float focal_length;
         float width;
         float height;

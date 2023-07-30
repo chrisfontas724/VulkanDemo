@@ -7,12 +7,12 @@
 
 // Represents a camera.
 struct Camera {
-    mat4 matrix;
-    vec4 clear_color;
-    ivec2 extent;
-    vec2 pixel_offset;
-    float focal_length;
-    float aperture_width;
+        vec4 position;
+        vec4 direction;
+        vec4 up;
+        float focal_length;
+        float width;
+        float height;
 };
 
 #endif // CAMERA_INFO_COMP_

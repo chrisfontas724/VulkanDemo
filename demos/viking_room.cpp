@@ -91,7 +91,7 @@ VikingRoom::VikingRoom(uint32_t width, uint32_t height)
     }
 
 
-    cxl::FileSystem fs("c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/shaders");
+    cxl::FileSystem fs("c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/shaders/lighting/");
     model_shader_ = christalz::ShaderResource::createGraphics(logical_device_, fs, "model");
     post_shader_ = christalz::ShaderResource::createGraphics(logical_device_, fs, "post");
     model_ = std::make_shared<christalz::Model>(logical_device_, 

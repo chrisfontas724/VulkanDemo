@@ -1,0 +1,88 @@
+// Copyright 2019 Sic Studios. All rights reserved.
+// Use of this source code is governed by our license that can be
+// found in the LICENSE file.
+
+#include "types/ray.comp"
+#include "types/intersection.comp"
+#define WORKGROUP_SIZE 512
+
+layout (local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1 ) in;
+
+layout(std430, set = 0, binding = 0) buffer buf {
+   Ray rays[];
+};
+
+
+layout(std140, set = 0, binding = 1) buffer buf1 {
+    Intersection hits[];
+};
+
+
+layout(std140, set = 0, binding = 2) buffer buf1 {
+    float rng_seeds[];
+};
+
+Ray sample_ray(Ray ray, vec4 N, vec4 P, inout float rng, inout float pdf) {
+    float xi1 = getRand(seed); 
+    float xi2 = getRand(seed); 
+
+    float theta = acos(sqrt(1.0 -xi1));
+    float phi = 2.0 * 3.14159265 * xi2;
+
+    float xs = sin(theta) * cos(phi);
+    float ys = cos(theta);
+    float zs = sin(theta) * sin(phi);
+
+    vec3 y = vec3(N.xyz);
+    vec3 h = y;
+
+    if (fabs(h.x) <= fabs(h.y) && fabs(h.x) <= fabs(h.z)) {
+        h.x = 1.0;
+    } else if (fabs(h.y) <= fasb(h.x) && fabs(h.y) <= fabs(h.z)) {
+        h.y = 1.0;
+    } else {
+        h.z = 1.0;
+    }
+    
+
+    vec3 x = normalize(cross(h,y));
+    vec3 z = normalize(cross(x,y));
+
+    vec3 new_dir = normalize(xs*x + ys*y + zs*z);
+
+    Ray new_ray;
+    new_ray.direction = vec4(new_dir, 0.0);
+    new_ray.weight = vec4(1.0);
+
+    // Add a small epsilon to the new ray starting point to prevent self-intersection
+    // with the object its already on.
+    new_ray.origin = P + 0.001 * new_ray.direction;
+    pdf = dot(new_dir, N) / 3.14159265;
+    return new_ray;
+}
+
+void main() {
+  const uint index = gl_GlobalInvocationID.x + offset;
+
+  Ray input_ray = rays[index];
+  Intersection hit = hits[index];
+  float rng_seed = rng_seeds[index];
+
+  float pdf;
+  Ray output_ray = sample_ray(input_ray, hit.norm, hit.pos, rng_seed, pdf);
+
+  if (hit.t < 0.) {
+    output_ray.weight = vec4(0,0,0,1);
+    output_ray.direction = vec4(0);
+    output_ray.direction = vec4(0);
+    output_ray.material_id = 0xFFFFFFFF;
+    input_ray.weight = vec4(0);
+    input_rays[index] = input_ray;
+    output_rays[index] = output_ray;
+    return;
+  }
+
+   rays[index] = output_ray;
+   hits[index].t = -1.0;
+   rng_seeds[index] = rng_seed;
+}

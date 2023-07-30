@@ -46,7 +46,7 @@ TextRenderer::TextRenderer(const gfx::LogicalDevicePtr& device)
 
   // Create Shader
   {
-    cxl::FileSystem fs("c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/shaders");
+    cxl::FileSystem fs("c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/shaders/debug/");
     cxl::FileStream vert_shader;
     cxl::FileStream frag_shader;
     bool result = vert_shader.load(&fs, "text.vert");
