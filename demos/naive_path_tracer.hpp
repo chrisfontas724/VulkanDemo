@@ -53,7 +53,6 @@ private:
 
     std::vector<gfx::ComputeTexturePtr> color_textures_;
     std::vector<gfx::ComputeTexturePtr> resolve_textures_;
-    std::vector<gfx::ComputeTexturePtr> depth_textures_;
 
     std::vector<gfx::CommandBufferPtr> compute_command_buffers_;
 

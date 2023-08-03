@@ -19,10 +19,6 @@ struct UniformBufferObject {
 
 glm::vec3 eye_pos = glm::vec3(2, 2, 2);
 glm::vec3 direction = glm::normalize(glm::vec3(0) - eye_pos);
-
-gfx::CommandBufferState::DefaultState default_state_ =
-    gfx::CommandBufferState::DefaultState::kOpaque;
-
 float degrees = 90;
 
 } // anonymous namespace
@@ -71,8 +67,6 @@ void VikingRoom::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, i
         render_passes_.push_back(std::move(builder.build()));
     }
 
-
-
     cxl::FileSystem fs("c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/shaders/");
     model_shader_ = christalz::ShaderResource::createGraphics(logical_device, fs, "lighting/model");
     model_ = std::make_shared<christalz::Model>(logical_device, 
@@ -81,8 +75,7 @@ void VikingRoom::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, i
     CXL_DCHECK(model_shader_);
     CXL_DCHECK(model_);
 
-    ubo_buffer_ = gfx::ComputeBuffer::createHostAccessableUniform(logical_device,
-                                                                      sizeof(UniformBufferObject));
+    ubo_buffer_ = gfx::ComputeBuffer::createHostAccessableUniform(logical_device, sizeof(UniformBufferObject));
     CXL_DCHECK(ubo_buffer_);
 }
 
@@ -113,44 +106,34 @@ VikingRoom::~VikingRoom() {
 gfx::ComputeTexturePtr
 VikingRoom::renderFrame(gfx::CommandBufferPtr command_buffer, 
                         uint32_t image_index, uint32_t frame) { 
-    {
-        UniformBufferObject ubo; 
-        ubo.model = glm::rotate(glm::mat4(1.0f), glm::radians(degrees), glm::vec3(0.0f, 0.0f, 1.0f));
-        ubo.view = glm::lookAt(eye_pos, eye_pos + direction, glm::vec3(0.0f, 0.0f, 1.0f));
-        ubo.proj = glm::perspective(glm::radians(45.0f),
-                                    float(width_) / float(height_), 0.1f, 100.0f);
-        ubo.proj[1][1] *= -1;
-        ubo_buffer_->write(&ubo, 1);
-        degrees += 0.01;
-    }
-            
+    UniformBufferObject ubo; 
+    ubo.model = glm::rotate(glm::mat4(1.0f), glm::radians(degrees), glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.view = glm::lookAt(eye_pos, eye_pos + direction, glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.proj = glm::perspective(glm::radians(45.0f), float(width_) / float(height_), 0.1f, 100.0f);
+    ubo.proj[1][1] *= -1;
+    ubo_buffer_->write(&ubo, 1);
+    degrees += 0.01;
+         
     // Record graphics commands.
     resolve_textures_[image_index]->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eColorAttachmentOptimal);
     command_buffer->beginRenderPass(render_passes_[image_index]);
-
-    {       
-        command_buffer->setVertexAttribute(/*binding*/ 0, /*location*/ 0,
-                                            /*format*/ vk::Format::eR32G32B32A32Sfloat);
-        command_buffer->setVertexAttribute(/*binding*/ 0, /*location*/ 1,
-                                            /*format*/ vk::Format::eR32G32B32A32Sfloat);
-        command_buffer->setVertexAttribute(/*binding*/ 0, /*location*/ 2,
-                                            /*format*/ vk::Format::eR32G32Sfloat);                              
-        command_buffer->setProgram(model_shader_->program());
-        command_buffer->bindVertexBuffer(model_->vertices());
-        command_buffer->bindIndexBuffer(model_->indices());
-        command_buffer->bindUniformBuffer(0, 0, ubo_buffer_);
-        command_buffer->bindTexture(0, 1, model_->texture());
-        command_buffer->setDefaultState(default_state_);
-        command_buffer->setDepth(/*test*/ true, /*write*/ true);
-        command_buffer->drawIndexed(model_->num_indices());
-    }
+ 
+    command_buffer->setVertexAttribute(/*binding*/ 0, /*location*/ 0, /*format*/ vk::Format::eR32G32B32A32Sfloat);
+    command_buffer->setVertexAttribute(/*binding*/ 0, /*location*/ 1, /*format*/ vk::Format::eR32G32B32A32Sfloat);
+    command_buffer->setVertexAttribute(/*binding*/ 0, /*location*/ 2, /*format*/ vk::Format::eR32G32Sfloat);                              
+    command_buffer->setProgram(model_shader_->program());
+    command_buffer->bindVertexBuffer(model_->vertices());
+    command_buffer->bindIndexBuffer(model_->indices());
+    command_buffer->bindUniformBuffer(0, 0, ubo_buffer_);
+    command_buffer->bindTexture(0, 1, model_->texture());
+    command_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kOpaque);
+    command_buffer->setDepth(/*test*/ true, /*write*/ true);
+    command_buffer->drawIndexed(model_->num_indices());
             
     // Render Debug Text.
-    {
-        std::string text = "sample: " + std::to_string(sample);
-        text_renderer_->renderText(command_buffer, text, {-0.9, 0.8}, {-0.5, 0.9}, text.size());
-        sample++;
-    }
+    std::string text = "sample: " + std::to_string(sample);
+    text_renderer_->renderText(command_buffer, text, {-0.9, 0.8}, {-0.5, 0.9}, text.size());
+    sample++;
 
     command_buffer->endRenderPass();
     resolve_textures_[image_index]->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal); 

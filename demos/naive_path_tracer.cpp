@@ -80,24 +80,16 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
         CXL_DCHECK(resolve_textures_[i]);
     }
 
-    depth_textures_.resize(num_swap);
-    for (uint32_t i = 0; i < num_swap; i++) {
-      depth_textures_[i] =
-        gfx::ImageUtils::createDepthTexture(logical_device, width, height, samples);
-      CXL_DCHECK(depth_textures_[i]);
-    }
 
     for (int32_t tex_index = 0; tex_index < num_swap; tex_index++) {
         builder.reset();
         builder.addColorAttachment(color_textures_[tex_index]);
-        builder.addDepthAttachment(depth_textures_[tex_index]);
         builder.addResolveAttachment(resolve_textures_[tex_index]);
 
         builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
                             .input_indices = {},
                             .color_indices = {0},
-                            .resolve_index = 0,
-                            .depth_index = 0});
+                            .resolve_index = 0});
         render_passes_.push_back(std::move(builder.build()));
     }
 
