@@ -13,21 +13,13 @@
 class Demo {
 
 public:
-    ~Demo();
+    virtual void setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, int32_t width, int32_t height) = 0;
 
-    virtual int32_t run() = 0;
+    virtual std::pair<std::vector<vk::Semaphore>, gfx::ComputeTexturePtr>
+    renderFrame(gfx::CommandBufferPtr command_buffer, uint32_t image_index, uint32_t frame) = 0;
 
 protected:
-    Demo(const std::string& name, uint32_t width, uint32_t height);
-
-    gfx::InstancePtr instance_;
-    gfx::PhysicalDevicePtr physical_device_;
-    gfx::LogicalDevicePtr logical_device_;
-    gfx::SwapChainPtr swap_chain_;
-    display::Window::Config window_config_;
-    std::shared_ptr<display::GLFWWindow> window_;
-    std::shared_ptr<display::WindowDelegate> delegate_;
-    vk::SurfaceKHR surface_;
+    gfx::LogicalDeviceWeakPtr logical_device_;
 };
 
 #endif // DEMO_HPP_

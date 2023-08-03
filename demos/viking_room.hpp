@@ -10,28 +10,28 @@
 #include "demo.hpp"
 #include "text_renderer.hpp"
 #include "shader_resource.hpp"
+#include "compute_texture.hpp"
 #include "model.hpp"
 
 class VikingRoom : public Demo {
 
 public:
 
-    VikingRoom(uint32_t width, uint32_t height);
     ~VikingRoom();
 
-    int32_t run() override;
+    void setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, int32_t width, int32_t height) override;
+
+    std::pair<std::vector<vk::Semaphore>, gfx::ComputeTexturePtr>
+    renderFrame(gfx::CommandBufferPtr command_buffer, 
+                uint32_t image_index, 
+                uint32_t frame) override;
 
 private:
-
     std::shared_ptr<TextRenderer> text_renderer_;
-    std::vector<gfx::CommandBufferPtr> command_buffers_;
-
     std::vector<gfx::RenderPassInfo> render_passes_;
-    std::vector<gfx::RenderPassInfo> display_render_passes_;
     std::vector<vk::Semaphore> render_semaphores_;
 
     std::shared_ptr<christalz::ShaderResource> model_shader_;
-    std::shared_ptr<christalz::ShaderResource> post_shader_;
     std::shared_ptr<christalz::Model> model_;
 
     gfx::ComputeBufferPtr ubo_buffer_;
@@ -39,6 +39,7 @@ private:
     std::vector<gfx::ComputeTexturePtr> color_textures_;
     std::vector<gfx::ComputeTexturePtr> resolve_textures_;
     std::vector<gfx::ComputeTexturePtr> depth_textures_;
+    uint32_t width_, height_;
 };
 
 #endif // VIKING_ROOM_HPP_

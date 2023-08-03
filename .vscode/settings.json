@@ -81,6 +81,7 @@
         "forward_list": "cpp",
         "random": "cpp",
         "stop_token": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "filesystem": "cpp"
     }
 }

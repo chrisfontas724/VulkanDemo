@@ -17,10 +17,14 @@ class NaivePathTracer : public Demo {
 
 public:
 
-    NaivePathTracer(uint32_t width, uint32_t height);
     ~NaivePathTracer();
 
-    int32_t run() override;
+    void setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, int32_t width, int32_t height) override;
+
+    std::pair<std::vector<vk::Semaphore>, gfx::ComputeTexturePtr>
+    renderFrame(gfx::CommandBufferPtr command_buffer, 
+                uint32_t image_index, 
+                uint32_t frame) override;
 
 private:
 
@@ -40,18 +44,15 @@ private:
     std::vector<gfx::CommandBufferPtr> command_buffers_;
 
     std::vector<gfx::RenderPassInfo> render_passes_;
-    std::vector<gfx::RenderPassInfo> display_render_passes_;
 
     std::shared_ptr<christalz::ShaderResource> ray_generator_;
     std::shared_ptr<christalz::ShaderResource> hit_tester_;
     std::shared_ptr<christalz::ShaderResource> bouncer_;
     std::shared_ptr<christalz::ShaderResource> lighter_;
-    std::shared_ptr<christalz::ShaderResource> post_shader_;
 
     std::vector<gfx::ComputeTexturePtr> color_textures_;
     std::vector<gfx::ComputeTexturePtr> resolve_textures_;
 
-    std::vector<gfx::CommandBufferPtr> graphics_command_buffers_;
     std::vector<gfx::CommandBufferPtr> compute_command_buffers_;
 
     std::vector<vk::Semaphore> render_semaphores_;
