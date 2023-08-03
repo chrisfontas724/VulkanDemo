@@ -84,7 +84,6 @@ void TextRenderer::renderText(gfx::CommandBufferPtr cmd_buffer,
                               glm::vec2 top_left, 
                               glm::vec2 bottom_right,
                               uint32_t num_per_row ) {
-
     uint32_t num_rows = (text.size() + num_per_row - 1) / num_per_row;
     float glyph_width = fabs(bottom_right.x - top_left.x) / num_per_row;
     float glyph_height = fabs(bottom_right.y - top_left.y) / num_rows;
@@ -114,8 +113,7 @@ void TextRenderer::renderText(gfx::CommandBufferPtr cmd_buffer,
 
         cmd_buffer->pushConstants(&positions[0], 0u, sizeof(glm::vec2)*4);
         cmd_buffer->pushConstants(&uvs[0], 32u, sizeof(glm::vec2)*4);
-        cmd_buffer->pushConstants(glm::vec4(1,0,1,1), 64);
+        cmd_buffer->pushConstants(color_, 64);
         cmd_buffer->draw(6);
     }
-
 }

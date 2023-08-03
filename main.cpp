@@ -5,7 +5,7 @@
 
 #include <UsefulUtils/logging.hpp>
 #include "demos/viking_room.hpp"
-// ZZ#include "demos/naive_path_tracer.hpp"
+#include "demos/naive_path_tracer.hpp"
 #include "demos/demo_harness.hpp"
 
 INITIALIZE_EASYLOGGINGPP
@@ -19,6 +19,7 @@ int main(int argc, char** argv) {
     START_EASYLOGGINGPP(argc, argv);
 
     auto harness = DemoHarness(kDisplayWidth, kDisplayHeight);
+    harness.addDemo(std::move(std::make_shared<NaivePathTracer>()));
     harness.addDemo(std::move(std::make_shared<VikingRoom>()));
     return harness.run();
 }

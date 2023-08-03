@@ -12,6 +12,7 @@
 namespace {
 
 uint32_t index = 0;
+const int MAX_FRAMES_IN_FLIGHT = 2;
 
 // Example dummy delegate class.
 class Delegate : public display::WindowDelegate {
@@ -37,13 +38,21 @@ public:
     }
 };
 
+
 const std::vector<const char*> kDeviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-
 } // anonymous namespace
 
+void DemoHarness::checkInputManager(const display::InputManager* mngr) {
+    CXL_DCHECK(mngr);
+    if (mngr->key_up(display::KeyCode::A)) {
+        index++;
+        index %= demos_.size();
+        logical_device_->waitIdle();
+    }
+}
 
 DemoHarness::DemoHarness(uint32_t width, uint32_t height) {
     std::string name = "DemoHarness";
@@ -80,6 +89,8 @@ DemoHarness::DemoHarness(uint32_t width, uint32_t height) {
                                                   vk::CommandBufferLevel::ePrimary, num_swap);
     CXL_DCHECK(command_buffers_.size() == num_swap);
 
+    render_semaphores_ = logical_device_->createSemaphores(MAX_FRAMES_IN_FLIGHT);
+
     gfx::RenderPassBuilder builder(logical_device_);
     for (const auto& texture : swapchain_textures) {
         builder.reset();
@@ -96,20 +107,24 @@ DemoHarness::DemoHarness(uint32_t width, uint32_t height) {
 }
 
 
-int32_t DemoHarness::run() {
-    auto demo = current_demo();
-    if (!demo) {
-        return 0;
-    }
-
+int32_t DemoHarness::run() {   
     while (!window_->shouldClose()) {
         window_->poll();
+        checkInputManager(window_->input_manager());
+        auto demo = current_demo();
+        CXL_DCHECK(demo);
 
-        swap_chain_->beginFrame([&](vk::Semaphore& semaphore, vk::Fence& fence, uint32_t image_index,
+        swap_chain_->beginFrame([&](vk::Semaphore& image_available_semaphore, vk::Fence& in_flight_fence, uint32_t image_index,
                                     uint32_t frame) -> std::vector<vk::Semaphore> {
-      
             auto command_buffer = command_buffers_[image_index];
-            auto [semaphores, texture] = demo->renderFrame(command_buffer, image_index, frame);
+            command_buffer->reset();
+            command_buffer->beginRecording();
+
+            if (demo != last_demo_) {
+                last_demo_ = demo;
+            }
+
+            auto texture = demo->renderFrame(command_buffer, image_index, frame);
         
             command_buffer->beginRenderPass(display_render_passes_[image_index]);
             command_buffer->setProgram(post_shader_->program());
@@ -121,18 +136,17 @@ int32_t DemoHarness::run() {
             command_buffer->endRecording();
 
             // Submit graphics commands.
-            vk::PipelineStageFlags graphicsWaitStages[] = {
-            vk::PipelineStageFlagBits::eColorAttachmentOutput};
+            vk::PipelineStageFlags graphicsWaitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
             vk::SubmitInfo submit_info(/*wait_semaphore_count*/1U, 
-                                       /*wait_semaphores*/&semaphore, 
+                                       /*wait_semaphores*/&image_available_semaphore, 
                                        graphicsWaitStages, 
                                        /*command_buffer_count*/1U,
                                        /*command_buffers*/&command_buffer->vk(), 
-                                       /*signal_semaphore_count*/semaphores.size(), 
-                                       /*signal_semaphores*/semaphores.data());
-            logical_device_->getQueue(gfx::Queue::Type::kPresent).submit(submit_info, fence);
+                                       /*signal_semaphore_count*/1U, 
+                                       /*signal_semaphores*/&render_semaphores_[frame]);
+            logical_device_->getQueue(gfx::Queue::Type::kGraphics).submit(submit_info, in_flight_fence);
 
-            return semaphores;
+            return {render_semaphores_[frame]};
          });
     }
     return 0;
@@ -150,6 +164,10 @@ DemoHarness::~DemoHarness() {
         demo.reset();
     }
     demos_.clear();
+
+    for (auto& semaphore : render_semaphores_) {
+        logical_device_->vk().destroy(semaphore);
+    }
 
     for (auto& pass : display_render_passes_) {
         logical_device_->vk().destroyRenderPass(pass.render_pass);

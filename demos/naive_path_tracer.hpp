@@ -21,10 +21,12 @@ public:
 
     void setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, int32_t width, int32_t height) override;
 
-    std::pair<std::vector<vk::Semaphore>, gfx::ComputeTexturePtr>
+    gfx::ComputeTexturePtr
     renderFrame(gfx::CommandBufferPtr command_buffer, 
                 uint32_t image_index, 
                 uint32_t frame) override;
+    
+    std::string name() override { return "NaivePathTracer"; }
 
 private:
 
@@ -41,7 +43,6 @@ private:
     Camera camera_;
 
     std::shared_ptr<TextRenderer> text_renderer_;
-    std::vector<gfx::CommandBufferPtr> command_buffers_;
 
     std::vector<gfx::RenderPassInfo> render_passes_;
 
@@ -52,10 +53,10 @@ private:
 
     std::vector<gfx::ComputeTexturePtr> color_textures_;
     std::vector<gfx::ComputeTexturePtr> resolve_textures_;
+    std::vector<gfx::ComputeTexturePtr> depth_textures_;
 
     std::vector<gfx::CommandBufferPtr> compute_command_buffers_;
 
-    std::vector<vk::Semaphore> render_semaphores_;
     std::vector<vk::Semaphore> compute_semaphores_;
 
     std::vector<vk::Fence> compute_fences_;

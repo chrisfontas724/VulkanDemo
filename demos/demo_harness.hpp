@@ -27,6 +27,7 @@ public:
 
 private:
 
+    void checkInputManager(const display::InputManager* mngr);
     std::shared_ptr<Demo> current_demo();
 
     std::vector<std::shared_ptr<Demo>> demos_;
@@ -40,7 +41,9 @@ private:
     std::vector<gfx::CommandBufferPtr> command_buffers_;
     std::vector<gfx::RenderPassInfo> display_render_passes_;
     std::shared_ptr<christalz::ShaderResource> post_shader_;
+    std::vector<vk::Semaphore> render_semaphores_;
     vk::SurfaceKHR surface_;
+    std::shared_ptr<Demo> last_demo_ = nullptr;
 };
 
 #endif // DEMO_HARNESS_HPP_

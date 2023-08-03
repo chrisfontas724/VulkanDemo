@@ -32,8 +32,6 @@ void VikingRoom::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, i
     width_ = width;
     height_ = height;
 
-    render_semaphores_ = logical_device->createSemaphores(MAX_FRAMES_IN_FLIGHT);
-
     text_renderer_ = std::make_shared<TextRenderer>(logical_device);
 
     gfx::RenderPassBuilder builder(logical_device);
@@ -98,10 +96,6 @@ VikingRoom::~VikingRoom() {
         logical_device->vk().destroyRenderPass(pass.render_pass);
     }
 
-    for (auto& semaphore : render_semaphores_) {
-        logical_device->vk().destroy(semaphore);
-    }
-
     for (auto& texture: color_textures_) {
         texture.reset();
     }
@@ -116,7 +110,7 @@ VikingRoom::~VikingRoom() {
 }
 
 
-std::pair<std::vector<vk::Semaphore>, gfx::ComputeTexturePtr>
+gfx::ComputeTexturePtr
 VikingRoom::renderFrame(gfx::CommandBufferPtr command_buffer, 
                         uint32_t image_index, uint32_t frame) { 
     {
@@ -131,8 +125,6 @@ VikingRoom::renderFrame(gfx::CommandBufferPtr command_buffer,
     }
             
     // Record graphics commands.
-    command_buffer->reset();
-    command_buffer->beginRecording();
     resolve_textures_[image_index]->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eColorAttachmentOptimal);
     command_buffer->beginRenderPass(render_passes_[image_index]);
 
@@ -156,14 +148,13 @@ VikingRoom::renderFrame(gfx::CommandBufferPtr command_buffer,
     // Render Debug Text.
     {
         std::string text = "sample: " + std::to_string(sample);
-        command_buffer->setDefaultState(default_state_);
         text_renderer_->renderText(command_buffer, text, {-0.9, 0.8}, {-0.5, 0.9}, text.size());
         sample++;
     }
 
     command_buffer->endRenderPass();
     resolve_textures_[image_index]->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal); 
-    return {{render_semaphores_[frame]}, resolve_textures_[image_index]};
+    return resolve_textures_[image_index];
 }
 
 

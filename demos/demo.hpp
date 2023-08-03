@@ -15,11 +15,13 @@ class Demo {
 public:
     virtual void setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, int32_t width, int32_t height) = 0;
 
-    virtual std::pair<std::vector<vk::Semaphore>, gfx::ComputeTexturePtr>
-    renderFrame(gfx::CommandBufferPtr command_buffer, uint32_t image_index, uint32_t frame) = 0;
+    virtual gfx::ComputeTexturePtr renderFrame(gfx::CommandBufferPtr command_buffer, uint32_t image_index, uint32_t frame) = 0;
+
+    virtual std::string name() = 0;
 
 protected:
     gfx::LogicalDeviceWeakPtr logical_device_;
+    uint32_t width_, height_;
 };
 
 #endif // DEMO_HPP_
