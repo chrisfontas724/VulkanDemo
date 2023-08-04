@@ -24,9 +24,24 @@ layout(std140, set = 0, binding = 2) buffer buf2 {
     float rng_seeds[];
 };
 
-Ray sample_ray(Ray ray, vec4 N, vec4 P, inout float seed, inout float pdf) {
-    float xi1 = getRand(seed); 
-    float xi2 = getRand(seed); 
+
+void main() {
+    const uint index = gl_GlobalInvocationID.x;
+
+    Ray input_ray = rays[index];
+    HitPoint hit = hits[index];
+    float rng_seed = rng_seeds[index];
+
+    if (hit.t == -1.0) {
+        input_ray.valid = 0;
+        hits[index].t = -1.0;
+        rays[index] = input_ray;
+        return;
+    }
+
+
+    float xi1 = getRand(rng_seed); 
+    float xi2 = getRand(rng_seed); 
 
     float theta = acos(sqrt(1.0 -xi1));
     float phi = 2.0 * 3.14159265 * xi2;
@@ -35,7 +50,7 @@ Ray sample_ray(Ray ray, vec4 N, vec4 P, inout float seed, inout float pdf) {
     float ys = cos(theta);
     float zs = sin(theta) * sin(phi);
 
-    vec3 y = vec3(N.xyz);
+    vec3 y = vec3(hit.norm.xyz);
     vec3 h = y;
 
     if (abs(h.x) <= abs(h.y) && abs(h.x) <= abs(h.z)) {
@@ -50,41 +65,21 @@ Ray sample_ray(Ray ray, vec4 N, vec4 P, inout float seed, inout float pdf) {
     vec3 z = normalize(cross(x,y));
 
     vec3 new_dir = normalize(xs*x + ys*y + zs*z);
+    float pdf = dot(new_dir, hit.norm.xyz) / 3.14159265;
 
-    Ray new_ray;
-    new_ray.direction = vec4(new_dir, 0.0);
-    new_ray.weight = vec4(1.0);
-    new_ray.coord = ray.coord;
 
     // Add a small epsilon to the new ray starting point to prevent self-intersection
     // with the object its already on.
-    new_ray.origin = P + 0.001 * new_ray.direction;
-    pdf = dot(new_dir, N.xyz) / 3.14159265;
-    return new_ray;
-}
-
-void main() {
-    const uint index = gl_GlobalInvocationID.x;
-
-    Ray input_ray = rays[index];
-    HitPoint hit = hits[index];
-    float rng_seed = rng_seeds[index];
+    Ray new_ray = input_ray;
+    new_ray.direction = vec4(new_dir, 0.0);
+    new_ray.origin = hit.pos + 0.01 * new_ray.direction;
+    new_ray.accumulation += input_ray.weight * hit.emission;
+    new_ray.weight *= hit.col * dot(new_ray.direction.xyz, hit.norm.xyz) / pdf;
 
 
-    if (hit.t < 0.) {
-        Ray output_ray;
-        output_ray.weight = vec4(0,0,0,1);
-        output_ray.direction = vec4(0);
-        output_ray.direction = vec4(0);
-        rays[index] = output_ray;
-        return;
-    }
-
-    float pdf;
-    Ray output_ray = sample_ray(input_ray, hit.norm, hit.pos, rng_seed, pdf);
-
-
-    rays[index] = output_ray;
-    hits[index].t = -1.0;
+    HitPoint blank_hit;
+    blank_hit.t = -1.0;
+    rays[index] = new_ray;
+    hits[index] = blank_hit;
     rng_seeds[index] = rng_seed;
 }

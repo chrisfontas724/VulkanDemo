@@ -3,12 +3,12 @@
 // found in the LICENSE file.
 
 // Outputs
-layout (location = 0) in vec4 light;
-layout (location = 1) in vec4 weight;
+layout (location = 0) in vec4 accumulation;
+
 layout(location = 0) out vec4 outColor;
 
 
 // Simply write out the position with no transformation.
 void main() {
-    outColor = light*weight;
+    outColor = accumulation;
 }

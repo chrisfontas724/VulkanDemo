@@ -82,7 +82,8 @@ void main() {
   const uint index = gl_GlobalInvocationID.x;
 
   Ray ray = rays[index];
-  if (ray.weight == vec4(0.)) {
+  if (ray.valid != 1) {
+    hit_points[index].t = -1.0;
     return;
   }
 
@@ -99,5 +100,5 @@ void main() {
     new_hit.pos = ray.origin + t*ray.direction;
     new_hit.norm = vec4(normalize(cross(v0.xyz-v1.xyz, v0.xyz-v2.xyz)), 0.0);
     hit_points[index] = new_hit;
-  }
+  } 
 }

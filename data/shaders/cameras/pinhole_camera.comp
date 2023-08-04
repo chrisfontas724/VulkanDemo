@@ -40,8 +40,8 @@ void main() {
 
   float alpha = 2.0 * atan(1.0 / (2.0 * camera.focal_length));
 
-  float s_1 = 0.5;//getRand(seed);
-  float s_2 = 0.5;//getRand(seed);
+  float s_1 = getRand(seed);
+  float s_2 = getRand(seed);
 
   float pixel_normalized_x = (x_coord + s_1) / image_width;
   float pixel_normalized_y = (y_coord + s_2) / image_height; 
@@ -58,7 +58,9 @@ void main() {
   ray.origin = camera.position;
   ray.direction = normalize(-camera_point);
   ray.weight = vec4(1.0);
+  ray.accumulation = vec4(0);
   ray.coord = vec2(pixel_ndc_x, pixel_ndc_y);
+  ray.valid = 1;
   rays[index] = ray;
   seeds[index] = seed;
 }

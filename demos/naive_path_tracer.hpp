@@ -43,7 +43,9 @@ private:
         alignas(16) glm::vec4 origin;
         alignas(16) glm::vec4 direction;
         alignas(16) glm::vec4 weight;
+        alignas(16) glm::vec4 accumulation;
         alignas(8) glm::vec2 coord;
+        int32_t valid = true;
     };
  
     struct HitPoint {
@@ -128,6 +130,7 @@ private:
 
     std::shared_ptr<TextRenderer> text_renderer_;
 
+    std::vector<gfx::RenderPassInfo> accumulation_passes_;
     std::vector<gfx::RenderPassInfo> render_passes_;
 
     std::shared_ptr<christalz::ShaderResource> rng_seeder_;
@@ -135,7 +138,9 @@ private:
     std::shared_ptr<christalz::ShaderResource> hit_tester_;
     std::shared_ptr<christalz::ShaderResource> bouncer_;
     std::shared_ptr<christalz::ShaderResource> lighter_;
+    std::shared_ptr<christalz::ShaderResource> resolve_;
 
+    std::vector<gfx::ComputeTexturePtr> accum_textures_;
     std::vector<gfx::ComputeTexturePtr> color_textures_;
     std::vector<gfx::ComputeTexturePtr> resolve_textures_;
 
