@@ -16,7 +16,7 @@ layout(std430, set = 0, binding = 0) buffer buf {
 
 
 layout(std140, set = 0, binding = 1) buffer buf1 {
-    Intersection hits[];
+    HitPoint hits[];
 };
 
 
@@ -45,7 +45,6 @@ Ray sample_ray(Ray ray, vec4 N, vec4 P, inout float seed, inout float pdf) {
     } else {
         h.z = 1.0;
     }
-    
 
     vec3 x = normalize(cross(h,y));
     vec3 z = normalize(cross(x,y));
@@ -55,6 +54,7 @@ Ray sample_ray(Ray ray, vec4 N, vec4 P, inout float seed, inout float pdf) {
     Ray new_ray;
     new_ray.direction = vec4(new_dir, 0.0);
     new_ray.weight = vec4(1.0);
+    new_ray.coord = ray.coord;
 
     // Add a small epsilon to the new ray starting point to prevent self-intersection
     // with the object its already on.
@@ -64,27 +64,27 @@ Ray sample_ray(Ray ray, vec4 N, vec4 P, inout float seed, inout float pdf) {
 }
 
 void main() {
-  const uint index = gl_GlobalInvocationID.x;
+    const uint index = gl_GlobalInvocationID.x;
 
-  Ray input_ray = rays[index];
-  Intersection hit = hits[index];
-  float rng_seed = rng_seeds[index];
+    Ray input_ray = rays[index];
+    HitPoint hit = hits[index];
+    float rng_seed = rng_seeds[index];
 
 
-  if (hit.t < 0.) {
-    Ray output_ray;
-    output_ray.weight = vec4(0,0,0,1);
-    output_ray.direction = vec4(0);
-    output_ray.direction = vec4(0);
-    rays[index] = output_ray;
-    return;
-  }
+    if (hit.t < 0.) {
+        Ray output_ray;
+        output_ray.weight = vec4(0,0,0,1);
+        output_ray.direction = vec4(0);
+        output_ray.direction = vec4(0);
+        rays[index] = output_ray;
+        return;
+    }
 
     float pdf;
     Ray output_ray = sample_ray(input_ray, hit.norm, hit.pos, rng_seed, pdf);
 
 
-   rays[index] = output_ray;
-   hits[index].t = -1.0;
-   rng_seeds[index] = rng_seed;
+    rays[index] = output_ray;
+    hits[index].t = -1.0;
+    rng_seeds[index] = rng_seed;
 }

@@ -10,8 +10,8 @@
 
 INITIALIZE_EASYLOGGINGPP
 
-const uint32_t kDisplayWidth = 1800;
-const uint32_t kDisplayHeight = 1100;
+const uint32_t kDisplayWidth = 1024;
+const uint32_t kDisplayHeight = 768;
 
 
 // Set up a window with the delegate and start polling.

@@ -14,23 +14,90 @@ layout(std430, set = 0, binding = 0) buffer buf {
    Ray rays[];
 };
 
-layout(std140, set = 0, binding = 1) buffer buf2 {
-	Shape shapes[];
+layout(std430, set = 0, binding = 1) buffer buf2 {
+   HitPoint hit_points[];
 };
 
-layout(std140, set = 0, binding = 2) buffer buf3 {
-	vec4 vertex_positions[];
+layout(std140, set = 1, binding = 0) buffer buf3 {
+	vec4 vertices[];
 };
 
-layout(std140, set = 0, binding = 3) buffer buf4 {
+layout(std140, set = 1, binding = 1) buffer indices {
 	ivec4 triangles[];
 };
 
 layout(std140, push_constant) uniform PushBlock {
-    uint num_shapes;
+    layout(offset= 0) BoundingBox bbox;
+    layout(offset=32) Material mat;
+    layout(offset=64) int num_triangles;
 };
+
+float triangle_intersect(Ray ray, vec4 v0, vec4 v1, vec4 v2) {
+  vec4 v0v1 = v1 - v0;
+  vec4 v0v2 = v2 - v0;
+  vec3 pvec = cross(ray.direction.xyz, v0v2.xyz);
+
+  float det = dot(v0v1.xyz, pvec);
+
+  if (det < 0.000001)
+    return -1.0;
+
+  float invDet = 1.0 / det;
+  vec4 tvec = ray.origin - v0;
+  float u = dot(tvec.xyz, pvec) * invDet;
+
+  if (u < 0.0 || u > 1.0) {
+    return -1.0;
+  }
+
+  vec3 qvec = cross(tvec.xyz, v0v1.xyz);
+  float v = dot(ray.direction.xyz, qvec) * invDet;
+
+  if (v < 0.0 || u + v > 1.0)
+    return -1.0;
+  return dot(v0v2.xyz, qvec) * invDet;
+}
+
+float intersect(Ray ray, out vec4 out_v0, out vec4 out_v1, out vec4 out_v2) {
+  float closest_hit = 1000000000.0;
+  for (int i = 0; i < num_triangles; i++) {
+    ivec4 triangle = triangles[i];
+    vec4 v0 = vertices[triangle.x];
+    vec4 v1 = vertices[triangle.y];
+    vec4 v2 = vertices[triangle.z];
+
+    float curr_hit = triangle_intersect(ray, v0, v1, v2);
+    if (curr_hit > 0.0 && curr_hit < closest_hit) {
+      closest_hit = curr_hit;
+      out_v0 = v0;
+      out_v1 = v1;
+      out_v2 = v2;
+    }
+  }
+
+  return closest_hit != 1000000000.0 ? closest_hit : -1.0;
+}
 
 void main() {
   const uint index = gl_GlobalInvocationID.x;
 
+  Ray ray = rays[index];
+  if (ray.weight == vec4(0.)) {
+    return;
+  }
+
+  HitPoint hit = hit_points[index];
+
+  vec4 v0, v1, v2;
+  float t = intersect(ray, v0, v1, v2);
+
+  if (t != -1.0 && t < hit.t) {
+    HitPoint new_hit;
+    new_hit.t = t;
+    new_hit.col = mat.diffuse_color;
+    new_hit.emission = mat.emissive_color;
+    new_hit.pos = ray.origin + t*ray.direction;
+    new_hit.norm = vec4(normalize(cross(v0.xyz-v1.xyz, v0.xyz-v2.xyz)), 0.0);
+    hit_points[index] = new_hit;
+  }
 }

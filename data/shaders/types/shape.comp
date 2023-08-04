@@ -38,5 +38,15 @@ struct Shape {
     uint interpolate_normals;
     uint turbulence_size;
 };
+    
+struct Material {
+    vec4 diffuse_color;
+    vec4 emissive_color;
+};
+
+struct BoundingBox {
+    vec4 min_pos;
+    vec4 max_pos;
+};
 
 #endif // SHAPE_INFO_COMP_

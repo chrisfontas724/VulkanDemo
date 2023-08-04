@@ -7,23 +7,12 @@
 
 #include "types/shape.comp"
 
-struct Intersection {
+struct HitPoint {
     vec4 pos;
     vec4 norm;
-    vec4 tan;
     vec4 col;
     vec4 emission;
     float t;
-};
-
-struct PreintersectData {
-    vec4 local_origin;
-    vec4 local_direction;
-    float local_hit_dist;
-    float world_hit_dist;
-    int hit_index;
-    ivec3 indices;
-    uint mat_group;
 };
 
 #endif // INTERSECTION_INFO_COMP_

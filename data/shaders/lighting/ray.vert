@@ -10,7 +10,7 @@ layout(std430, set = 0, binding = 0) buffer buf {
 };
 
 layout(std140, set = 0, binding = 1) buffer buf2 {
-   Intersection intersections[];
+    HitPoint intersections[];
 };
 
 layout(push_constant) uniform PushBlock {
@@ -25,7 +25,7 @@ layout(location = 3) out vec4 weight;
 // Simply write out the position with no transformation.
 void main() {
     Ray ray = rays[gl_VertexIndex];
-    Intersection intersection = intersections[gl_VertexIndex];
+    HitPoint intersection = intersections[gl_VertexIndex];
 
     light = intersection.emission;
     weight = ray.weight;

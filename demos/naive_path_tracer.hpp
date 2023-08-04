@@ -37,10 +37,95 @@ private:
         glm::vec2 sensor_size;
         float focal_length;
         float width;
-        float height;
-}   ;
+        float height;   
+    };
+
+    struct Ray {
+        glm::vec4 origin;
+        glm::vec4 direction;
+        glm::vec4 weight;
+        glm::ivec2 coord;
+    };
+ 
+    struct HitPoint {
+        alignas(16) glm::vec4 pos = glm::vec4(0.f, 0.f, 0.f, 1.f);
+        alignas(16) glm::vec4 norm = glm::vec4(0.f);
+        alignas(16) glm::vec4 col = glm::vec4(0.f);
+        alignas(16) glm::vec4 emission = glm::vec4(0.f);
+        alignas(4) float t = -1;
+    };
+
+    struct Material {
+        Material(glm::vec4 diffuse, glm::vec4 emissive = glm::vec4(0)) 
+        : diffuse_color(diffuse)
+        , emissive_color(emissive) {}
+        glm::vec4 diffuse_color;
+        glm::vec4 emissive_color;
+    };
+
+    struct BoundingBox {
+        glm::vec4 min_pos = glm::vec4(10000000000);
+        glm::vec4 max_pos = glm::vec4(-10000000000);
+        BoundingBox(const std::vector<glm::vec4>& vertices) {
+            for(auto v : vertices) {
+                if (v.x < min_pos.x) min_pos.x = v.x;
+                if (v.y < min_pos.y) min_pos.y = v.y;
+                if (v.z < min_pos.z) min_pos.z = v.z;
+                if (v.x > max_pos.x) max_pos.x = v.x;
+                if (v.y > max_pos.y) max_pos.y = v.y;
+                if (v.z > max_pos.z) max_pos.z = v.z;
+            }
+        }
+    };
+
+
+    struct Mesh {
+        Mesh(gfx::LogicalDevicePtr logical_device, 
+            std::vector<glm::vec4> in_vertices,
+            std::vector<uint32_t> in_indices,
+            Material in_material) 
+            : material(in_material) {
+                bbox = BoundingBox(in_vertices);
+                vertices = gfx::ComputeBuffer::createFromVector(
+                                logical_device, in_vertices, vk::BufferUsageFlagBits::eStorageBuffer);
+                
+                std::vector<glm::ivec4> in_triangles;
+                CXL_DCHECK(in_indices.size() % 3 == 0);
+                for (uint32_t i = 0; i < in_indices.size(); i += 3) {
+                    in_triangles.push_back(glm::ivec4(
+                        in_indices[i],
+                        in_indices[i+1],
+                        in_indices[i+2],
+                        0U
+                    ));
+                }
+                
+                num_triangles = in_indices.size() / 3;
+                triangles = gfx::ComputeBuffer::createFromVector(
+                                logical_device, in_triangles, vk::BufferUsageFlagBits::eStorageBuffer);
+
+        }
+
+        Material material;
+        std::optional<BoundingBox> bbox;
+        gfx::ComputeBufferPtr vertices;
+        gfx::ComputeBufferPtr triangles;
+        uint32_t num_triangles;
+
+        static Mesh createRectangle(gfx::LogicalDevicePtr logical_device,
+                                    glm::vec4 v0, 
+                                    glm::vec4 v1, 
+                                    glm::vec4 v2, 
+                                    glm::vec4 v3,
+                                    Material material) {
+            return Mesh(logical_device, {v0, v1, v2, v3}, {0,1,2,0,2,3}, material);
+        }
+    };
+
+
 
     Camera camera_;
+    std::vector<Mesh> meshes_;
 
     std::shared_ptr<TextRenderer> text_renderer_;
 
