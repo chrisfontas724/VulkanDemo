@@ -242,22 +242,22 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
                                                     uint32_t image_index, 
                                                     uint32_t frame) {
     auto logical_device = logical_device_.lock();      
-    // Record compute commands.
-    CXL_LOG(INFO) << "Render frame!";
-    auto compute_buffer = compute_command_buffers_[image_index];
 
     // Generate rays.
+    auto compute_buffer = compute_command_buffers_[image_index];
     compute_buffer->reset();
     compute_buffer->beginRecording();
     compute_buffer->setProgram(ray_generator_->program());
     compute_buffer->bindUniformBuffer(0, 0, rays_[image_index]);
     compute_buffer->bindUniformBuffer(0, 1, random_seeds_[image_index]);
     compute_buffer->pushConstants(camera_);
+    compute_buffer->dispatch(width_ / 32, height_ / 32, 1);
 
     // Hit testing.
     for (uint32_t i = 0; i < MAX_BOUNCES; i++) {
         compute_buffer->setProgram(hit_tester_->program());
         compute_buffer->bindUniformBuffer(0, 0, rays_[image_index]);
+        compute_buffer->bindUniformBuffer(0, 1, hits_[image_index]);
         for (uint32_t j = 0; j < meshes_.size(); j++) {
             compute_buffer->bindUniformBuffer(1, 0, meshes_[j].vertices);
             compute_buffer->bindUniformBuffer(1, 1, meshes_[j].triangles);
@@ -266,9 +266,10 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
             compute_buffer->pushConstants(meshes_[j].num_triangles, sizeof(BoundingBox) + sizeof(Material));
             compute_buffer->dispatch(width_ * height_ / 512, 1, 1);
         }
-
         if (i < MAX_BOUNCES-1) {
             compute_buffer->setProgram(bouncer_->program());
+            compute_buffer->bindUniformBuffer(0, 2, random_seeds_[image_index]);
+            compute_buffer->dispatch(width_ * height_ / 512, 1, 1);
         }
     }
 
@@ -277,9 +278,9 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
                                /*wait_semaphores*/nullptr, 
                                /*wait_stages*/{}, 
                                /*command_buffer_count*/1U,
-                               /*command_buffers*/&command_buffer->vk(), 
-                               /*signal_semaphore_count*/1U, 
-                              /*signal_semaphores*/&compute_semaphores_[frame]);
+                               /*command_buffers*/&compute_buffer->vk(), 
+                               /*signal_semaphore_count*/0u,//1U, 
+                              /*signal_semaphores*/nullptr);//&compute_semaphores_[frame]);
     logical_device->getQueue(gfx::Queue::Type::kCompute).submit(submit_info, vk::Fence());
             
     // Record graphics commands.

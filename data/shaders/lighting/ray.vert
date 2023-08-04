@@ -19,7 +19,7 @@ layout(push_constant) uniform PushBlock {
 
 // Outputs
 layout(location = 0) out vec4 light;
-layout(location = 3) out vec4 weight;
+layout(location = 1) out vec4 weight;
 
 
 // Simply write out the position with no transformation.

@@ -10,19 +10,20 @@
 
 layout (local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1 ) in;
 
-layout(std430, set = 0, binding = 0) buffer buf {
+layout(set = 0, binding = 0) buffer buf {
    Ray rays[];
 };
 
-layout(std430, set = 0, binding = 1) buffer buf2 {
+layout(set = 0, binding = 1) buffer buf2 {
    HitPoint hit_points[];
 };
 
-layout(std140, set = 1, binding = 0) buffer buf3 {
+
+layout(set = 1, binding = 0) buffer buf3 {
 	vec4 vertices[];
 };
 
-layout(std140, set = 1, binding = 1) buffer indices {
+layout(std140, set = 1, binding = 1) buffer buf4 {
 	ivec4 triangles[];
 };
 

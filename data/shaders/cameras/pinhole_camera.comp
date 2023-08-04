@@ -6,7 +6,7 @@
 #include "types/ray.comp"
 #include "sampling/random.comp"
 
-#define WORKGROUP_SIZE 16
+#define WORKGROUP_SIZE 32
 
 layout (local_size_x = WORKGROUP_SIZE, local_size_y = WORKGROUP_SIZE, local_size_z = 1 ) in;
 
@@ -19,9 +19,9 @@ layout(std430, set = 0, binding = 1) buffer buf2 {
 };
 
 layout(push_constant) uniform PushBlock {
-    Camera camera;
-    uint image_width;
-    uint image_height;
+    layout(offset=0)  Camera camera;
+    layout(offset=64) uint image_width;
+    layout(offset=68) uint image_height;
 };
 
 
