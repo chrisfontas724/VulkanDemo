@@ -40,17 +40,17 @@ void main() {
 
   float alpha = 2.0 * atan(1.0 / (2.0 * camera.focal_length));
 
-  float s_1 = getRand(seed);
-  float s_2 = getRand(seed);
+  float s_1 = 0.0;//getRand(seed);
+  float s_2 = 0.0;//getRand(seed);
 
-  float pixel_ndc_x = (x_coord + s_1) / image_width;
-  float pixel_ndc_y = (y_coord + s_2) / image_height; 
+  float pixel_normalized_x = (x_coord + s_1) / image_width;
+  float pixel_normalized_y = (y_coord + s_2) / image_height; 
 
-  float pixel_screen_x = 2.0 * pixel_ndc_x - 1.0;
-  float pixel_screen_y = 2.0 * pixel_ndc_y - 1.0;
+  float pixel_ndc_x = 2.0 * pixel_normalized_x - 1.0;
+  float pixel_ndc_y = 2.0 * pixel_normalized_y - 1.0;
 
-  float pixel_camera_x = pixel_screen_x * camera.width * image_aspect_ratio * tan(alpha/2);
-  float pixel_camera_y = pixel_screen_y * camera.height * tan(alpha/2);
+  float pixel_camera_x = pixel_ndc_x * camera.width * image_aspect_ratio * tan(alpha/2);
+  float pixel_camera_y = pixel_ndc_y * camera.height * tan(alpha/2);
 
   vec4 camera_point = vec4(pixel_camera_x, pixel_camera_y, -1.0, 0.0);
 
@@ -58,7 +58,7 @@ void main() {
   ray.origin = camera.position;
   ray.direction = normalize(camera_point);
   ray.weight = vec4(1.0);
-  ray.coord = ivec2(pixel_screen_x, pixel_screen_y);
+  ray.coord = vec2(pixel_ndc_x, pixel_ndc_y);
   rays[index] = ray;
   seeds[index] = seed;
 }

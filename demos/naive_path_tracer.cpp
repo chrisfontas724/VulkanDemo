@@ -42,7 +42,7 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
     height_ = height;
 
     text_renderer_ = std::make_shared<TextRenderer>(logical_device);
-    text_renderer_->set_color(glm::vec4(1,1,0,1));
+    text_renderer_->set_color(glm::vec4(1,1,1,1));
 
     gfx::RenderPassBuilder builder(logical_device);
     vk::SampleCountFlagBits samples = vk::SampleCountFlagBits::e4;
@@ -251,27 +251,29 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
     compute_buffer->bindUniformBuffer(0, 0, rays_[image_index]);
     compute_buffer->bindUniformBuffer(0, 1, random_seeds_[image_index]);
     compute_buffer->pushConstants(camera_);
+    compute_buffer->pushConstants(width_, sizeof(Camera));
+    compute_buffer->pushConstants(height_, sizeof(Camera) + sizeof(uint32_t));
     compute_buffer->dispatch(width_ / 32, height_ / 32, 1);
 
     // Hit testing.
-    for (uint32_t i = 0; i < MAX_BOUNCES; i++) {
-        compute_buffer->setProgram(hit_tester_->program());
-        compute_buffer->bindUniformBuffer(0, 0, rays_[image_index]);
-        compute_buffer->bindUniformBuffer(0, 1, hits_[image_index]);
-        for (uint32_t j = 0; j < meshes_.size(); j++) {
-            compute_buffer->bindUniformBuffer(1, 0, meshes_[j].vertices);
-            compute_buffer->bindUniformBuffer(1, 1, meshes_[j].triangles);
-            compute_buffer->pushConstants(meshes_[j].bbox);
-            compute_buffer->pushConstants(meshes_[j].material, sizeof(BoundingBox));
-            compute_buffer->pushConstants(meshes_[j].num_triangles, sizeof(BoundingBox) + sizeof(Material));
-            compute_buffer->dispatch(width_ * height_ / 512, 1, 1);
-        }
-        if (i < MAX_BOUNCES-1) {
-            compute_buffer->setProgram(bouncer_->program());
-            compute_buffer->bindUniformBuffer(0, 2, random_seeds_[image_index]);
-            compute_buffer->dispatch(width_ * height_ / 512, 1, 1);
-        }
-    }
+    // for (uint32_t i = 0; i < MAX_BOUNCES; i++) {
+    //     compute_buffer->setProgram(hit_tester_->program());
+    //     compute_buffer->bindUniformBuffer(0, 0, rays_[image_index]);
+    //     compute_buffer->bindUniformBuffer(0, 1, hits_[image_index]);
+    //     for (uint32_t j = 0; j < meshes_.size(); j++) {
+    //         compute_buffer->bindUniformBuffer(1, 0, meshes_[j].vertices);
+    //         compute_buffer->bindUniformBuffer(1, 1, meshes_[j].triangles);
+    //         compute_buffer->pushConstants(meshes_[j].bbox);
+    //         compute_buffer->pushConstants(meshes_[j].material, sizeof(BoundingBox));
+    //         compute_buffer->pushConstants(meshes_[j].num_triangles, sizeof(BoundingBox) + sizeof(Material));
+    //         compute_buffer->dispatch(width_ * height_ / 512, 1, 1);
+    //     }
+    //     if (i < MAX_BOUNCES-1) {
+    //         compute_buffer->setProgram(bouncer_->program());
+    //         compute_buffer->bindUniformBuffer(0, 2, random_seeds_[image_index]);
+    //         compute_buffer->dispatch(width_ * height_ / 512, 1, 1);
+    //     }
+    // }
 
     compute_buffer->endRecording();
     vk::SubmitInfo submit_info(/*wait_semaphore_count*/0U, 
@@ -282,7 +284,9 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
                                /*signal_semaphore_count*/0u,//1U, 
                               /*signal_semaphores*/nullptr);//&compute_semaphores_[frame]);
     logical_device->getQueue(gfx::Queue::Type::kCompute).submit(submit_info, vk::Fence());
-            
+    
+    logical_device->waitIdle();
+
     // Record graphics commands.
     resolve_textures_[image_index]->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eColorAttachmentOptimal);
     command_buffer->beginRenderPass(render_passes_[image_index]); 
@@ -292,7 +296,6 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
     command_buffer->setProgram(lighter_->program());
     command_buffer->bindUniformBuffer(0, 0, rays_[image_index]);
     command_buffer->bindUniformBuffer(0, 1, hits_[image_index]);
-    command_buffer->pushConstants(glm::vec2(width_, height_));
     command_buffer->draw(width_ * height_);
 
     // Render Debug Text.

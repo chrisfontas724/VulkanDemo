@@ -92,7 +92,7 @@ void main() {
   vec4 v0, v1, v2;
   float t = intersect(ray, v0, v1, v2);
 
-  if (t != -1.0 && t < hit.t) {
+  if (t != -1.0 && (t < hit.t || hit.t == -1.0)) {
     HitPoint new_hit;
     new_hit.t = t;
     new_hit.col = mat.diffuse_color;

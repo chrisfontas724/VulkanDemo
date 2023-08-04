@@ -13,10 +13,6 @@ layout(std140, set = 0, binding = 1) buffer buf2 {
     HitPoint intersections[];
 };
 
-layout(push_constant) uniform PushBlock {
-    layout(offset=0) ivec2 extent;
-};
-
 // Outputs
 layout(location = 0) out vec4 light;
 layout(location = 1) out vec4 weight;
@@ -30,7 +26,6 @@ void main() {
     light = intersection.emission;
     weight = ray.weight;
 
-    ivec2 coord = ivec2(2)*ray.coord - extent;
-    gl_Position = vec4(vec2(coord) / vec2(extent), 0.0, 1.0);
+    gl_Position = vec4(ray.coord, 1.0, 1.0);
     gl_PointSize = 1.0;
 }

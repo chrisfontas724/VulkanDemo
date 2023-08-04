@@ -31,20 +31,19 @@ public:
 private:
 
     struct Camera {
-        glm::vec4 position;
-        glm::vec4 direction;
-        glm::vec4 up;
-        glm::vec2 sensor_size;
-        float focal_length;
-        float width;
-        float height;   
-    };
+        alignas(16) glm::vec4 position;
+        alignas(16) glm::vec4 direction;
+        alignas(16) glm::vec4 up;
+        alignas(4) float focal_length;
+        alignas(4) float width;
+        alignas(4) float height;   
+    } alignas(64);
 
     struct Ray {
-        glm::vec4 origin;
-        glm::vec4 direction;
-        glm::vec4 weight;
-        glm::ivec2 coord;
+        alignas(16) glm::vec4 origin;
+        alignas(16) glm::vec4 direction;
+        alignas(16) glm::vec4 weight;
+        alignas(8) glm::vec2 coord;
     };
  
     struct HitPoint {

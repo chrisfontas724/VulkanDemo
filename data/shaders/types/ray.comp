@@ -16,7 +16,7 @@ struct Ray {
   vec4 origin;
   vec4 direction;
   vec4 weight;
-  ivec2 coord;
+  vec2 coord; //ndc coordinates
 };
 
 // This function transforms a ray by an arbitrary 4x4 matrix.
