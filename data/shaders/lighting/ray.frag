@@ -10,5 +10,5 @@ layout(location = 0) out vec4 outColor;
 
 // Simply write out the position with no transformation.
 void main() {
-    outColor = vec4(1.f, 0.0, 1.f, 1.f);//light*weight;
+    outColor = light*weight;
 }

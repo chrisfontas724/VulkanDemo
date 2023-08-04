@@ -58,8 +58,8 @@ private:
         Material(glm::vec4 diffuse, glm::vec4 emissive = glm::vec4(0)) 
         : diffuse_color(diffuse)
         , emissive_color(emissive) {}
-        glm::vec4 diffuse_color;
-        glm::vec4 emissive_color;
+        alignas(16) glm::vec4 diffuse_color;
+        alignas(16) glm::vec4 emissive_color;
     };
 
     struct BoundingBox {
@@ -130,6 +130,7 @@ private:
 
     std::vector<gfx::RenderPassInfo> render_passes_;
 
+    std::shared_ptr<christalz::ShaderResource> rng_seeder_;
     std::shared_ptr<christalz::ShaderResource> ray_generator_;
     std::shared_ptr<christalz::ShaderResource> hit_tester_;
     std::shared_ptr<christalz::ShaderResource> bouncer_;

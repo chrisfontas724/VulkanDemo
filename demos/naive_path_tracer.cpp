@@ -8,7 +8,7 @@
 namespace {
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
-const int MAX_BOUNCES = 8;
+const int MAX_BOUNCES = 1;
 uint32_t sample = 1;
 
 } // anonymous namespace
@@ -81,6 +81,10 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
     compute_semaphores_ = logical_device->createSemaphores(MAX_FRAMES_IN_FLIGHT);
 
     cxl::FileSystem fs("c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/shaders");
+    CXL_LOG(INFO) << "Create rng shader";
+    rng_seeder_ = christalz::ShaderResource::createCompute(logical_device, fs, "sampling/rng_seeding", {fs.directory()});
+    CXL_DCHECK(rng_seeder_);
+ 
     CXL_LOG(INFO) << "Create camera shader";
     ray_generator_ = christalz::ShaderResource::createCompute(logical_device, fs, "cameras/pinhole_camera", {fs.directory()});
     CXL_DCHECK(ray_generator_);
@@ -97,10 +101,12 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
     bouncer_ = christalz::ShaderResource::createCompute(logical_device, fs, "raytraversal/bounce", {fs.directory()});
     CXL_DCHECK(bouncer_);
 
+    std::vector<HitPoint> hits;
+    hits.resize(width * height);
     for (uint32_t i = 0; i < num_swap; i++) {
         rays_.push_back(gfx::ComputeBuffer::createStorageBuffer(logical_device, sizeof(Ray) * width * height));
         random_seeds_.push_back(gfx::ComputeBuffer::createStorageBuffer(logical_device, sizeof(float) * width * height));
-        hits_.push_back(gfx::ComputeBuffer::createStorageBuffer(logical_device, sizeof(HitPoint) * width * height));
+        hits_.push_back(gfx::ComputeBuffer::createFromVector(logical_device, hits, vk::BufferUsageFlagBits::eStorageBuffer));
     }
 
     camera_ = Camera {
@@ -242,11 +248,17 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
                                                     uint32_t image_index, 
                                                     uint32_t frame) {
     auto logical_device = logical_device_.lock();      
-
-    // Generate rays.
     auto compute_buffer = compute_command_buffers_[image_index];
     compute_buffer->reset();
     compute_buffer->beginRecording();
+
+    if (sample < 4) {
+        compute_buffer->setProgram(rng_seeder_->program());
+        compute_buffer->bindUniformBuffer(0, 0, random_seeds_[image_index]);
+        compute_buffer->dispatch(width_ / 16, height_ / 16, 1);
+    }
+
+    // Generate rays.
     compute_buffer->setProgram(ray_generator_->program());
     compute_buffer->bindUniformBuffer(0, 0, rays_[image_index]);
     compute_buffer->bindUniformBuffer(0, 1, random_seeds_[image_index]);
@@ -256,24 +268,23 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
     compute_buffer->dispatch(width_ / 32, height_ / 32, 1);
 
     // Hit testing.
-    // for (uint32_t i = 0; i < MAX_BOUNCES; i++) {
-    //     compute_buffer->setProgram(hit_tester_->program());
-    //     compute_buffer->bindUniformBuffer(0, 0, rays_[image_index]);
-    //     compute_buffer->bindUniformBuffer(0, 1, hits_[image_index]);
-    //     for (uint32_t j = 0; j < meshes_.size(); j++) {
-    //         compute_buffer->bindUniformBuffer(1, 0, meshes_[j].vertices);
-    //         compute_buffer->bindUniformBuffer(1, 1, meshes_[j].triangles);
-    //         compute_buffer->pushConstants(meshes_[j].bbox);
-    //         compute_buffer->pushConstants(meshes_[j].material, sizeof(BoundingBox));
-    //         compute_buffer->pushConstants(meshes_[j].num_triangles, sizeof(BoundingBox) + sizeof(Material));
-    //         compute_buffer->dispatch(width_ * height_ / 512, 1, 1);
-    //     }
-    //     if (i < MAX_BOUNCES-1) {
-    //         compute_buffer->setProgram(bouncer_->program());
-    //         compute_buffer->bindUniformBuffer(0, 2, random_seeds_[image_index]);
-    //         compute_buffer->dispatch(width_ * height_ / 512, 1, 1);
-    //     }
-    // }
+    for (uint32_t i = 0; i < MAX_BOUNCES; i++) {
+        compute_buffer->setProgram(hit_tester_->program());
+        compute_buffer->bindUniformBuffer(0, 0, rays_[image_index]);
+        compute_buffer->bindUniformBuffer(0, 1, hits_[image_index]);
+        for (uint32_t j = 0; j < meshes_.size(); j++) {
+            compute_buffer->bindUniformBuffer(1, 0, meshes_[j].vertices);
+            compute_buffer->bindUniformBuffer(1, 1, meshes_[j].triangles);
+            compute_buffer->pushConstants(meshes_[j].material);
+            compute_buffer->pushConstants(meshes_[j].num_triangles, sizeof(Material));
+            compute_buffer->dispatch(width_ * height_ / 512, 1, 1);
+        }
+        // if (i < MAX_BOUNCES-1) {
+        //     compute_buffer->setProgram(bouncer_->program());
+        //     compute_buffer->bindUniformBuffer(0, 2, random_seeds_[image_index]);
+        //     compute_buffer->dispatch(width_ * height_ / 512, 1, 1);
+        // }
+    }
 
     compute_buffer->endRecording();
     vk::SubmitInfo submit_info(/*wait_semaphore_count*/0U, 

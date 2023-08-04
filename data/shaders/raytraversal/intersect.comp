@@ -28,9 +28,8 @@ layout(std140, set = 1, binding = 1) buffer buf4 {
 };
 
 layout(std140, push_constant) uniform PushBlock {
-    layout(offset= 0) BoundingBox bbox;
-    layout(offset=32) Material mat;
-    layout(offset=64) int num_triangles;
+    layout(offset=0) Material mat;
+    layout(offset=32) int num_triangles;
 };
 
 float triangle_intersect(Ray ray, vec4 v0, vec4 v1, vec4 v2) {
@@ -76,7 +75,7 @@ float intersect(Ray ray, out vec4 out_v0, out vec4 out_v1, out vec4 out_v2) {
     }
   }
 
-  return closest_hit != 1000000000.0 ? closest_hit : -1.0;
+  return closest_hit < 1000000000.0 ? closest_hit : -1.0;
 }
 
 void main() {
