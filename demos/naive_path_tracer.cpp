@@ -305,7 +305,8 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
             compute_buffer->bindUniformBuffer(1, 0, meshes_[j].vertices);
             compute_buffer->bindUniformBuffer(1, 1, meshes_[j].triangles);
             compute_buffer->pushConstants(meshes_[j].material);
-            compute_buffer->pushConstants(meshes_[j].num_triangles, sizeof(Material));
+            compute_buffer->pushConstants(meshes_[j].bbox, sizeof(Material));
+            compute_buffer->pushConstants(meshes_[j].num_triangles, sizeof(Material) + sizeof(BoundingBox));
             compute_buffer->dispatch(width_ * height_ / 512, 1, 1);
         }
 

@@ -45,8 +45,8 @@ struct Material {
 };
 
 struct BoundingBox {
-    vec4 min_pos;
-    vec4 max_pos;
+    vec4 min;
+    vec4 max;
 };
 
 #endif // SHAPE_INFO_COMP_

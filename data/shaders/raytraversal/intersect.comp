@@ -29,8 +29,62 @@ layout(std140, set = 1, binding = 1) buffer buf4 {
 
 layout(std140, push_constant) uniform PushBlock {
     layout(offset=0) Material mat;
-    layout(offset=32) int num_triangles;
+    layout(offset=32) BoundingBox bbox;
+    layout(offset=64) int num_triangles;
 };
+
+bool boundingBoxIntersection(Ray ray) {
+  float tmin = (bbox.min.x - ray.origin.x) / (ray.direction.x + 0.0001);
+  float tmax = (bbox.max.x - ray.origin.x) / (ray.direction.x + 0.0001);
+ 
+  if (tmin > tmax)  {
+    float temp = tmin;
+    tmin = tmax;
+    tmax = temp;
+  }
+ 
+  float tymin = (bbox.min.y - ray.origin.y) / (ray.direction.y + 0.0001);
+  float tymax = (bbox.max.y - ray.origin.y) / (ray.direction.y + 0.0001);
+ 
+  if (tymin > tymax) {
+    float temp = tymin;
+    tymin = tymax;
+    tymax = temp;
+  }
+ 
+  if (tmin > tymax || tymin > tmax) {
+    return false; 
+  }
+ 
+  if (tymin > tmin) 
+    tmin = tymin;
+ 
+  if (tymax < tmax)
+    tmax = tymax;
+ 
+  float tzmin = (bbox.min.z - ray.origin.z) / (ray.direction.z + 0.0001);
+  float tzmax = (bbox.max.z - ray.origin.z) / (ray.direction.z + 0.0001);
+ 
+  if (tzmin > tzmax) {
+    float temp = tzmin;
+    tzmin = tzmax;
+    tzmax = temp;
+  }
+ 
+  if (tmin > tzmax || tzmin > tmax) {
+    return false;
+  }
+ 
+  if (tzmin > tmin)
+    tmin = tzmin;
+ 
+  if (tzmax < tmax)
+    tmax = tzmax; 
+ 
+  return true; 
+}
+
+
 
 float triangle_intersect(Ray ray, vec4 v0, vec4 v1, vec4 v2) {
   vec4 v0v1 = v1 - v0;
@@ -59,6 +113,11 @@ float triangle_intersect(Ray ray, vec4 v0, vec4 v1, vec4 v2) {
 }
 
 float intersect(Ray ray, out vec4 out_v0, out vec4 out_v1, out vec4 out_v2) {
+
+  if (!boundingBoxIntersection(ray)) {
+    return -1.0;
+  }
+
   float closest_hit = 1000000000.0;
   for (int i = 0; i < num_triangles; i++) {
     ivec4 triangle = triangles[i];
