@@ -283,7 +283,9 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
 
 gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr command_buffer, 
                                                     uint32_t image_index, 
-                                                    uint32_t frame) {
+                                                    uint32_t frame,
+                                                    std::vector<vk::Semaphore>* signal_semaphores,
+                                                    std::vector<vk::PipelineStageFlags>* signal_wait_stages) {
     auto logical_device = logical_device_.lock();      
     auto compute_buffer = compute_command_buffers_[image_index];
     compute_buffer->reset();
@@ -321,10 +323,14 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
                                /*wait_stages*/{}, 
                                /*command_buffer_count*/1U,
                                /*command_buffers*/&compute_buffer->vk(), 
-                               /*signal_semaphore_count*/0u,//1U, 
-                              /*signal_semaphores*/nullptr);//&compute_semaphores_[frame]);
+                               /*signal_semaphore_count*/1U, 
+                              /*signal_semaphores*/&compute_semaphores_[frame]);
     logical_device->getQueue(gfx::Queue::Type::kCompute).submit(submit_info, vk::Fence());
-    logical_device->waitIdle();
+
+    if (signal_semaphores) {
+        signal_semaphores->push_back(compute_semaphores_[frame]);
+        signal_wait_stages->push_back(vk::PipelineStageFlagBits::eComputeShader);
+    }
 
     // Render to the accumulation buffer.
     accum_texture_->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eColorAttachmentOptimal);

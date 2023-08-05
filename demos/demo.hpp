@@ -15,7 +15,9 @@ class Demo {
 public:
     virtual void setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, int32_t width, int32_t height) = 0;
 
-    virtual gfx::ComputeTexturePtr renderFrame(gfx::CommandBufferPtr command_buffer, uint32_t image_index, uint32_t frame) = 0;
+    virtual gfx::ComputeTexturePtr renderFrame(gfx::CommandBufferPtr command_buffer, uint32_t image_index, uint32_t frame,             
+                                               std::vector<vk::Semaphore>* signal_semaphores = nullptr,
+                                               std::vector<vk::PipelineStageFlags>* signal_wait_stages = nullptr) = 0;
 
     virtual std::string name() = 0;
 

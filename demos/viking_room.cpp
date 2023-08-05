@@ -105,7 +105,9 @@ VikingRoom::~VikingRoom() {
 
 gfx::ComputeTexturePtr
 VikingRoom::renderFrame(gfx::CommandBufferPtr command_buffer, 
-                        uint32_t image_index, uint32_t frame) { 
+                        uint32_t image_index, uint32_t frame,
+                        std::vector<vk::Semaphore>* signal_semaphores,
+                        std::vector<vk::PipelineStageFlags>* signal_wait_stages) { 
     UniformBufferObject ubo; 
     ubo.model = glm::rotate(glm::mat4(1.0f), glm::radians(degrees), glm::vec3(0.0f, 0.0f, 1.0f));
     ubo.view = glm::lookAt(eye_pos, eye_pos + direction, glm::vec3(0.0f, 0.0f, 1.0f));

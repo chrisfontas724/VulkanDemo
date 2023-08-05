@@ -41,7 +41,6 @@ private:
     };
 
     void checkInputManager(const display::InputManager* mngr);
-   // std::shared_ptr<Demo> next_demo();
 
     std::shared_ptr<WindowDelegate> window_delegate_;
     std::vector<std::shared_ptr<Demo>> demos_;

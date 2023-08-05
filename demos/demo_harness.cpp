@@ -95,7 +95,9 @@ int32_t DemoHarness::run() {
             command_buffer->reset();
             command_buffer->beginRecording();
 
-            auto texture = current_demo_->renderFrame(command_buffer, image_index, frame);
+            std::vector<vk::Semaphore> demo_semaphores;
+            std::vector<vk::PipelineStageFlags> demo_wait_stages;
+            auto texture = current_demo_->renderFrame(command_buffer, image_index, frame, &demo_semaphores, &demo_wait_stages);
         
             command_buffer->beginRenderPass(display_render_passes_[image_index]);
             command_buffer->setProgram(post_shader_->program());
@@ -106,11 +108,15 @@ int32_t DemoHarness::run() {
             command_buffer->endRenderPass();
             command_buffer->endRecording();
 
+            demo_semaphores.push_back(image_available_semaphore);
+            demo_wait_stages.push_back(vk::PipelineStageFlagBits::eColorAttachmentOutput);
+            CXL_DCHECK(demo_semaphores.size() == demo_wait_stages.size());
+
             // Submit graphics commands.
             vk::PipelineStageFlags graphicsWaitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
-            vk::SubmitInfo submit_info(/*wait_semaphore_count*/1U, 
-                                       /*wait_semaphores*/&image_available_semaphore, 
-                                       graphicsWaitStages, 
+            vk::SubmitInfo submit_info(/*wait_semaphore_count*/demo_semaphores.size(), 
+                                       /*wait_semaphores*/demo_semaphores.data(),
+                                       /*wait_stages*/demo_wait_stages.data(),
                                        /*command_buffer_count*/1U,
                                        /*command_buffers*/&command_buffer->vk(), 
                                        /*signal_semaphore_count*/1U, 

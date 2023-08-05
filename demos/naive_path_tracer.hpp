@@ -24,7 +24,9 @@ public:
     gfx::ComputeTexturePtr
     renderFrame(gfx::CommandBufferPtr command_buffer, 
                 uint32_t image_index, 
-                uint32_t frame) override;
+                uint32_t frame,
+                std::vector<vk::Semaphore>* signal_semaphores = nullptr,
+                std::vector<vk::PipelineStageFlags>* signal_wait_stages = nullptr) override;
     
     std::string name() override { return "NaivePathTracer"; }
 
