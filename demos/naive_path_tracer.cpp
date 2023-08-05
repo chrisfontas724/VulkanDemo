@@ -89,10 +89,6 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
     compute_semaphores_ = logical_device->createSemaphores(MAX_FRAMES_IN_FLIGHT);
 
     cxl::FileSystem fs("c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/shaders");
-    CXL_LOG(INFO) << "Create rng shader";
-    rng_seeder_ = christalz::ShaderResource::createCompute(logical_device, fs, "sampling/rng_seeding", {fs.directory()});
-    CXL_DCHECK(rng_seeder_);
-
     CXL_LOG(INFO) << "Create mwc64x shader";
     mwc64x_seeder_ = christalz::ShaderResource::createCompute(logical_device, fs, "mwc64x/glsl/mwc64x_seeding", {
         fs.directory(),
@@ -132,9 +128,6 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
         hits_.push_back(gfx::ComputeBuffer::createFromVector(logical_device, hits, vk::BufferUsageFlagBits::eStorageBuffer));
     }
 
-    std::vector<float> test_rands;
-    auto test_buffer = gfx::ComputeBuffer::createStorageBuffer(logical_device, sizeof(float) * width * height);
-
     auto compute_buffer = compute_command_buffers_[0];
     compute_buffer->reset();
     compute_buffer->beginRecording();
@@ -143,7 +136,6 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
     for (uint32_t i = 0; i < num_swap; i++) {
         compute_buffer->setProgram(mwc64x_seeder_->program());
         compute_buffer->bindUniformBuffer(0, 0, random_seeds_[i]);
-        compute_buffer->bindUniformBuffer(0, 1, test_buffer);
         compute_buffer->pushConstants(offset);
         compute_buffer->dispatch(width_ * height_/ 16, 1, 1);
         offset += width_ * height_;

@@ -13,10 +13,6 @@ layout(set = 0, binding = 0) buffer buf {
     mwc64x_state_t states[];
 };
 
-layout(set = 0, binding = 1) buffer buf2 {
-    float randoms[];
-};
-
 
 layout(push_constant) uniform PushBlock {
     layout(offset=0)  uint64_t offset;
@@ -32,14 +28,7 @@ float uniformRandomVariable(inout mwc64x_state_t state) {
 
 void main() {
     uint index = gl_GlobalInvocationID.x;
-    uint workerOffset = gl_LocalInvocationID.x;
     mwc64x_state_t state = states[index];
-    
-    uint64_t baseOffset = workerOffset*index;
-    
-    MWC64X_SeedStreams(state, offset + gl_GlobalInvocationID.x, gl_LocalInvocationID.x);//   baseOffset, workerOffset);
-
-    randoms[index] = uniformRandomVariable(state);
-    
+    MWC64X_SeedStreams(state, offset + gl_GlobalInvocationID.x, gl_LocalInvocationID.x);
     states[index] = state;
 }

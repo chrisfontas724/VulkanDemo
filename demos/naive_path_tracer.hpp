@@ -135,7 +135,6 @@ private:
     std::vector<gfx::RenderPassInfo> render_passes_;
 
     std::shared_ptr<christalz::ShaderResource> mwc64x_seeder_;
-    std::shared_ptr<christalz::ShaderResource> rng_seeder_;
     std::shared_ptr<christalz::ShaderResource> ray_generator_;
     std::shared_ptr<christalz::ShaderResource> hit_tester_;
     std::shared_ptr<christalz::ShaderResource> bouncer_;
