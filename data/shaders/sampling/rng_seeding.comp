@@ -9,7 +9,7 @@
 layout (local_size_x = WORKGROUP_SIZE, local_size_y = WORKGROUP_SIZE, local_size_z = 1 ) in;
 
 // Use std430 layout for tight packing.
-layout(std430, set = 0, binding = 0) buffer buf {
+layout(set = 0, binding = 0) buffer buf {
     float seeds[];
 };
 

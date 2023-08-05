@@ -20,7 +20,7 @@ layout(std140, set = 0, binding = 1) buffer buf1 {
 };
 
 
-layout(std140, set = 0, binding = 2) buffer buf2 {
+layout(set = 0, binding = 2) buffer buf2 {
     float rng_seeds[];
 };
 

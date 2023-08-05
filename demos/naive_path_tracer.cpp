@@ -131,7 +131,7 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
     hits.resize(width * height);
     for (uint32_t i = 0; i < num_swap; i++) {
         rays_.push_back(gfx::ComputeBuffer::createStorageBuffer(logical_device, sizeof(Ray) * width * height));
-        random_seeds_.push_back(gfx::ComputeBuffer::createStorageBuffer(logical_device, sizeof(float) * width * height * 8));
+        random_seeds_.push_back(gfx::ComputeBuffer::createStorageBuffer(logical_device, sizeof(float) * width * height));
         hits_.push_back(gfx::ComputeBuffer::createFromVector(logical_device, hits, vk::BufferUsageFlagBits::eStorageBuffer));
     }
 
@@ -143,7 +143,7 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
         compute_buffer->setProgram(rng_seeder_->program());
         compute_buffer->bindUniformBuffer(0, 0, random_seeds_[i]);
         compute_buffer->pushConstants(glm::ivec2(width_, height_));
-        compute_buffer->dispatch(width_ * 4/ 16, height_ * 4 / 16, 1);
+        compute_buffer->dispatch(width_ / 16, height_  / 16, 1);
     }
     compute_buffer->endRecording();
     logical_device->getQueue(gfx::Queue::Type::kCompute).submit(compute_buffer);
