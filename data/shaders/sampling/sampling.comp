@@ -2,145 +2,152 @@
 // Use of this source code is governed by our license that can be
 // found in the LICENSE file.
 
-#ifndef VULKAN_HEADER_FILES_SAMPLING_SAMPLING_COMP_
-#define VULKAN_HEADER_FILES_SAMPLING_SAMPLING_COMP_
+// #ifndef VULKAN_HEADER_FILES_SAMPLING_SAMPLING_COMP_
+// #define VULKAN_HEADER_FILES_SAMPLING_SAMPLING_COMP_
 
-#include"sampling/random.comp"
+// #include"sampling/random.comp"
+#include "mwc64x/glsl/mwc64x/mwc64x_rng.comp"
 
-// Finds a uniform 2D sample within a square.
-vec2 __squareSample(inout float rng) {
-    float u = getRand(rng);
-    float v = getRand(rng);
-    return (vec2)(u,v);
+float uniformRandomVariable(inout mwc64x_state_t state) {
+    uint randMax = 0xFFFFFFFF;
+    uint randomInt =  MWC64X_NextUint(state);
+    return float(randomInt) / float(randMax);
 }
+
+// // Finds a uniform 2D sample within a square.
+// vec2 __squareSample(inout float rng) {
+//     float u = getRand(rng);
+//     float v = getRand(rng);
+//     return (vec2)(u,v);
+// }
         
-// Use trigonometry to uniformly sample the sphere. The  area of a sphere
-// equals the area of every right circular cylinder circumcribed around the
-// unit sphere, excluding the bases.
-vec4 __sphereSample(inout float rng) {
-    float x = 2.f * getRand(rng) - 1.f;
-    float y = 2.f * getRand(rng) - 1.f;
-    float z = 2.f * getRand(rng) - 1.f;
+// // Use trigonometry to uniformly sample the sphere. The  area of a sphere
+// // equals the area of every right circular cylinder circumcribed around the
+// // unit sphere, excluding the bases.
+// vec4 __sphereSample(inout float rng) {
+//     float x = 2.f * getRand(rng) - 1.f;
+//     float y = 2.f * getRand(rng) - 1.f;
+//     float z = 2.f * getRand(rng) - 1.f;
     
-    vec4 vector = (vec4)(x,y,z, 0.0);
-    vec4 result = normalize(vector);
-    result.w = (float)(1.0);
-    return result;
-}
-
-    
-// Finds a uniform 3D sample within a cube
-vec4 __cubeSample(inout float rng) {
-    float u = getRand(rng);
-    float v = getRand(rng);
-    float w = getRand(rng);
-    return (vec4)(u,v,w, 1.f);
-}
-        
-
-// Samples a point uniformly on the surface of a triangle
-// given 3 vertices
-vec4 __triangularSample(inout float rng, vec4 v1, vec4 v2, vec4 v3) {
-    float r1 = sqrt(getRand(rng));
-    float r2 = getRand(rng);
-    
-    vec4 result = ((float)(1.0) - r1) * v1  + (r1 * ((float)(1.0) - r2)) * v2 + (r1 * r2) * v3;
-    result.w = 1.f;
-    return result;
-}
-        
-
-// Returns a vector in the hemisphere around N with a cosine weighted
-// distribution to avoid clumping.
-vec4 __cosWeightedHemisphereDirection(vec4 N,inout float rng){
-    float xi1=getRand(rng);
-    float xi2=getRand(rng);
-    
-    float theta=acos(sqrt(float(1.)-xi1));
-    float phi=TWO_PI*xi2;
-    
-    float xs=sin(theta)*cos(phi);
-    float ys=cos(theta);
-    float zs=sin(theta)*sin(phi);
-    
-    vec4 y=N;
-    vec4 h=y;
-    if(fabs(h.x)<=fabs(h.y)&&fabs(h.x)<=fabs(h.z)){
-        h.x=(float)(1.);
-    }
-    else if(fabs(h.y)<=fabs(h.x)&&fabs(h.y)<=fabs(h.z)){
-        h.y=(float)(1.);
-    }
-    else
-    h.z=(float)(1.);
-    vec4 x=normalize(cross(h,y));
-    vec4 z=normalize(cross(x,y));
-    
-    return xs*x+ys*y+zs*z;
-}
-
-// Uniformly samples points on a unit disk using polar coordinates. To avoid
-// clumping towards the center, the radius is determined using the square
-// root of a random variable between [0, 1] instead of the direct value of
-// the random variable. Theta on the other hand does directly use the value
-// of its random variable, modulated by 2*PI.
-vec2 __diskSample(inout rng){
-    float k1=getRand(rng);
-    float k2=getRand(rng);
-    
-    float r=sqrt(k1);/*Avoids clumping*/
-    float theta=TWO_PI*k2;
-    
-    float u=r*cos(theta);
-    float v=r*sin(theta);
-    
-    return vec2(u,v);
-}
-
-
-// Converts a spherical representation of a vector into a
-// cartesian one.
-
-// vec4 __sphericalToCartesian(vec4 N,float theta,float phi) {
-    //     float xyLength = min(sqrt(N.x*N.x+N.y*N.y),.99999999f);
-    //     float zAngle=(xyLength<=(float)(.001))?(N.x>(float)(0.))?INV_PI:-INV_PI:acos(N.y/xyLength);
-    
-    //     float xAngle=acos(xyLength);
-    //     xAngle=(N.z>(float)(0.))?xAngle:-xAngle;
-    //     zAngle=(N.x>(float)(0.))?-zAngle:zAngle;
-    
-    //     /*-Transform Axis-*/
-    //     Matrix4x4 identity  = __createIdentityMatrix();
-    //     Matrix4x4 transform = __rotateX(identity, xAngle);
-    //     transform           = __rotateZ(transform, zAngle);
-    
-    //     float x         = sin(theta)*cos(phi);
-    //     float y         = cos(theta);
-    //     float z         = sin(theta)*sin(phi);
-    //     vec4 mPoint = (vec4)(x,y,z, 1.0);
-    //     vec4 transP = __multMatrixPoint(transform, mPoint);
-    
-    //     return (vec4)(transP.xyz, 0.0);
+//     vec4 vector = (vec4)(x,y,z, 0.0);
+//     vec4 result = normalize(vector);
+//     result.w = (float)(1.0);
+//     return result;
 // }
 
-// // Finds a uniformly sampled normalized vector for a cone who's axis
-// // is the provided normal vector.
-// vec4 __coneSample(vec4 N, float cosThetaMax, float inout pdf, float inout rng){
-    //     // Calculate Theta.
-    //     float x = getRand(rng);
-    //     float cosTheta=((float)(1.)-x)+x*cosThetaMax;
-    //     float theta=acos(cosTheta);
     
-    //     // Calculate Phi.
-    //     float x2 = getRand(rng);
-    //     float phi=TWO_PI*x2;
+// // Finds a uniform 3D sample within a cube
+// vec4 __cubeSample(inout float rng) {
+//     float u = getRand(rng);
+//     float v = getRand(rng);
+//     float w = getRand(rng);
+//     return (vec4)(u,v,w, 1.f);
+// }
+        
+
+// // Samples a point uniformly on the surface of a triangle
+// // given 3 vertices
+// vec4 __triangularSample(inout float rng, vec4 v1, vec4 v2, vec4 v3) {
+//     float r1 = sqrt(getRand(rng));
+//     float r2 = getRand(rng);
     
-    //     // Set PDF.
-    //     pdf= (float)(1.)/(TWO_PI*((float)(1.)-cosThetaMax));
+//     vec4 result = ((float)(1.0) - r1) * v1  + (r1 * ((float)(1.0) - r2)) * v2 + (r1 * r2) * v3;
+//     result.w = 1.f;
+//     return result;
+// }
+        
+
+// // Returns a vector in the hemisphere around N with a cosine weighted
+// // distribution to avoid clumping.
+// vec4 __cosWeightedHemisphereDirection(vec4 N,inout float rng){
+//     float xi1=getRand(rng);
+//     float xi2=getRand(rng);
     
-    //     // Convert into cartesian coordinates
-    //     return __sphericalToCartesian(N,theta,phi);
+//     float theta=acos(sqrt(float(1.)-xi1));
+//     float phi=TWO_PI*xi2;
+    
+//     float xs=sin(theta)*cos(phi);
+//     float ys=cos(theta);
+//     float zs=sin(theta)*sin(phi);
+    
+//     vec4 y=N;
+//     vec4 h=y;
+//     if(fabs(h.x)<=fabs(h.y)&&fabs(h.x)<=fabs(h.z)){
+//         h.x=(float)(1.);
+//     }
+//     else if(fabs(h.y)<=fabs(h.x)&&fabs(h.y)<=fabs(h.z)){
+//         h.y=(float)(1.);
+//     }
+//     else
+//     h.z=(float)(1.);
+//     vec4 x=normalize(cross(h,y));
+//     vec4 z=normalize(cross(x,y));
+    
+//     return xs*x+ys*y+zs*z;
+// }
+
+// // Uniformly samples points on a unit disk using polar coordinates. To avoid
+// // clumping towards the center, the radius is determined using the square
+// // root of a random variable between [0, 1] instead of the direct value of
+// // the random variable. Theta on the other hand does directly use the value
+// // of its random variable, modulated by 2*PI.
+// vec2 __diskSample(inout rng){
+//     float k1=getRand(rng);
+//     float k2=getRand(rng);
+    
+//     float r=sqrt(k1);/*Avoids clumping*/
+//     float theta=TWO_PI*k2;
+    
+//     float u=r*cos(theta);
+//     float v=r*sin(theta);
+    
+//     return vec2(u,v);
 // }
 
 
-#endif VULKAN_HEADER_FILES_SAMPLING_SAMPLING_COMP_
+// // Converts a spherical representation of a vector into a
+// // cartesian one.
+
+// // vec4 __sphericalToCartesian(vec4 N,float theta,float phi) {
+//     //     float xyLength = min(sqrt(N.x*N.x+N.y*N.y),.99999999f);
+//     //     float zAngle=(xyLength<=(float)(.001))?(N.x>(float)(0.))?INV_PI:-INV_PI:acos(N.y/xyLength);
+    
+//     //     float xAngle=acos(xyLength);
+//     //     xAngle=(N.z>(float)(0.))?xAngle:-xAngle;
+//     //     zAngle=(N.x>(float)(0.))?-zAngle:zAngle;
+    
+//     //     /*-Transform Axis-*/
+//     //     Matrix4x4 identity  = __createIdentityMatrix();
+//     //     Matrix4x4 transform = __rotateX(identity, xAngle);
+//     //     transform           = __rotateZ(transform, zAngle);
+    
+//     //     float x         = sin(theta)*cos(phi);
+//     //     float y         = cos(theta);
+//     //     float z         = sin(theta)*sin(phi);
+//     //     vec4 mPoint = (vec4)(x,y,z, 1.0);
+//     //     vec4 transP = __multMatrixPoint(transform, mPoint);
+    
+//     //     return (vec4)(transP.xyz, 0.0);
+// // }
+
+// // // Finds a uniformly sampled normalized vector for a cone who's axis
+// // // is the provided normal vector.
+// // vec4 __coneSample(vec4 N, float cosThetaMax, float inout pdf, float inout rng){
+//     //     // Calculate Theta.
+//     //     float x = getRand(rng);
+//     //     float cosTheta=((float)(1.)-x)+x*cosThetaMax;
+//     //     float theta=acos(cosTheta);
+    
+//     //     // Calculate Phi.
+//     //     float x2 = getRand(rng);
+//     //     float phi=TWO_PI*x2;
+    
+//     //     // Set PDF.
+//     //     pdf= (float)(1.)/(TWO_PI*((float)(1.)-cosThetaMax));
+    
+//     //     // Convert into cartesian coordinates
+//     //     return __sphericalToCartesian(N,theta,phi);
+// // }
+
+
+// #endif // VULKAN_HEADER_FILES_SAMPLING_SAMPLING_COMP_

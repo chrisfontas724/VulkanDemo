@@ -4,7 +4,7 @@
 
 #include "types/camera.comp"
 #include "types/ray.comp"
-#include "sampling/random.comp"
+#include "sampling/sampling.comp"
 
 #define WORKGROUP_SIZE 32
 
@@ -15,7 +15,7 @@ layout(std430, set = 0, binding = 0) buffer buf {
 };
 
 layout(set = 0, binding = 1) buffer buf2 {
-   float seeds[];
+   mwc64x_state_t seeds[];
 };
 
 layout(push_constant) uniform PushBlock {
@@ -33,15 +33,17 @@ void main() {
   }
 
   uint index = image_width * gl_GlobalInvocationID.y + gl_GlobalInvocationID.x;
-  float seed = seeds[index];
-  float rand1 = getRand(seed);
+  
+  
+  mwc64x_state_t seed = seeds[index];
+  float rand1 = uniformRandomVariable(seed);
 
   float image_aspect_ratio = float(image_width) / float(image_height);
 
   float alpha = 2.0 * atan(1.0 / (2.0 * camera.focal_length));
 
-  float s_1 = getRand(seed);
-  float s_2 = getRand(seed);
+  float s_1 = uniformRandomVariable(seed);
+  float s_2 = uniformRandomVariable(seed);
 
   float pixel_normalized_x = (x_coord + s_1) / image_width;
   float pixel_normalized_y = (y_coord + s_2) / image_height; 

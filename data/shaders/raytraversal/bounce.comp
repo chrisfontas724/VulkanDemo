@@ -4,7 +4,7 @@
 
 #include "types/ray.comp"
 #include "types/intersection.comp"
-#include "sampling/random.comp"
+#include "sampling/sampling.comp"
 
 #define WORKGROUP_SIZE 512
 
@@ -21,7 +21,7 @@ layout(std140, set = 0, binding = 1) buffer buf1 {
 
 
 layout(set = 0, binding = 2) buffer buf2 {
-    float rng_seeds[];
+    mwc64x_state_t seeds[];
 };
 
 
@@ -30,7 +30,7 @@ void main() {
 
     Ray input_ray = rays[index];
     HitPoint hit = hits[index];
-    float rng_seed = rng_seeds[index];
+    mwc64x_state_t seed = seeds[index];
 
     if (hit.t == -1.0) {
         input_ray.valid = 0;
@@ -43,8 +43,8 @@ void main() {
     }
 
 
-    float xi1 = getRand(rng_seed); 
-    float xi2 = getRand(rng_seed); 
+    float xi1 = uniformRandomVariable(seed); 
+    float xi2 = uniformRandomVariable(seed); 
 
     float theta = acos(sqrt(1.0 -xi1));
     float phi = 2.0 * 3.14159265 * xi2;
@@ -86,5 +86,5 @@ void main() {
     blank_hit.t = -1.0;
     rays[index] = new_ray;
     hits[index] = blank_hit;
-    rng_seeds[index] = rng_seed;
+    seeds[index] = seed;
 }

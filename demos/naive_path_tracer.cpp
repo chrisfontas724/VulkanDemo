@@ -8,7 +8,7 @@
 namespace {
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
-const int MAX_BOUNCES = 15;
+const int MAX_BOUNCES = 8;
 uint32_t sample = 1;
 
 } // anonymous namespace
@@ -47,11 +47,9 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
 
     gfx::RenderPassBuilder builder(logical_device);
 
-    accum_textures_.resize(num_swap);
-    for (uint32_t i = 0; i < num_swap; i++) {
-        accum_textures_[i] = gfx::ImageUtils::createAccumulationAttachment(logical_device, width, height);
-        CXL_DCHECK(accum_textures_[i]);
-    }
+    accum_texture_ = gfx::ImageUtils::createAccumulationAttachment(logical_device, width, height);
+    CXL_DCHECK(accum_texture_);
+  
     
     resolve_textures_.resize(num_swap);
     for (uint32_t i = 0; i < num_swap; i++) {
@@ -63,7 +61,7 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
 
     for (int32_t tex_index = 0; tex_index < num_swap; tex_index++) {
         builder.reset();
-        builder.addColorAttachment(accum_textures_[tex_index], {
+        builder.addColorAttachment(accum_texture_, {
             .load_op = vk::AttachmentLoadOp::eLoad,
             .store_op = vk::AttachmentStoreOp::eStore,
          });
@@ -103,7 +101,9 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
  
  
     CXL_LOG(INFO) << "Create camera shader";
-    ray_generator_ = christalz::ShaderResource::createCompute(logical_device, fs, "cameras/pinhole_camera", {fs.directory()});
+    ray_generator_ = christalz::ShaderResource::createCompute(logical_device, fs, "cameras/pinhole_camera", {
+        fs.directory(),
+        fs.directory() + "/mwc64x/glsl"});
     CXL_DCHECK(ray_generator_);
 
     CXL_LOG(INFO) << "Create lighting shader";
@@ -119,27 +119,36 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
     CXL_DCHECK(hit_tester_);
 
     CXL_LOG(INFO) << "Create bounce shader";
-    bouncer_ = christalz::ShaderResource::createCompute(logical_device, fs, "raytraversal/bounce", {fs.directory()});
+    bouncer_ = christalz::ShaderResource::createCompute(logical_device, fs, "raytraversal/bounce", {
+        fs.directory(),
+        fs.directory() + "/mwc64x/glsl"});
     CXL_DCHECK(bouncer_);
 
     std::vector<HitPoint> hits;
     hits.resize(width * height);
     for (uint32_t i = 0; i < num_swap; i++) {
         rays_.push_back(gfx::ComputeBuffer::createStorageBuffer(logical_device, sizeof(Ray) * width * height));
-        random_seeds_.push_back(gfx::ComputeBuffer::createStorageBuffer(logical_device, sizeof(float) * width * height));
+        random_seeds_.push_back(gfx::ComputeBuffer::createStorageBuffer(logical_device, sizeof(uint32_t) * width * height * 2));
         hits_.push_back(gfx::ComputeBuffer::createFromVector(logical_device, hits, vk::BufferUsageFlagBits::eStorageBuffer));
     }
+
+    std::vector<float> test_rands;
+    auto test_buffer = gfx::ComputeBuffer::createStorageBuffer(logical_device, sizeof(float) * width * height);
 
     auto compute_buffer = compute_command_buffers_[0];
     compute_buffer->reset();
     compute_buffer->beginRecording();
 
+    uint64_t offset = 0;
     for (uint32_t i = 0; i < num_swap; i++) {
-        compute_buffer->setProgram(rng_seeder_->program());
+        compute_buffer->setProgram(mwc64x_seeder_->program());
         compute_buffer->bindUniformBuffer(0, 0, random_seeds_[i]);
-        compute_buffer->pushConstants(glm::ivec2(width_, height_));
-        compute_buffer->dispatch(width_ / 16, height_  / 16, 1);
+        compute_buffer->bindUniformBuffer(0, 1, test_buffer);
+        compute_buffer->pushConstants(offset);
+        compute_buffer->dispatch(width_ * height_/ 16, 1, 1);
+        offset += width_ * height_;
     }
+
     compute_buffer->endRecording();
     logical_device->getQueue(gfx::Queue::Type::kCompute).submit(compute_buffer);
     logical_device->waitIdle();
@@ -325,7 +334,7 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
     logical_device->waitIdle();
 
     // Render to the accumulation buffer.
-    accum_textures_[image_index]->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eColorAttachmentOptimal);
+    accum_texture_->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eColorAttachmentOptimal);
     resolve_textures_[image_index]->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eColorAttachmentOptimal);
     command_buffer->beginRenderPass(accumulation_passes_[image_index]); 
     command_buffer->setProgram(lighter_->program());
@@ -337,11 +346,11 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
     command_buffer->endRenderPass();
 
     // Average out the accumulation buffer.
-    accum_textures_[image_index]->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal);
+    accum_texture_->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal);
     command_buffer->beginRenderPass(render_passes_[image_index]); 
     command_buffer->setProgram(resolve_->program());
     command_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kOpaque);
-    command_buffer->bindTexture(0, 0, accum_textures_[image_index]);
+    command_buffer->bindTexture(0, 0, accum_texture_);
     command_buffer->pushConstants(sample);
     command_buffer->draw(3);
 

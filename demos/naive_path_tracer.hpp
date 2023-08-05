@@ -142,7 +142,7 @@ private:
     std::shared_ptr<christalz::ShaderResource> lighter_;
     std::shared_ptr<christalz::ShaderResource> resolve_;
 
-    std::vector<gfx::ComputeTexturePtr> accum_textures_;
+    gfx::ComputeTexturePtr accum_texture_;
     std::vector<gfx::ComputeTexturePtr> resolve_textures_;
 
     std::vector<gfx::CommandBufferPtr> compute_command_buffers_;

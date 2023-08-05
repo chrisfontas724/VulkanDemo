@@ -13,9 +13,22 @@ layout(set = 0, binding = 0) buffer buf {
     mwc64x_state_t states[];
 };
 
-layout(push_constant) uniform PushBlock {
-    layout(offset=0) ivec2 dimensions;
+layout(set = 0, binding = 1) buffer buf2 {
+    float randoms[];
 };
+
+
+layout(push_constant) uniform PushBlock {
+    layout(offset=0)  uint64_t offset;
+};
+
+
+
+float uniformRandomVariable(inout mwc64x_state_t state) {
+    uint randMax = 0xFFFFFFFF;
+    uint randomInt =  MWC64X_NextUint(state);
+    return float(randomInt) / float(randMax);
+}
 
 void main() {
     uint index = gl_GlobalInvocationID.x;
@@ -24,7 +37,9 @@ void main() {
     
     uint64_t baseOffset = workerOffset*index;
     
-    MWC64X_SeedStreams(state, baseOffset, workerOffset);
+    MWC64X_SeedStreams(state, offset + gl_GlobalInvocationID.x, gl_LocalInvocationID.x);//   baseOffset, workerOffset);
+
+    randoms[index] = uniformRandomVariable(state);
     
     states[index] = state;
 }
