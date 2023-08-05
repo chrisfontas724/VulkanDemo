@@ -33,10 +33,11 @@ private:
     struct Camera {
         alignas(16) glm::vec4 position;
         alignas(16) glm::vec4 direction;
-        alignas(16) glm::vec4 up;
         alignas(4) float focal_length;
         alignas(4) float width;
         alignas(4) float height;   
+        alignas(4) uint32_t x_res;
+        alignas(4) uint32_t y_res;
     } alignas(64);
 
     struct Ray {
@@ -60,8 +61,8 @@ private:
         Material(glm::vec4 diffuse, glm::vec4 emissive = glm::vec4(0)) 
         : diffuse_color(diffuse)
         , emissive_color(emissive) {}
-        alignas(16) glm::vec4 diffuse_color;
-        alignas(16) glm::vec4 emissive_color;
+        alignas(16) glm::vec4 diffuse_color = glm::vec4(0.f);
+        alignas(16) glm::vec4 emissive_color = glm::vec4(0.f);
     };
 
     struct BoundingBox {

@@ -9,10 +9,11 @@
 struct Camera {
         vec4 position;
         vec4 direction;
-        vec4 up;
         float focal_length;
         float width;
         float height;
+        uint x_res;
+        uint y_res;
 };
 
 #endif // CAMERA_INFO_COMP_

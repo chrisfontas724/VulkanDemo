@@ -34,6 +34,9 @@ void main() {
 
     if (hit.t == -1.0) {
         input_ray.valid = 0;
+        input_ray.origin = vec4(0.);
+        input_ray.direction = vec4(0.);
+        input_ray.weight = vec4(0.);
         hits[index].t = -1.0;
         rays[index] = input_ray;
         return;
@@ -67,15 +70,17 @@ void main() {
     vec3 new_dir = normalize(xs*x + ys*y + zs*z);
     float pdf = dot(new_dir, hit.norm.xyz) / 3.14159265;
 
-
     // Add a small epsilon to the new ray starting point to prevent self-intersection
     // with the object its already on.
     Ray new_ray = input_ray;
     new_ray.direction = vec4(new_dir, 0.0);
     new_ray.origin = hit.pos + 0.01 * new_ray.direction;
     new_ray.accumulation += input_ray.weight * hit.emission;
-    new_ray.weight *= hit.col * dot(new_ray.direction.xyz, hit.norm.xyz) / pdf;
 
+    // The new weight is BRDF * cosTheta / pdf.
+    vec4 brdf = hit.col / vec4(3.14159265);
+    float cos_theta = dot(new_ray.direction.xyz, hit.norm.xyz);
+    new_ray.weight *= brdf * cos_theta / pdf;
 
     HitPoint blank_hit;
     blank_hit.t = -1.0;

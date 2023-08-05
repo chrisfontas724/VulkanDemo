@@ -8,7 +8,7 @@
 namespace {
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
-const int MAX_BOUNCES = 8;
+const int MAX_BOUNCES = 15;
 uint32_t sample = 1;
 
 } // anonymous namespace
@@ -131,7 +131,7 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
     hits.resize(width * height);
     for (uint32_t i = 0; i < num_swap; i++) {
         rays_.push_back(gfx::ComputeBuffer::createStorageBuffer(logical_device, sizeof(Ray) * width * height));
-        random_seeds_.push_back(gfx::ComputeBuffer::createStorageBuffer(logical_device, sizeof(float) * width * height));
+        random_seeds_.push_back(gfx::ComputeBuffer::createStorageBuffer(logical_device, sizeof(float) * width * height * 8));
         hits_.push_back(gfx::ComputeBuffer::createFromVector(logical_device, hits, vk::BufferUsageFlagBits::eStorageBuffer));
     }
 
@@ -143,7 +143,7 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
         compute_buffer->setProgram(rng_seeder_->program());
         compute_buffer->bindUniformBuffer(0, 0, random_seeds_[i]);
         compute_buffer->pushConstants(glm::ivec2(width_, height_));
-        compute_buffer->dispatch(width_ * height_ / 16, 1, 1);
+        compute_buffer->dispatch(width_ * 4/ 16, height_ * 4 / 16, 1);
     }
     compute_buffer->endRecording();
     logical_device->getQueue(gfx::Queue::Type::kCompute).submit(compute_buffer);
@@ -152,10 +152,11 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
     camera_ = Camera {
         .position = glm::vec4(278, 273, -800, 1.0),
         .direction = glm::vec4(0,0,1,0),
-        .up = glm::vec4(0,1,0,0),
         .focal_length = 0.035,
         .width = 0.025,
         .height = 0.025,
+        .x_res = width_,
+        .y_res = height_
     };
 
     meshes_ = {
@@ -297,8 +298,6 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
     compute_buffer->bindUniformBuffer(0, 0, rays_[image_index]);
     compute_buffer->bindUniformBuffer(0, 1, random_seeds_[image_index]);
     compute_buffer->pushConstants(camera_);
-    compute_buffer->pushConstants(width_, sizeof(Camera));
-    compute_buffer->pushConstants(height_, sizeof(Camera) + sizeof(uint32_t));
     compute_buffer->dispatch(width_ / 32, height_ / 32, 1);
 
     // Hit testing.
@@ -313,11 +312,10 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
             compute_buffer->pushConstants(meshes_[j].num_triangles, sizeof(Material));
             compute_buffer->dispatch(width_ * height_ / 512, 1, 1);
         }
-            compute_buffer->setProgram(bouncer_->program());
-            compute_buffer->bindUniformBuffer(0, 0, rays_[image_index]);
-            compute_buffer->bindUniformBuffer(0, 1, hits_[image_index]);
-            compute_buffer->bindUniformBuffer(0, 2, random_seeds_[image_index]);
-            compute_buffer->dispatch(width_ * height_ / 512, 1, 1);
+
+        compute_buffer->setProgram(bouncer_->program());
+        compute_buffer->bindUniformBuffer(0, 2, random_seeds_[image_index]);
+        compute_buffer->dispatch(width_ * height_ / 512, 1, 1);
     }
 
     compute_buffer->endRecording();
@@ -329,7 +327,6 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
                                /*signal_semaphore_count*/0u,//1U, 
                               /*signal_semaphores*/nullptr);//&compute_semaphores_[frame]);
     logical_device->getQueue(gfx::Queue::Type::kCompute).submit(submit_info, vk::Fence());
-    
     logical_device->waitIdle();
 
     // Render to the accumulation buffer.

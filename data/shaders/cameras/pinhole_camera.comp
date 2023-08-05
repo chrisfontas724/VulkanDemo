@@ -20,12 +20,12 @@ layout(std430, set = 0, binding = 1) buffer buf2 {
 
 layout(push_constant) uniform PushBlock {
     layout(offset=0)  Camera camera;
-    layout(offset=64) uint image_width;
-    layout(offset=68) uint image_height;
 };
 
 
 void main() {
+  uint image_width = camera.x_res;
+  uint image_height = camera.y_res;
   const uint x_coord = gl_GlobalInvocationID.x;
   const uint y_coord = gl_GlobalInvocationID.y;
   if (x_coord >= image_width|| y_coord >= image_height) {
@@ -49,8 +49,8 @@ void main() {
   float pixel_ndc_x = 2.0 * pixel_normalized_x - 1.0;
   float pixel_ndc_y = 2.0 * pixel_normalized_y - 1.0;
 
-  float pixel_camera_x = pixel_ndc_x * camera.width * image_aspect_ratio * tan(alpha/2);
-  float pixel_camera_y = pixel_ndc_y * camera.height * tan(alpha/2);
+  float pixel_camera_x = pixel_ndc_x * camera.width * image_aspect_ratio * tan(alpha/2.0);
+  float pixel_camera_y = pixel_ndc_y * camera.height * tan(alpha/2.0);
 
   vec4 camera_point = vec4(pixel_camera_x, pixel_camera_y, -1.0, 0.0);
 

@@ -1,5 +1,3 @@
-
-
 layout (set = 0, binding = 0) uniform sampler2D input_color;
 
 layout(location = 0) in vec2 uv_coord;
@@ -10,5 +8,5 @@ layout(std140, push_constant) uniform PushBlock {
 };
 
 void main() {
-   out_color = vec4(texture(input_color, uv_coord).xyz / vec3(num_samples), 1.0);
+   out_color = vec4(texture(input_color, uv_coord).rgb / vec3(num_samples), 1.0);
 }
