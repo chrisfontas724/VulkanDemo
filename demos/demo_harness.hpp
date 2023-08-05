@@ -20,16 +20,30 @@ public:
 
     void addDemo(std::shared_ptr<Demo> demo) {
         demo->setup(logical_device_, swap_chain_->textures().size(), window_config_.width, window_config_.height);
-        demos_.push_back(std::move(demo));
+        demos_.push_back(demo);
+        if (demos_.size() == 1) {
+            current_demo_ = demo;
+            window_->set_title(current_demo_->name());
+        }
     }
 
     int32_t run();
 
 private:
 
-    void checkInputManager(const display::InputManager* mngr);
-    std::shared_ptr<Demo> current_demo();
+    class WindowDelegate : public display::WindowDelegate{
+    public:
+        void onUpdate() override;
+        void onResize(int32_t width, int32_t height) override;
+        void onWindowMove(int32_t x, int32_t y) override;
+        void onStart(display::Window*) override;
+        void onClose() override;
+    };
 
+    void checkInputManager(const display::InputManager* mngr);
+   // std::shared_ptr<Demo> next_demo();
+
+    std::shared_ptr<WindowDelegate> window_delegate_;
     std::vector<std::shared_ptr<Demo>> demos_;
     gfx::InstancePtr instance_;
     gfx::PhysicalDevicePtr physical_device_;
@@ -43,7 +57,7 @@ private:
     std::shared_ptr<christalz::ShaderResource> post_shader_;
     std::vector<vk::Semaphore> render_semaphores_;
     vk::SurfaceKHR surface_;
-    std::shared_ptr<Demo> last_demo_ = nullptr;
+    std::shared_ptr<Demo> current_demo_ = nullptr;
 };
 
 #endif // DEMO_HARNESS_HPP_

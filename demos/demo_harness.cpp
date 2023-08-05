@@ -14,30 +14,6 @@ namespace {
 uint32_t index = 0;
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
-// Example dummy delegate class.
-class Delegate : public display::WindowDelegate {
-public:
-    
-    // |WindowDelegate|
-    void onUpdate() override { /*std::cout << "onUpdate" << std::endl;*/ }
-    
-    void onResize(int32_t width, int32_t height) override {
-        std::cout << "onResize" << std::endl;
-    }
-    
-    void onWindowMove(int32_t x, int32_t y) override {
-        std::cout << "onWindowMove" << std::endl;
-    }
-    
-    void onStart(display::Window*) override {
-        std::cout << "onStart" << std::endl;
-    }
-    
-    void onClose() override {
-        std::cout << "onClose" << std::endl;
-    }
-};
-
 
 const std::vector<const char*> kDeviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -50,20 +26,20 @@ void DemoHarness::checkInputManager(const display::InputManager* mngr) {
     if (mngr->key_up(display::KeyCode::A)) {
         index++;
         index %= demos_.size();
-        logical_device_->waitIdle();
+        current_demo_ = demos_[index];
     }
 }
 
 DemoHarness::DemoHarness(uint32_t width, uint32_t height) {
-    std::string name = "DemoHarness";
-    window_config_.name = name;
+    std::string title = "DemoHarness";
+    window_config_.title = title;
     window_config_.width = width;
     window_config_.height = height;
-    delegate_ = std::make_shared<Delegate>();
-    window_ = std::make_shared<display::GLFWWindow>(window_config_, delegate_); 
+    window_delegate_ = std::make_shared<WindowDelegate>();
+    window_ = std::make_shared<display::GLFWWindow>(window_config_, window_delegate_); 
     CXL_DCHECK(window_);
 
-    instance_ = gfx::Instance::create(name, window_->getExtensions(), /*validation*/true);   
+    instance_ = gfx::Instance::create(title, window_->getExtensions(), /*validation*/true);   
     CXL_DCHECK(instance_);
 
     surface_ = window_->createVKSurface(instance_->vk());
@@ -111,8 +87,7 @@ int32_t DemoHarness::run() {
     while (!window_->shouldClose()) {
         window_->poll();
         checkInputManager(window_->input_manager());
-        auto demo = current_demo();
-        CXL_DCHECK(demo);
+        CXL_DCHECK(current_demo_);
 
         swap_chain_->beginFrame([&](vk::Semaphore& image_available_semaphore, vk::Fence& in_flight_fence, uint32_t image_index,
                                     uint32_t frame) -> std::vector<vk::Semaphore> {
@@ -120,11 +95,7 @@ int32_t DemoHarness::run() {
             command_buffer->reset();
             command_buffer->beginRecording();
 
-            if (demo != last_demo_) {
-                last_demo_ = demo;
-            }
-
-            auto texture = demo->renderFrame(command_buffer, image_index, frame);
+            auto texture = current_demo_->renderFrame(command_buffer, image_index, frame);
         
             command_buffer->beginRenderPass(display_render_passes_[image_index]);
             command_buffer->setProgram(post_shader_->program());
@@ -152,9 +123,27 @@ int32_t DemoHarness::run() {
     return 0;
 }
 
-std::shared_ptr<Demo> DemoHarness::current_demo() {
-    return index < demos_.size() ? demos_[index] : nullptr;
+void DemoHarness::WindowDelegate::onUpdate() {
+
 }
+
+void DemoHarness::WindowDelegate::onResize(int32_t width, int32_t height) {
+
+}
+    
+
+void DemoHarness::WindowDelegate::onWindowMove(int32_t x, int32_t y) {
+
+}
+    
+void DemoHarness::WindowDelegate::onStart(display::Window*)  {
+
+}
+    
+void DemoHarness::WindowDelegate::onClose() {
+
+}
+
 
 DemoHarness::~DemoHarness() {
     logical_device_->waitIdle();
