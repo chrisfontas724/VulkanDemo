@@ -22,7 +22,7 @@ layout(push_constant) uniform PushBlock {
 
 float uniformRandomVariable(inout mwc64x_state_t state) {
     uint randMax = 0xFFFFFFFF;
-    uint randomInt =  MWC64X_NextUint(state);
+    uint randomInt = MWC64X_NextUint(state);
     return float(randomInt) / float(randMax);
 }
 
