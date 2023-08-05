@@ -1,0 +1,80 @@
+#extension GL_ARB_gpu_shader_int64 : enable
+
+/*
+Part of MWC64X by David Thomas, dt10@imperial.ac.uk
+This is provided under BSD, full license is with the main package.
+See http://www.doc.ic.ac.uk/~dt10/research
+*/
+#ifndef dt10_mwc64x_skip_cl
+#define dt10_mwc64x_skip_cl
+
+// Pre: a<M, b<M
+// Post: r=(a+b) mod M
+uint64_t MWC_AddMod64(uint64_t a, uint64_t b, uint64_t M)
+{
+	uint64_t v=a+b;
+	if( (v>=M) || (v<a) )
+		v=v-M;
+	return v;
+}
+
+// Pre: a<M,b<M
+// Post: r=(a*b) mod M
+// This could be done more efficently, but it is portable, and should
+// be easy to understand. It can be replaced with any of the better
+// modular multiplication algorithms (for example if you know you have
+// double precision available or something).
+uint64_t MWC_MulMod64(uint64_t a, uint64_t b, uint64_t M)
+{	
+	uint64_t r=0;
+	while(a != 0){
+		if ((a & 1u) != 0)
+			r=MWC_AddMod64(r,b,M);
+		b=MWC_AddMod64(b,b,M);
+		a=a>>1;
+	}
+	return r;
+}
+
+
+// Pre: a<M, e>=0
+// Post: r=(a^b) mod M
+// This takes at most ~64^2 modular additions, so probably about 2^15 or so instructions on
+// most architectures
+uint64_t MWC_PowMod64(uint64_t a, uint64_t e, uint64_t M)
+{
+	uint64_t sqr=a, acc=1;
+	while(e!=0){
+		if((e&1u) != 0)
+			acc=MWC_MulMod64(acc,sqr,M);
+		sqr=MWC_MulMod64(sqr,sqr,M);
+		e=e>>1;
+	}
+	return acc;
+}
+
+uvec2 MWC_SkipImpl_Mod64(uvec2 curr, uint64_t A, uint64_t M, uint64_t distance)
+{
+	uint64_t m = MWC_PowMod64(A, distance, M);
+	uint64_t x = curr.x*A+curr.y;
+	x=MWC_MulMod64(x, m, M);
+	return uvec2(uint(x/A), uint(x%A));
+}
+
+uvec2 MWC_SeedImpl_Mod64(uint64_t A, uint64_t M, uint vecSize, uint vecOffset, uint64_t streamBase, uint64_t streamGap)
+{
+	// This is an arbitrary constant for starting LCG jumping from. I didn't
+	// want to start from 1, as then you end up with the two or three first values
+	// being a bit poor in ones - once you've decided that, one constant is as
+	// good as any another. There is no deep mathematical reason for it, I just
+	// generated a random number.
+	uint64_t MWC_BASEID = 4077358422479273989UL;
+	
+	uint64_t dist=streamBase + (gl_GlobalInvocationID.x*vecSize+vecOffset)*streamGap;
+	uint64_t m=MWC_PowMod64(A, dist, M);
+	
+	uint64_t x=MWC_MulMod64(MWC_BASEID, m, M);
+	return uvec2(uint(x/A), uint(x%A));
+}
+
+#endif

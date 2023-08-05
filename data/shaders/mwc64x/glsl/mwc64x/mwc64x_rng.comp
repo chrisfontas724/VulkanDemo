@@ -1,0 +1,54 @@
+/*
+Part of MWC64X by David Thomas, dt10@imperial.ac.uk
+This is provided under BSD, full license is with the main package.
+See http://www.doc.ic.ac.uk/~dt10/research
+*/
+#ifndef dt10_mwc64x_rng_cl
+#define dt10_mwc64x_rng_cl
+
+#extension GL_ARB_gpu_shader_int64 : enable
+
+
+#include "skip_mwc.comp"
+
+//! Represents the state of a particular generator
+struct mwc64x_state_t{ uint x; uint c; };
+
+uint MWC64X_A = 4294883355U;
+uint64_t MWC64X_M = 18446383549859758079UL;
+
+void MWC64X_Step(inout mwc64x_state_t s)
+{
+	uint X = s.x, C = s.c;
+	
+	uint Xn = MWC64X_A*X+C;
+	uint carry = uint(Xn<C);				// The (Xn<C) will be zero or one for scalar
+	uint Cn = (MWC64X_A*X)>>16 + carry;     //    mad_hi(MWC64X_A,X,carry);  
+	
+	s.x=Xn;
+	s.c=Cn;
+}
+
+void MWC64X_Skip(inout mwc64x_state_t s, uint64_t distance)
+{
+	uvec2 tmp=MWC_SkipImpl_Mod64(uvec2(s.x,s.c), MWC64X_A, MWC64X_M, distance);
+	s.x=tmp.x;
+	s.c=tmp.y;
+}
+
+void MWC64X_SeedStreams(inout mwc64x_state_t s, uint64_t baseOffset, uint64_t perStreamOffset)
+{
+	uvec2 tmp =MWC_SeedImpl_Mod64(MWC64X_A, MWC64X_M, 1, 0, baseOffset, perStreamOffset);
+	s.x=tmp.x;
+	s.c=tmp.y;
+}
+
+//! Return a 32-bit integer in the range [0..2^32)
+uint MWC64X_NextUint(inout mwc64x_state_t s)
+{
+	uint res=s.x ^ s.c;
+	MWC64X_Step(s);
+	return res;
+}
+
+#endif

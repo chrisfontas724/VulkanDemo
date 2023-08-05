@@ -134,6 +134,7 @@ private:
     std::vector<gfx::RenderPassInfo> accumulation_passes_;
     std::vector<gfx::RenderPassInfo> render_passes_;
 
+    std::shared_ptr<christalz::ShaderResource> mwc64x_seeder_;
     std::shared_ptr<christalz::ShaderResource> rng_seeder_;
     std::shared_ptr<christalz::ShaderResource> ray_generator_;
     std::shared_ptr<christalz::ShaderResource> hit_tester_;
@@ -142,7 +143,6 @@ private:
     std::shared_ptr<christalz::ShaderResource> resolve_;
 
     std::vector<gfx::ComputeTexturePtr> accum_textures_;
-    std::vector<gfx::ComputeTexturePtr> color_textures_;
     std::vector<gfx::ComputeTexturePtr> resolve_textures_;
 
     std::vector<gfx::CommandBufferPtr> compute_command_buffers_;

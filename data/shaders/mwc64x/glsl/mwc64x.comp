@@ -1,0 +1,17 @@
+/*
+Part of MWC64X by David Thomas, dt10@imperial.ac.uk
+This is provided under BSD, full license is with the main package.
+See http://www.doc.ic.ac.uk/~dt10/research
+*/
+#ifndef dt10_mwc32_cl
+#define dt10_mwc32_cl
+
+#include "mwc64x/mwc64x_rng.comp"
+// #include "mwc64x/mwc64xvec2_rng.comp"
+// #include "mwc64x/mwc64xvec4_rng.comp"
+// #include "mwc64x/mwc64xvec8_rng.comp"
+
+// Useful links
+// https://stackoverflow.com/questions/64526014/mul-hi-function-in-opencl-what-does-high-half-mean
+
+#endif

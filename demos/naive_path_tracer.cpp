@@ -29,9 +29,6 @@ NaivePathTracer::~NaivePathTracer() {
         logical_device->vk().destroy(semaphore);
     }
 
-    for (auto& texture: color_textures_) {
-        texture.reset();
-    }
     for (auto& texture: resolve_textures_) {
         texture.reset();
     }
@@ -49,18 +46,11 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
     text_renderer_->set_color(glm::vec4(1,1,1,1));
 
     gfx::RenderPassBuilder builder(logical_device);
-    vk::SampleCountFlagBits samples = vk::SampleCountFlagBits::e4;
 
     accum_textures_.resize(num_swap);
     for (uint32_t i = 0; i < num_swap; i++) {
         accum_textures_[i] = gfx::ImageUtils::createAccumulationAttachment(logical_device, width, height);
         CXL_DCHECK(accum_textures_[i]);
-    }
-
-    color_textures_.resize(num_swap);
-    for (uint32_t i = 0; i < num_swap; i++) {
-        color_textures_[i] = gfx::ImageUtils::createColorAttachment(logical_device, width, height, samples);
-        CXL_DCHECK(color_textures_[i]);
     }
     
     resolve_textures_.resize(num_swap);
@@ -86,12 +76,10 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
 
     for (int32_t tex_index = 0; tex_index < num_swap; tex_index++) {
         builder.reset();
-        builder.addColorAttachment(color_textures_[tex_index]);
-        builder.addResolveAttachment(resolve_textures_[tex_index]);
+        builder.addColorAttachment(resolve_textures_[tex_index]);
         builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
                             .input_indices = {},
-                            .color_indices = {0},
-                            .resolve_index = 0});
+                            .color_indices = {0}});
         render_passes_.push_back(std::move(builder.build()));
     }
 
@@ -106,6 +94,13 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
     CXL_LOG(INFO) << "Create rng shader";
     rng_seeder_ = christalz::ShaderResource::createCompute(logical_device, fs, "sampling/rng_seeding", {fs.directory()});
     CXL_DCHECK(rng_seeder_);
+
+    CXL_LOG(INFO) << "Create mwc64x shader";
+    mwc64x_seeder_ = christalz::ShaderResource::createCompute(logical_device, fs, "mwc64x/glsl/mwc64x_seeding", {
+        fs.directory(),
+        fs.directory() + "/mwc64x/glsl"});
+    CXL_DCHECK(mwc64x_seeder_);
+ 
  
     CXL_LOG(INFO) << "Create camera shader";
     ray_generator_ = christalz::ShaderResource::createCompute(logical_device, fs, "cameras/pinhole_camera", {fs.directory()});
