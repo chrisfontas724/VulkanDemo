@@ -81,6 +81,23 @@ void NaivePathTracer::resize(uint32_t width, uint32_t height) {
     width_ = width;
     height_ = height;
 
+    for (auto& pass : render_passes_) {
+        logical_device->vk().destroyRenderPass(pass.render_pass);
+    }
+
+    for (auto& pass : accumulation_passes_) {
+        logical_device->vk().destroyRenderPass(pass.render_pass);
+    }
+
+    for (auto& texture: resolve_textures_) {
+        texture.reset();
+    }
+
+    accum_texture_.reset();
+    accumulation_passes_.clear();
+    render_passes_.clear();
+    resolve_textures_.clear();
+
     gfx::RenderPassBuilder builder(logical_device);
     accum_texture_ = gfx::ImageUtils::createAccumulationAttachment(logical_device, width, height);
     CXL_DCHECK(accum_texture_);

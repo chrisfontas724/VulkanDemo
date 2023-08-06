@@ -70,10 +70,6 @@ int32_t DemoHarness::run() {
         checkInputManager(window_->input_manager());
         CXL_DCHECK(current_demo_);
 
-        if (!ready_.load()) {
-            return 0;
-        }
-
         swap_chain_->beginFrame([&](vk::Semaphore& image_available_semaphore, vk::Fence& in_flight_fence, uint32_t image_index,
                                     uint32_t frame) -> std::vector<vk::Semaphore> {
             auto command_buffer = command_buffers_[image_index];
@@ -116,7 +112,6 @@ int32_t DemoHarness::run() {
 
 
 void DemoHarness::recreateSwapchain(int32_t width, int32_t height) {
-    ready_ = false;
     logical_device_->waitIdle();
     if (swap_chain_) {
         for (const auto &semaphore : render_semaphores_) {
@@ -158,7 +153,6 @@ void DemoHarness::recreateSwapchain(int32_t width, int32_t height) {
     for (auto demo : demos_) {
         demo->resize(width, height);
     }
-    ready_ = true;
 }
 
 void DemoHarness::WindowDelegate::onUpdate() {

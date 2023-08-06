@@ -11,7 +11,6 @@
 #include <Windowing/glfw_window.hpp>
 #include "render_pass.hpp"
 #include "shader_resource.hpp"
-#include <atomic>
 
 class DemoHarness {
 public:
@@ -65,8 +64,6 @@ private:
     std::vector<gfx::RenderPassInfo> display_render_passes_;
     std::vector<vk::Semaphore> render_semaphores_;
     std::shared_ptr<Demo> current_demo_ = nullptr;
-
-    std::atomic_bool ready_ = false;
 };
 
 #endif // DEMO_HARNESS_HPP_
