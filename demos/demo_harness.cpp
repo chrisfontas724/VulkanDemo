@@ -35,7 +35,7 @@ DemoHarness::DemoHarness(uint32_t width, uint32_t height) {
     window_config_.title = title;
     window_config_.width = width;
     window_config_.height = height;
-    window_delegate_ = std::make_shared<WindowDelegate>();
+    window_delegate_ = std::make_shared<WindowDelegate>(this);
     window_ = std::make_shared<display::GLFWWindow>(window_config_, window_delegate_); 
     CXL_DCHECK(window_);
 
@@ -53,33 +53,14 @@ DemoHarness::DemoHarness(uint32_t width, uint32_t height) {
         std::make_shared<gfx::LogicalDevice>(physical_device_, surface_, kDeviceExtensions);
     CXL_DCHECK(logical_device_);
 
-    int32_t display_width, display_height;
-    window_->getSize(&display_width, &display_height);
-    swap_chain_ = std::make_unique<gfx::SwapChain>(logical_device_, surface_, display_width, display_height);
-    CXL_DCHECK(swap_chain_);
-
-    const auto& swapchain_textures = swap_chain_->textures();
-    auto num_swap = swapchain_textures.size();
-
-    command_buffers_ = gfx::CommandBuffer::create(logical_device_, gfx::Queue::Type::kGraphics,
-                                                  vk::CommandBufferLevel::ePrimary, num_swap);
-    CXL_DCHECK(command_buffers_.size() == num_swap);
-
-    render_semaphores_ = logical_device_->createSemaphores(MAX_FRAMES_IN_FLIGHT);
-
-    gfx::RenderPassBuilder builder(logical_device_);
-    for (const auto& texture : swapchain_textures) {
-        builder.reset();
-        builder.addColorAttachment(texture);
-        builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
-                            .input_indices = {},
-                            .color_indices = {0}});
-        display_render_passes_.push_back(std::move(builder.build()));
-    }
-
     cxl::FileSystem fs("c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/shaders/");
     post_shader_ = christalz::ShaderResource::createGraphics(logical_device_, fs, "posteffects/post");
     CXL_DCHECK(post_shader_);
+
+    int32_t display_width, display_height;
+    window_->getSize(&display_width, &display_height);
+
+    recreateSwapchain(display_width, display_height);
 }
 
 
@@ -88,6 +69,10 @@ int32_t DemoHarness::run() {
         window_->poll();
         checkInputManager(window_->input_manager());
         CXL_DCHECK(current_demo_);
+
+        if (!ready_.load()) {
+            return 0;
+        }
 
         swap_chain_->beginFrame([&](vk::Semaphore& image_available_semaphore, vk::Fence& in_flight_fence, uint32_t image_index,
                                     uint32_t frame) -> std::vector<vk::Semaphore> {
@@ -129,12 +114,61 @@ int32_t DemoHarness::run() {
     return 0;
 }
 
+
+void DemoHarness::recreateSwapchain(int32_t width, int32_t height) {
+    ready_ = false;
+    logical_device_->waitIdle();
+    if (swap_chain_) {
+        for (const auto &semaphore : render_semaphores_) {
+            logical_device_->vk().destroy(semaphore);
+        }
+        for (auto& pass : display_render_passes_) {
+            logical_device_->vk().destroyRenderPass(pass.render_pass);
+        }
+
+        render_semaphores_.clear();
+        display_render_passes_.clear();
+        command_buffers_.clear();
+        swap_chain_.reset();
+    }
+    
+    swap_chain_ = std::make_unique<gfx::SwapChain>(logical_device_, surface_, width, height);
+    CXL_DCHECK(swap_chain_);
+
+    const auto& swapchain_textures = swap_chain_->textures();
+    auto num_swap = swapchain_textures.size();
+
+    command_buffers_ = gfx::CommandBuffer::create(logical_device_, gfx::Queue::Type::kGraphics,
+                                                  vk::CommandBufferLevel::ePrimary, num_swap);
+    CXL_DCHECK(command_buffers_.size() == num_swap);
+
+    render_semaphores_ = logical_device_->createSemaphores(MAX_FRAMES_IN_FLIGHT);
+
+    gfx::RenderPassBuilder builder(logical_device_);
+    for (const auto& texture : swapchain_textures) {
+        builder.reset();
+        builder.addColorAttachment(texture);
+        builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
+                            .input_indices = {},
+                            .color_indices = {0}});
+        display_render_passes_.push_back(std::move(builder.build()));
+    }
+
+    // Update the demos.
+    for (auto demo : demos_) {
+        demo->resize(width, height);
+    }
+    ready_ = true;
+}
+
 void DemoHarness::WindowDelegate::onUpdate() {
 
 }
 
 void DemoHarness::WindowDelegate::onResize(int32_t width, int32_t height) {
-
+  if (harness_->logical_device_) {
+    harness_->recreateSwapchain(width, height);
+  }
 }
     
 

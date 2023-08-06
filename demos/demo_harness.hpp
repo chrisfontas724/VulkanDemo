@@ -11,6 +11,7 @@
 #include <Windowing/glfw_window.hpp>
 #include "render_pass.hpp"
 #include "shader_resource.hpp"
+#include <atomic>
 
 class DemoHarness {
 public:
@@ -33,30 +34,39 @@ private:
 
     class WindowDelegate : public display::WindowDelegate{
     public:
+        WindowDelegate(DemoHarness* harness):
+        harness_(harness){}
         void onUpdate() override;
         void onResize(int32_t width, int32_t height) override;
         void onWindowMove(int32_t x, int32_t y) override;
         void onStart(display::Window*) override;
         void onClose() override;
+     private:
+        DemoHarness* harness_;
     };
 
+    void recreateSwapchain(int32_t width, int32_t height);
     void checkInputManager(const display::InputManager* mngr);
 
-    std::shared_ptr<WindowDelegate> window_delegate_;
+    std::shared_ptr<WindowDelegate> window_delegate_ = nullptr;
     std::vector<std::shared_ptr<Demo>> demos_;
-    gfx::InstancePtr instance_;
-    gfx::PhysicalDevicePtr physical_device_;
-    gfx::LogicalDevicePtr logical_device_;
-    gfx::SwapChainPtr swap_chain_;
+    gfx::InstancePtr instance_ = nullptr;
+    gfx::PhysicalDevicePtr physical_device_ = nullptr;
+    gfx::LogicalDevicePtr logical_device_ = nullptr;
+    gfx::SwapChainPtr swap_chain_ = nullptr;
+    std::shared_ptr<christalz::ShaderResource> post_shader_ = nullptr;
+
     display::Window::Config window_config_;
-    std::shared_ptr<display::GLFWWindow> window_;
-    std::shared_ptr<display::WindowDelegate> delegate_;
+    std::shared_ptr<display::GLFWWindow> window_ = nullptr;
+    std::shared_ptr<display::WindowDelegate> delegate_ = nullptr;
+    vk::SurfaceKHR surface_;
+
     std::vector<gfx::CommandBufferPtr> command_buffers_;
     std::vector<gfx::RenderPassInfo> display_render_passes_;
-    std::shared_ptr<christalz::ShaderResource> post_shader_;
     std::vector<vk::Semaphore> render_semaphores_;
-    vk::SurfaceKHR surface_;
     std::shared_ptr<Demo> current_demo_ = nullptr;
+
+    std::atomic_bool ready_ = false;
 };
 
 #endif // DEMO_HARNESS_HPP_

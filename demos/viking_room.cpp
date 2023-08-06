@@ -25,35 +25,73 @@ float degrees = 90;
 
 void VikingRoom::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, int32_t width, int32_t height) {
     logical_device_ = logical_device;
+    num_swap_images_ = num_swap;
+
+    text_renderer_ = std::make_shared<TextRenderer>(logical_device);
+
+    cxl::FileSystem fs("c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/shaders/");
+    model_shader_ = christalz::ShaderResource::createGraphics(logical_device, fs, "lighting/model");
+    model_ = std::make_shared<christalz::Model>(logical_device, 
+        "C:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/models/viking_room.obj", 
+        "C:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/textures/viking_room.png");
+    CXL_DCHECK(model_shader_);
+    CXL_DCHECK(model_);
+
+    ubo_buffer_ = gfx::ComputeBuffer::createHostAccessableUniform(logical_device, sizeof(UniformBufferObject));
+    CXL_DCHECK(ubo_buffer_);
+
+    resize(width, height);
+}
+
+void VikingRoom::resize(uint32_t width, uint32_t height) {
+    auto logical_device = logical_device_.lock();
     width_ = width;
     height_ = height;
 
-    text_renderer_ = std::make_shared<TextRenderer>(logical_device);
+    for (auto& pass : render_passes_) {
+        logical_device->vk().destroyRenderPass(pass.render_pass);
+    }
+
+    for (auto& texture: color_textures_) {
+        texture.reset();
+    }
+    for (auto& texture: resolve_textures_) {
+        texture.reset();
+    }
+    for (auto& texture: depth_textures_) {
+        texture.reset();
+    }
+
+    render_passes_.clear();
+    color_textures_.clear();
+    resolve_textures_.clear();
+    depth_textures_.clear();
+
 
     gfx::RenderPassBuilder builder(logical_device);
     vk::SampleCountFlagBits samples = vk::SampleCountFlagBits::e4;
 
-    color_textures_.resize(num_swap);
-    for (uint32_t i = 0; i < num_swap; i++) {
+    color_textures_.resize(num_swap_images_);
+    for (uint32_t i = 0; i < num_swap_images_; i++) {
         color_textures_[i] = gfx::ImageUtils::createColorAttachment(logical_device, width, height, samples);
         CXL_DCHECK(color_textures_[i]);
     }
     
-    resolve_textures_.resize(num_swap);
-    for (uint32_t i = 0; i < num_swap; i++) {
+    resolve_textures_.resize(num_swap_images_);
+    for (uint32_t i = 0; i < num_swap_images_; i++) {
         resolve_textures_[i] = gfx::ImageUtils::createColorAttachment(logical_device, width,
                                                                      height, vk::SampleCountFlagBits::e1);
         CXL_DCHECK(resolve_textures_[i]);
     }
 
-    depth_textures_.resize(num_swap);
-    for (uint32_t i = 0; i < num_swap; i++) {
+    depth_textures_.resize(num_swap_images_);
+    for (uint32_t i = 0; i < num_swap_images_; i++) {
       depth_textures_[i] =
         gfx::ImageUtils::createDepthTexture(logical_device, width, height, samples);
       CXL_DCHECK(depth_textures_[i]);
     }
 
-    for (int32_t tex_index = 0; tex_index < num_swap; tex_index++) {
+    for (int32_t tex_index = 0; tex_index < num_swap_images_; tex_index++) {
         builder.reset();
         builder.addColorAttachment(color_textures_[tex_index]);
         builder.addDepthAttachment(depth_textures_[tex_index]);
@@ -66,20 +104,7 @@ void VikingRoom::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, i
                             .depth_index = 0});
         render_passes_.push_back(std::move(builder.build()));
     }
-
-    cxl::FileSystem fs("c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/shaders/");
-    model_shader_ = christalz::ShaderResource::createGraphics(logical_device, fs, "lighting/model");
-    model_ = std::make_shared<christalz::Model>(logical_device, 
-        "C:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/models/viking_room.obj", 
-        "C:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/textures/viking_room.png");
-    CXL_DCHECK(model_shader_);
-    CXL_DCHECK(model_);
-
-    ubo_buffer_ = gfx::ComputeBuffer::createHostAccessableUniform(logical_device, sizeof(UniformBufferObject));
-    CXL_DCHECK(ubo_buffer_);
 }
-
-
 
 VikingRoom::~VikingRoom() {
     auto logical_device = logical_device_.lock();

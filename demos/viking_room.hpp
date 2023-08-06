@@ -20,6 +20,7 @@ public:
     ~VikingRoom();
 
     void setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, int32_t width, int32_t height) override;
+    void resize(uint32_t width, uint32_t height) override;
 
     gfx::ComputeTexturePtr
     renderFrame(gfx::CommandBufferPtr command_buffer, 

@@ -38,28 +38,62 @@ NaivePathTracer::~NaivePathTracer() {
 
 
 void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, int32_t width, int32_t height) {
+    num_swap_images_ = num_swap;
     logical_device_ = logical_device;
+    text_renderer_ = std::make_shared<TextRenderer>(logical_device);
+
+    compute_command_buffers_ = gfx::CommandBuffer::create(logical_device, gfx::Queue::Type::kCompute,
+                                                          vk::CommandBufferLevel::ePrimary, num_swap);
+    CXL_DCHECK(compute_command_buffers_.size() == num_swap);
+    compute_semaphores_ = logical_device->createSemaphores(MAX_FRAMES_IN_FLIGHT);
+
+    cxl::FileSystem fs("c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/shaders");
+    mwc64x_seeder_ = christalz::ShaderResource::createCompute(logical_device, fs, "mwc64x/glsl/mwc64x_seeding", {
+        fs.directory(),
+        fs.directory() + "/mwc64x/glsl"});
+    CXL_DCHECK(mwc64x_seeder_);
+ 
+    ray_generator_ = christalz::ShaderResource::createCompute(logical_device, fs, "cameras/pinhole_camera", {
+        fs.directory(),
+        fs.directory() + "/mwc64x/glsl"});
+    CXL_DCHECK(ray_generator_);
+
+    hit_tester_ = christalz::ShaderResource::createCompute(logical_device, fs, "raytraversal/intersect", {fs.directory()});
+    CXL_DCHECK(hit_tester_);
+
+    bouncer_ = christalz::ShaderResource::createCompute(logical_device, fs, "raytraversal/bounce", {
+        fs.directory(),
+        fs.directory() + "/mwc64x/glsl"});
+    CXL_DCHECK(bouncer_);
+
+    lighter_ = christalz::ShaderResource::createGraphics(logical_device, fs, "lighting/ray", {fs.directory()});
+    CXL_DCHECK(lighter_);
+
+    resolve_ = christalz::ShaderResource::createGraphics(logical_device, fs, "lighting/resolve", {fs.directory()});
+    CXL_DCHECK(resolve_);
+
+    resize(width, height);
+}
+
+void NaivePathTracer::resize(uint32_t width, uint32_t height) {
+    CXL_DCHECK(width > 0 && height > 0);
+    auto logical_device = logical_device_.lock();
     width_ = width;
     height_ = height;
 
-    text_renderer_ = std::make_shared<TextRenderer>(logical_device);
-    text_renderer_->set_color(glm::vec4(1,1,1,1));
-
     gfx::RenderPassBuilder builder(logical_device);
-
     accum_texture_ = gfx::ImageUtils::createAccumulationAttachment(logical_device, width, height);
     CXL_DCHECK(accum_texture_);
-  
     
-    resolve_textures_.resize(num_swap);
-    for (uint32_t i = 0; i < num_swap; i++) {
+    resolve_textures_.resize(num_swap_images_);
+    for (uint32_t i = 0; i < num_swap_images_; i++) {
         resolve_textures_[i] = gfx::ImageUtils::createColorAttachment(logical_device, width,
                                                                      height, vk::SampleCountFlagBits::e1);
         CXL_DCHECK(resolve_textures_[i]);
     }
 
 
-    for (int32_t tex_index = 0; tex_index < num_swap; tex_index++) {
+    for (int32_t tex_index = 0; tex_index < num_swap_images_; tex_index++) {
         builder.reset();
         builder.addColorAttachment(accum_texture_, {
             .load_op = vk::AttachmentLoadOp::eLoad,
@@ -71,8 +105,7 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
         accumulation_passes_.push_back(std::move(builder.build()));
     }
 
-
-    for (int32_t tex_index = 0; tex_index < num_swap; tex_index++) {
+    for (int32_t tex_index = 0; tex_index < num_swap_images_; tex_index++) {
         builder.reset();
         builder.addColorAttachment(resolve_textures_[tex_index]);
         builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
@@ -81,50 +114,11 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
         render_passes_.push_back(std::move(builder.build()));
     }
 
-  
-    compute_command_buffers_ = gfx::CommandBuffer::create(logical_device, gfx::Queue::Type::kCompute,
-                                                          vk::CommandBufferLevel::ePrimary, num_swap);
-    CXL_DCHECK(compute_command_buffers_.size() == num_swap);
-
-    compute_semaphores_ = logical_device->createSemaphores(MAX_FRAMES_IN_FLIGHT);
-
-    cxl::FileSystem fs("c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/shaders");
-    CXL_LOG(INFO) << "Create mwc64x shader";
-    mwc64x_seeder_ = christalz::ShaderResource::createCompute(logical_device, fs, "mwc64x/glsl/mwc64x_seeding", {
-        fs.directory(),
-        fs.directory() + "/mwc64x/glsl"});
-    CXL_DCHECK(mwc64x_seeder_);
- 
- 
-    CXL_LOG(INFO) << "Create camera shader";
-    ray_generator_ = christalz::ShaderResource::createCompute(logical_device, fs, "cameras/pinhole_camera", {
-        fs.directory(),
-        fs.directory() + "/mwc64x/glsl"});
-    CXL_DCHECK(ray_generator_);
-
-    CXL_LOG(INFO) << "Create lighting shader";
-    lighter_ = christalz::ShaderResource::createGraphics(logical_device, fs, "lighting/ray", {fs.directory()});
-    CXL_DCHECK(lighter_);
-
-    CXL_LOG(INFO) << "Create resolve shader";
-    resolve_ = christalz::ShaderResource::createGraphics(logical_device, fs, "lighting/resolve", {fs.directory()});
-    CXL_DCHECK(resolve_);
-
-    CXL_LOG(INFO) << "Create intersection shader";
-    hit_tester_ = christalz::ShaderResource::createCompute(logical_device, fs, "raytraversal/intersect", {fs.directory()});
-    CXL_DCHECK(hit_tester_);
-
-    CXL_LOG(INFO) << "Create bounce shader";
-    bouncer_ = christalz::ShaderResource::createCompute(logical_device, fs, "raytraversal/bounce", {
-        fs.directory(),
-        fs.directory() + "/mwc64x/glsl"});
-    CXL_DCHECK(bouncer_);
-
     std::vector<HitPoint> hits;
-    hits.resize(width * height);
-    for (uint32_t i = 0; i < num_swap; i++) {
-        rays_.push_back(gfx::ComputeBuffer::createStorageBuffer(logical_device, sizeof(Ray) * width * height));
-        random_seeds_.push_back(gfx::ComputeBuffer::createStorageBuffer(logical_device, sizeof(uint32_t) * width * height * 2));
+    hits.resize(width_ * height_);
+    for (uint32_t i = 0; i < num_swap_images_; i++) {
+        rays_.push_back(gfx::ComputeBuffer::createStorageBuffer(logical_device, sizeof(Ray) * width_ * height_));
+        random_seeds_.push_back(gfx::ComputeBuffer::createStorageBuffer(logical_device, sizeof(uint32_t) * width_ * height_ * 2));
         hits_.push_back(gfx::ComputeBuffer::createFromVector(logical_device, hits, vk::BufferUsageFlagBits::eStorageBuffer));
     }
 
@@ -133,7 +127,7 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
     compute_buffer->beginRecording();
 
     uint64_t offset = 0;
-    for (uint32_t i = 0; i < num_swap; i++) {
+    for (uint32_t i = 0; i < num_swap_images_; i++) {
         compute_buffer->setProgram(mwc64x_seeder_->program());
         compute_buffer->bindUniformBuffer(0, 0, random_seeds_[i]);
         compute_buffer->pushConstants(offset);
