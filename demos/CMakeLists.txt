@@ -1,6 +1,7 @@
 set(SOURCE
    ${SOURCE}
    ${CMAKE_CURRENT_SOURCE_DIR}/demo_harness.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/multipass_example.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/naive_path_tracer.cpp
    ${CMAKE_CURRENT_SOURCE_DIR}/viking_room.cpp
    PARENT_SCOPE
@@ -9,6 +10,7 @@ set(HEADERS
    ${HEADERS}
    ${CMAKE_CURRENT_SOURCE_DIR}/demo.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/demo_harness.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/multipass_example.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/naive_path_tracer.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/viking_room.hpp
    PARENT_SCOPE

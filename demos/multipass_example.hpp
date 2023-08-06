@@ -7,6 +7,10 @@
 #define MULTIPASS_EXAMLE_HPP_
 
 #include "demo.hpp"
+#include "text_renderer.hpp"
+#include "shader_resource.hpp"
+#include "compute_texture.hpp"
+#include "model.hpp"
 
 class MultipassExample : public Demo {
 
@@ -14,6 +18,8 @@ public:
 
     ~MultipassExample();
     void setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, int32_t width, int32_t height) override;
+
+    void resize(uint32_t width, uint32_t height) override;
 
     gfx::ComputeTexturePtr
     renderFrame(gfx::CommandBufferPtr command_buffer, 
@@ -23,7 +29,17 @@ public:
                 std::vector<vk::PipelineStageFlags>* signal_wait_stages = nullptr) override;
     
     std::string name() override { return "Multipass Example"; }
+private:
 
+    std::shared_ptr<TextRenderer> text_renderer_;
+    std::vector<gfx::RenderPassInfo> render_passes_;
+
+    std::shared_ptr<christalz::ShaderResource> model_shader_;
+    std::shared_ptr<christalz::Model> model_;
+
+    std::vector<gfx::ComputeTexturePtr> first_pass_textures_;
+    std::vector<gfx::ComputeTexturePtr> second_pass_textures_;
+    std::vector<gfx::ComputeTexturePtr> depth_textures_;
 };
 
 #endif // MULTIPASS_EXAMLE_HPP_

@@ -4,10 +4,7 @@
 
 set(LIBRARY_NAME demo)
 
-set(HEADER_LIST 
-    "${VulkanDemo_SOURCE_DIR}/src/application_config.hpp" 
-    "${VulkanDemo_SOURCE_DIR}/src/application_runner.hpp"
-    "${VulkanDemo_SOURCE_DIR}/src/application.hpp")
+set(HEADER_LIST)
 
 set(INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -17,12 +14,9 @@ set(INCLUDE_DIRS
 
 # Make an automatic library - will be static or dynamic based on user setting
 add_library(demo 
-    application_runner.cpp
-    application.cpp
     model.cpp
     shader_resource.cpp
     text_renderer.cpp
-    vk_raytracer.cpp
     ${HEADER_LIST})
 
 target_include_directories(${LIBRARY_NAME} PRIVATE

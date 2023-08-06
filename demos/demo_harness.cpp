@@ -27,6 +27,7 @@ void DemoHarness::checkInputManager(const display::InputManager* mngr) {
         index++;
         index %= demos_.size();
         current_demo_ = demos_[index];
+        window_->set_title(current_demo_->name());
     }
 }
 

@@ -4,8 +4,9 @@
 
 
 #include <UsefulUtils/logging.hpp>
-#include "demos/viking_room.hpp"
+#include "demos/multipass_example.hpp"
 #include "demos/naive_path_tracer.hpp"
+#include "demos/viking_room.hpp"
 #include "demos/demo_harness.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL 
@@ -16,8 +17,8 @@ INITIALIZE_EASYLOGGINGPP
 int main(int argc, char** argv) {
     START_EASYLOGGINGPP(argc, argv);
 
-    uint32_t x_res = 1024;
-    uint32_t y_res = 768;
+    uint32_t x_res = 512;
+    uint32_t y_res = 512;
     for (uint32_t i = 0; i < argc; i++) {
         std::string arg(argv[i]);
         if (arg.find("--xres=") != std::string::npos) {
@@ -31,5 +32,6 @@ int main(int argc, char** argv) {
     auto harness = DemoHarness(x_res, y_res);
     harness.addDemo(std::move(std::make_shared<NaivePathTracer>()));
     harness.addDemo(std::move(std::make_shared<VikingRoom>()));
+    harness.addDemo(std::move(std::make_shared<MultipassExample>()));
     return harness.run();
 }
