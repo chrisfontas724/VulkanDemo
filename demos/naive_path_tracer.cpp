@@ -21,10 +21,6 @@ NaivePathTracer::~NaivePathTracer() {
         logical_device->vk().destroyRenderPass(pass.render_pass);
     }
 
-    for (auto& pass : accumulation_passes_) {
-        logical_device->vk().destroyRenderPass(pass.render_pass);
-    }
-
     for (auto& semaphore : compute_semaphores_) {
         logical_device->vk().destroy(semaphore);
     }
@@ -85,16 +81,11 @@ void NaivePathTracer::resize(uint32_t width, uint32_t height) {
         logical_device->vk().destroyRenderPass(pass.render_pass);
     }
 
-    for (auto& pass : accumulation_passes_) {
-        logical_device->vk().destroyRenderPass(pass.render_pass);
-    }
-
     for (auto& texture: resolve_textures_) {
         texture.reset();
     }
 
     accum_texture_.reset();
-    accumulation_passes_.clear();
     render_passes_.clear();
     resolve_textures_.clear();
 
@@ -116,18 +107,14 @@ void NaivePathTracer::resize(uint32_t width, uint32_t height) {
             .load_op = vk::AttachmentLoadOp::eLoad,
             .store_op = vk::AttachmentStoreOp::eStore,
          });
-        builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
-                            .input_indices = {},
-                            .color_indices = {0}});
-        accumulation_passes_.push_back(std::move(builder.build()));
-    }
-
-    for (int32_t tex_index = 0; tex_index < num_swap_images_; tex_index++) {
-        builder.reset();
         builder.addColorAttachment(resolve_textures_[tex_index]);
+
         builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
                             .input_indices = {},
                             .color_indices = {0}});
+        builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
+                            .input_indices = {0},
+                            .color_indices = {1}});
         render_passes_.push_back(std::move(builder.build()));
     }
 
@@ -344,23 +331,22 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
     }
 
     // Render to the accumulation buffer.
-    accum_texture_->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eColorAttachmentOptimal);
+   // accum_texture_->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eColorAttachmentOptimal);
     resolve_textures_[image_index]->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eColorAttachmentOptimal);
-    command_buffer->beginRenderPass(accumulation_passes_[image_index]); 
+    command_buffer->beginRenderPass(render_passes_[image_index]); 
     command_buffer->setProgram(lighter_->program());
     command_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kCustomRaytrace);
     command_buffer->setDepth(/*test*/ false, /*write*/ false);
     command_buffer->setProgram(lighter_->program());
     command_buffer->bindUniformBuffer(0, 0, rays_[image_index]);
     command_buffer->draw(width_ * height_);
-    command_buffer->endRenderPass();
 
     // Average out the accumulation buffer.
-    accum_texture_->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal);
-    command_buffer->beginRenderPass(render_passes_[image_index]); 
+    command_buffer->nextSubPass();
+  //  accum_texture_->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal);
     command_buffer->setProgram(resolve_->program());
     command_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kOpaque);
-    command_buffer->bindTexture(0, 0, accum_texture_);
+    command_buffer->bindInputAttachment(0, 0, accum_texture_);
     command_buffer->pushConstants(sample);
     command_buffer->draw(3);
 

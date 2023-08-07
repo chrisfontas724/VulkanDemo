@@ -137,7 +137,6 @@ private:
 
     std::shared_ptr<TextRenderer> text_renderer_;
 
-    std::vector<gfx::RenderPassInfo> accumulation_passes_;
     std::vector<gfx::RenderPassInfo> render_passes_;
 
     std::shared_ptr<christalz::ShaderResource> mwc64x_seeder_;
