@@ -331,7 +331,6 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
     }
 
     // Render to the accumulation buffer.
-   // accum_texture_->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eColorAttachmentOptimal);
     resolve_textures_[image_index]->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eColorAttachmentOptimal);
     command_buffer->beginRenderPass(render_passes_[image_index]); 
     command_buffer->setProgram(lighter_->program());
@@ -343,7 +342,6 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
 
     // Average out the accumulation buffer.
     command_buffer->nextSubPass();
-  //  accum_texture_->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal);
     command_buffer->setProgram(resolve_->program());
     command_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kOpaque);
     command_buffer->bindInputAttachment(0, 0, accum_texture_);
