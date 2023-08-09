@@ -4,10 +4,12 @@
 
 
 #include "demo_harness.hpp"
-#include "instance.hpp"
 #include <iostream>
-#include "command_buffer.hpp"
+
 #include <UsefulUtils/logging.hpp>
+
+#include <VulkanWrappers/command_buffer.hpp>
+#include <VulkanWrappers/instance.hpp>
 
 namespace {
 

@@ -8,9 +8,9 @@
 
 #include "demo.hpp"
 #include "text_renderer.hpp"
-#include "shader_resource.hpp"
-#include "compute_texture.hpp"
 #include "model.hpp"
+#include "shader_resource.hpp"
+#include <VulkanWrappers/compute_texture.hpp>
 
 class MultipassExample : public Demo {
 

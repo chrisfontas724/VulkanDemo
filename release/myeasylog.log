@@ -1,0 +1,180 @@
+2023-08-09 14:50:42,651 INFO [default] HMMM....?
+2023-08-09 14:50:42,651 INFO [default] Do I get here?
+2023-08-09 14:50:43,914 INFO [default] Device: NVIDIA Quadro RTX 3000 with Max-Q Design
+2023-08-09 14:50:43,914 INFO [default]     1. ID: 7990
+2023-08-09 14:50:43,915 INFO [default]     2. Type: DiscreteGpu
+2023-08-09 14:50:43,915 INFO [default]     3. Vendor: 4318
+2023-08-09 14:50:43,915 INFO [default]     4. API Version: 4202664
+2023-08-09 14:50:43,916 INFO [default]     5. Driver Version: 1955528704
+2023-08-09 14:50:43,916 INFO [default]     6. Limits: 
+2023-08-09 14:50:43,916 INFO [default]         a. Max Image Dimensions 2D: 32768
+2023-08-09 14:50:43,917 INFO [default]         b. Max Storage Buffer Range: 4294967295
+2023-08-09 14:50:43,917 INFO [default]         c. Max Compute Work Group Invocations: 1024
+2023-08-09 14:50:43,917 INFO [default]         d. Max Compute Work Group Size: 1024
+2023-08-09 14:50:43,917 INFO [default]         e. Max MSAA samples: 8
+2023-08-09 14:50:43,918 INFO [default]     7. Features: 
+2023-08-09 14:50:43,918 INFO [default]         a. Has Geometry Shaders: yes
+2023-08-09 14:50:43,918 INFO [default] 
+
+
+2023-08-09 14:50:43,918 INFO [default] Device: Intel(R) UHD Graphics 630
+2023-08-09 14:50:43,918 INFO [default]     1. ID: 16027
+2023-08-09 14:50:43,919 INFO [default]     2. Type: IntegratedGpu
+2023-08-09 14:50:43,919 INFO [default]     3. Vendor: 32902
+2023-08-09 14:50:43,919 INFO [default]     4. API Version: 4202644
+2023-08-09 14:50:43,919 INFO [default]     5. Driver Version: 1647081
+2023-08-09 14:50:43,919 INFO [default]     6. Limits: 
+2023-08-09 14:50:43,919 INFO [default]         a. Max Image Dimensions 2D: 16384
+2023-08-09 14:50:43,920 INFO [default]         b. Max Storage Buffer Range: 4294967295
+2023-08-09 14:50:43,920 INFO [default]         c. Max Compute Work Group Invocations: 1024
+2023-08-09 14:50:43,920 INFO [default]         d. Max Compute Work Group Size: 1024
+2023-08-09 14:50:43,920 INFO [default]         e. Max MSAA samples: 16
+2023-08-09 14:50:43,920 INFO [default]     7. Features: 
+2023-08-09 14:50:43,921 INFO [default]         a. Has Geometry Shaders: yes
+2023-08-09 14:50:43,921 INFO [default] 
+
+
+2023-08-09 14:51:17,903 INFO [default] HMMM....?
+2023-08-09 14:51:17,903 INFO [default] Do I get here?
+2023-08-09 14:51:19,164 INFO [default] Device: NVIDIA Quadro RTX 3000 with Max-Q Design
+2023-08-09 14:51:19,164 INFO [default]     1. ID: 7990
+2023-08-09 14:51:19,164 INFO [default]     2. Type: DiscreteGpu
+2023-08-09 14:51:19,165 INFO [default]     3. Vendor: 4318
+2023-08-09 14:51:19,165 INFO [default]     4. API Version: 4202664
+2023-08-09 14:51:19,165 INFO [default]     5. Driver Version: 1955528704
+2023-08-09 14:51:19,166 INFO [default]     6. Limits: 
+2023-08-09 14:51:19,166 INFO [default]         a. Max Image Dimensions 2D: 32768
+2023-08-09 14:51:19,166 INFO [default]         b. Max Storage Buffer Range: 4294967295
+2023-08-09 14:51:19,166 INFO [default]         c. Max Compute Work Group Invocations: 1024
+2023-08-09 14:51:19,166 INFO [default]         d. Max Compute Work Group Size: 1024
+2023-08-09 14:51:19,167 INFO [default]         e. Max MSAA samples: 8
+2023-08-09 14:51:19,167 INFO [default]     7. Features: 
+2023-08-09 14:51:19,167 INFO [default]         a. Has Geometry Shaders: yes
+2023-08-09 14:51:19,167 INFO [default] 
+
+
+2023-08-09 14:51:19,167 INFO [default] Device: Intel(R) UHD Graphics 630
+2023-08-09 14:51:19,168 INFO [default]     1. ID: 16027
+2023-08-09 14:51:19,168 INFO [default]     2. Type: IntegratedGpu
+2023-08-09 14:51:19,168 INFO [default]     3. Vendor: 32902
+2023-08-09 14:51:19,168 INFO [default]     4. API Version: 4202644
+2023-08-09 14:51:19,168 INFO [default]     5. Driver Version: 1647081
+2023-08-09 14:51:19,168 INFO [default]     6. Limits: 
+2023-08-09 14:51:19,169 INFO [default]         a. Max Image Dimensions 2D: 16384
+2023-08-09 14:51:19,169 INFO [default]         b. Max Storage Buffer Range: 4294967295
+2023-08-09 14:51:19,169 INFO [default]         c. Max Compute Work Group Invocations: 1024
+2023-08-09 14:51:19,169 INFO [default]         d. Max Compute Work Group Size: 1024
+2023-08-09 14:51:19,169 INFO [default]         e. Max MSAA samples: 16
+2023-08-09 14:51:19,169 INFO [default]     7. Features: 
+2023-08-09 14:51:19,170 INFO [default]         a. Has Geometry Shaders: yes
+2023-08-09 14:51:19,170 INFO [default] 
+
+
+2023-08-09 14:51:27,712 INFO [default] HMMM....?
+2023-08-09 14:51:27,713 INFO [default] Do I get here?
+2023-08-09 14:51:28,521 INFO [default] Device: NVIDIA Quadro RTX 3000 with Max-Q Design
+2023-08-09 14:51:28,521 INFO [default]     1. ID: 7990
+2023-08-09 14:51:28,521 INFO [default]     2. Type: DiscreteGpu
+2023-08-09 14:51:28,522 INFO [default]     3. Vendor: 4318
+2023-08-09 14:51:28,522 INFO [default]     4. API Version: 4202664
+2023-08-09 14:51:28,522 INFO [default]     5. Driver Version: 1955528704
+2023-08-09 14:51:28,522 INFO [default]     6. Limits: 
+2023-08-09 14:51:28,523 INFO [default]         a. Max Image Dimensions 2D: 32768
+2023-08-09 14:51:28,523 INFO [default]         b. Max Storage Buffer Range: 4294967295
+2023-08-09 14:51:28,524 INFO [default]         c. Max Compute Work Group Invocations: 1024
+2023-08-09 14:51:28,524 INFO [default]         d. Max Compute Work Group Size: 1024
+2023-08-09 14:51:28,524 INFO [default]         e. Max MSAA samples: 8
+2023-08-09 14:51:28,525 INFO [default]     7. Features: 
+2023-08-09 14:51:28,525 INFO [default]         a. Has Geometry Shaders: yes
+2023-08-09 14:51:28,525 INFO [default] 
+
+
+2023-08-09 14:51:28,526 INFO [default] Device: Intel(R) UHD Graphics 630
+2023-08-09 14:51:28,526 INFO [default]     1. ID: 16027
+2023-08-09 14:51:28,526 INFO [default]     2. Type: IntegratedGpu
+2023-08-09 14:51:28,526 INFO [default]     3. Vendor: 32902
+2023-08-09 14:51:28,527 INFO [default]     4. API Version: 4202644
+2023-08-09 14:51:28,527 INFO [default]     5. Driver Version: 1647081
+2023-08-09 14:51:28,527 INFO [default]     6. Limits: 
+2023-08-09 14:51:28,527 INFO [default]         a. Max Image Dimensions 2D: 16384
+2023-08-09 14:51:28,527 INFO [default]         b. Max Storage Buffer Range: 4294967295
+2023-08-09 14:51:28,528 INFO [default]         c. Max Compute Work Group Invocations: 1024
+2023-08-09 14:51:28,528 INFO [default]         d. Max Compute Work Group Size: 1024
+2023-08-09 14:51:28,528 INFO [default]         e. Max MSAA samples: 16
+2023-08-09 14:51:28,528 INFO [default]     7. Features: 
+2023-08-09 14:51:28,528 INFO [default]         a. Has Geometry Shaders: yes
+2023-08-09 14:51:28,529 INFO [default] 
+
+
+2023-08-09 14:52:02,566 INFO [default] HMMM....?
+2023-08-09 14:52:02,567 INFO [default] Do I get here?
+2023-08-09 14:52:03,873 INFO [default] Device: NVIDIA Quadro RTX 3000 with Max-Q Design
+2023-08-09 14:52:03,873 INFO [default]     1. ID: 7990
+2023-08-09 14:52:03,874 INFO [default]     2. Type: DiscreteGpu
+2023-08-09 14:52:03,874 INFO [default]     3. Vendor: 4318
+2023-08-09 14:52:03,874 INFO [default]     4. API Version: 4202664
+2023-08-09 14:52:03,875 INFO [default]     5. Driver Version: 1955528704
+2023-08-09 14:52:03,875 INFO [default]     6. Limits: 
+2023-08-09 14:52:03,875 INFO [default]         a. Max Image Dimensions 2D: 32768
+2023-08-09 14:52:03,876 INFO [default]         b. Max Storage Buffer Range: 4294967295
+2023-08-09 14:52:03,876 INFO [default]         c. Max Compute Work Group Invocations: 1024
+2023-08-09 14:52:03,876 INFO [default]         d. Max Compute Work Group Size: 1024
+2023-08-09 14:52:03,876 INFO [default]         e. Max MSAA samples: 8
+2023-08-09 14:52:03,877 INFO [default]     7. Features: 
+2023-08-09 14:52:03,877 INFO [default]         a. Has Geometry Shaders: yes
+2023-08-09 14:52:03,877 INFO [default] 
+
+
+2023-08-09 14:52:03,878 INFO [default] Device: Intel(R) UHD Graphics 630
+2023-08-09 14:52:03,878 INFO [default]     1. ID: 16027
+2023-08-09 14:52:03,879 INFO [default]     2. Type: IntegratedGpu
+2023-08-09 14:52:03,879 INFO [default]     3. Vendor: 32902
+2023-08-09 14:52:03,879 INFO [default]     4. API Version: 4202644
+2023-08-09 14:52:03,880 INFO [default]     5. Driver Version: 1647081
+2023-08-09 14:52:03,880 INFO [default]     6. Limits: 
+2023-08-09 14:52:03,880 INFO [default]         a. Max Image Dimensions 2D: 16384
+2023-08-09 14:52:03,881 INFO [default]         b. Max Storage Buffer Range: 4294967295
+2023-08-09 14:52:03,881 INFO [default]         c. Max Compute Work Group Invocations: 1024
+2023-08-09 14:52:03,881 INFO [default]         d. Max Compute Work Group Size: 1024
+2023-08-09 14:52:03,881 INFO [default]         e. Max MSAA samples: 16
+2023-08-09 14:52:03,882 INFO [default]     7. Features: 
+2023-08-09 14:52:03,882 INFO [default]         a. Has Geometry Shaders: yes
+2023-08-09 14:52:03,882 INFO [default] 
+
+
+2023-08-09 15:15:22,295 INFO [default] HMMM....?
+2023-08-09 15:15:22,296 INFO [default] Do I get here?
+2023-08-09 15:15:23,550 INFO [default] Device: NVIDIA Quadro RTX 3000 with Max-Q Design
+2023-08-09 15:15:23,550 INFO [default]     1. ID: 7990
+2023-08-09 15:15:23,551 INFO [default]     2. Type: DiscreteGpu
+2023-08-09 15:15:23,551 INFO [default]     3. Vendor: 4318
+2023-08-09 15:15:23,551 INFO [default]     4. API Version: 4202664
+2023-08-09 15:15:23,551 INFO [default]     5. Driver Version: 1955528704
+2023-08-09 15:15:23,551 INFO [default]     6. Limits: 
+2023-08-09 15:15:23,552 INFO [default]         a. Max Image Dimensions 2D: 32768
+2023-08-09 15:15:23,552 INFO [default]         b. Max Storage Buffer Range: 4294967295
+2023-08-09 15:15:23,552 INFO [default]         c. Max Compute Work Group Invocations: 1024
+2023-08-09 15:15:23,552 INFO [default]         d. Max Compute Work Group Size: 1024
+2023-08-09 15:15:23,552 INFO [default]         e. Max MSAA samples: 8
+2023-08-09 15:15:23,552 INFO [default]     7. Features: 
+2023-08-09 15:15:23,552 INFO [default]         a. Has Geometry Shaders: yes
+2023-08-09 15:15:23,553 INFO [default] 
+
+
+2023-08-09 15:15:23,553 INFO [default] Device: Intel(R) UHD Graphics 630
+2023-08-09 15:15:23,553 INFO [default]     1. ID: 16027
+2023-08-09 15:15:23,553 INFO [default]     2. Type: IntegratedGpu
+2023-08-09 15:15:23,553 INFO [default]     3. Vendor: 32902
+2023-08-09 15:15:23,553 INFO [default]     4. API Version: 4202644
+2023-08-09 15:15:23,553 INFO [default]     5. Driver Version: 1647081
+2023-08-09 15:15:23,554 INFO [default]     6. Limits: 
+2023-08-09 15:15:23,554 INFO [default]         a. Max Image Dimensions 2D: 16384
+2023-08-09 15:15:23,554 INFO [default]         b. Max Storage Buffer Range: 4294967295
+2023-08-09 15:15:23,554 INFO [default]         c. Max Compute Work Group Invocations: 1024
+2023-08-09 15:15:23,554 INFO [default]         d. Max Compute Work Group Size: 1024
+2023-08-09 15:15:23,554 INFO [default]         e. Max MSAA samples: 16
+2023-08-09 15:15:23,554 INFO [default]     7. Features: 
+2023-08-09 15:15:23,554 INFO [default]         a. Has Geometry Shaders: yes
+2023-08-09 15:15:23,555 INFO [default] 
+
+

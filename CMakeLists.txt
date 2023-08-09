@@ -22,10 +22,12 @@ find_package(glfw3 3.3 REQUIRED)
 
 find_package(glm REQUIRED)
 
-add_subdirectory(libs/VulkanWrappers)
+find_package(VulkanWrappers CONFIG REQUIRED)
+include_directories(${VulkanWrappers_INCLUDE_DIRS})
+link_directories(${VulkanWrappers_LIBRARY_DIRS})
+
 add_subdirectory(demos)
 add_subdirectory(src)
-
 
 target_sources(${PROJECT_NAME}
     PRIVATE
@@ -34,7 +36,6 @@ target_sources(${PROJECT_NAME}
 )
 
 # Set the include directories.
-include_directories(${VULKAN_WRAPPER_INCLUDE_DIRS})
 include_directories(${INCLUDE_DIRS})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE glm demo Vulkan::Vulkan glfw display::Windowing)
+target_link_libraries(${PROJECT_NAME} PUBLIC gfx::VulkanWrappers PRIVATE glm demo Vulkan::Vulkan glfw display::Windowing)

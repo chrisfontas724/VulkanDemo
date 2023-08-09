@@ -6,7 +6,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <model.hpp>
-#include <image_utils.hpp>
+#include <VulkanWrappers/image_utils.hpp>
 #include "tiny_obj_loader.h"
 #include "stb_image.h"
 

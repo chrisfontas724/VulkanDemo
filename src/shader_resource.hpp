@@ -6,7 +6,7 @@
 #define INCLUDE_DEMO_SHADER_RESOURCE_HPP_
 
 #include <FileStreaming/file_system.hpp>
-#include <shader_program.hpp>
+#include <VulkanWrappers/shader_program.hpp>
 
 namespace christalz {
 

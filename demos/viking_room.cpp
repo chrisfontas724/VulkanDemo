@@ -4,7 +4,7 @@
 
 
 #include "viking_room.hpp"
-#include "command_buffer.hpp"
+#include <VulkanWrappers/command_buffer.hpp>
 
 namespace {
 

@@ -10,8 +10,8 @@
 #include "demo.hpp"
 #include "text_renderer.hpp"
 #include "shader_resource.hpp"
-#include "compute_texture.hpp"
 #include "model.hpp"
+#include <VulkanWrappers/compute_texture.hpp>
 
 class VikingRoom : public Demo {
 

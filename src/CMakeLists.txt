@@ -30,7 +30,7 @@ target_include_directories(${LIBRARY_NAME} PUBLIC
 
 target_include_directories(demo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(demo PUBLIC VulkanWrappers display::Windowing cxl::UsefulUtils cxl::FileStreaming)
+target_link_libraries(demo PRIVATE gfx::VulkanWrappers PUBLIC display::Windowing cxl::UsefulUtils cxl::FileStreaming)
 
 # All users of this library will need at least C++11
 target_compile_features(demo PUBLIC cxx_std_11)

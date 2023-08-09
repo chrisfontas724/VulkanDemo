@@ -1,5 +1,6 @@
 #include <shader_resource.hpp>
-#include <shader_compiler.hpp>
+#include <VulkanWrappers/shader_compiler.hpp>
+#include <FileStreaming/file_stream.hpp>
 
 namespace christalz {
 
@@ -18,8 +19,8 @@ std::shared_ptr<ShaderResource> ShaderResource::createGraphics(
 
   gfx::SpirV vertex_spirv, fragment_spirv;
   gfx::ShaderCompiler compiler;
-  compiler.compile(EShLanguage::EShLangVertex, vert_shader.text(), include_paths, macros, &vertex_spirv);
-  compiler.compile(EShLanguage::EShLangFragment, frag_shader.text(), include_paths, macros, &fragment_spirv);
+  compiler.compile(gfx::ShaderCompiler::Type::eVert, vert_shader.text(), include_paths, macros, &vertex_spirv);
+  compiler.compile(gfx::ShaderCompiler::Type::eFrag, frag_shader.text(), include_paths, macros, &fragment_spirv);
   CXL_DCHECK(vertex_spirv.size() > 0);
   CXL_DCHECK(fragment_spirv.size() > 0);
 
@@ -47,7 +48,7 @@ std::shared_ptr<ShaderResource> ShaderResource::createCompute(
 
   gfx::SpirV spirv;
   gfx::ShaderCompiler compiler;
-  compiler.compile(EShLanguage::EShLangCompute, shader.text(), include_paths, macros, &spirv);
+  compiler.compile(gfx::ShaderCompiler::Type::eComp, shader.text(), include_paths, macros, &spirv);
   CXL_DCHECK(spirv.size() > 0);
 
   CXL_VLOG(1) << "Starting to create compute shader";

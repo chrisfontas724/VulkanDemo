@@ -6,11 +6,14 @@
 #define DEMO_HARNESS_HPP_
 
 #include "demo.hpp"
-#include "logical_device.hpp"
-#include "swap_chain.hpp"
-#include <Windowing/glfw_window.hpp>
-#include "render_pass.hpp"
 #include "shader_resource.hpp"
+
+#include <VulkanWrappers/logical_device.hpp>
+#include <VulkanWrappers/render_pass.hpp>
+#include <VulkanWrappers/swap_chain.hpp>
+
+#include <Windowing/glfw_window.hpp>
+
 
 class DemoHarness {
 public:
