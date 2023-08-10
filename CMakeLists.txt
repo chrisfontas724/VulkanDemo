@@ -1,3 +1,7 @@
+# Copyright 2019 Chris Fontas. All rights reserved.
+# Use of this source code is governed by the license that can be
+# found in the LICENSE file.
+
 cmake_minimum_required(VERSION 3.21)
 
 project("VulkanDemo"
@@ -27,19 +31,19 @@ find_package(glm REQUIRED)
 find_package(VulkanWrappers CONFIG REQUIRED)
 include(GNUInstallDirs)
 
-add_subdirectory(demos)
 add_subdirectory(src)
+add_subdirectory(demos)
 
 target_sources(${PROJECT_NAME}
     PRIVATE
-        main.cpp
+    main.cpp
     ${SOURCE}
 )
 
 # Set the include directories.
-include_directories(${INCLUDE_DIRS})
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC gfx::VulkanWrappers PRIVATE glm demo Vulkan::Vulkan glfw display::Windowing)
+target_link_libraries(${PROJECT_NAME} PRIVATE gfx::VulkanWrappers glm glfw display::Windowing cxl::UsefulUtils cxl::FileStreaming)
 
 # Copy over the DLLs we need.
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

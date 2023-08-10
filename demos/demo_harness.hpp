@@ -6,7 +6,7 @@
 #define DEMO_HARNESS_HPP_
 
 #include "demo.hpp"
-#include "shader_resource.hpp"
+#include "src/shader_resource.hpp"
 
 #include <VulkanWrappers/logical_device.hpp>
 #include <VulkanWrappers/render_pass.hpp>

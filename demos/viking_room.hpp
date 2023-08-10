@@ -8,9 +8,9 @@
 
 #include <string>
 #include "demo.hpp"
-#include "text_renderer.hpp"
-#include "shader_resource.hpp"
-#include "model.hpp"
+#include "src/text_renderer.hpp"
+#include "src/shader_resource.hpp"
+#include "src/model.hpp"
 #include <VulkanWrappers/compute_texture.hpp>
 
 class VikingRoom : public Demo {

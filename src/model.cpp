@@ -5,10 +5,11 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
 
-#include <model.hpp>
-#include <VulkanWrappers/image_utils.hpp>
+#include "model.hpp"
 #include "tiny_obj_loader.h"
 #include "stb_image.h"
+#include <VulkanWrappers/image_utils.hpp>
+
 
 namespace christalz {
 
