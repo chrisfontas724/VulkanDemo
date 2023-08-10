@@ -1,2 +1,0 @@
-C:/TDM-GCC-64/bin/ar.exe qc libdemo.a CMakeFiles/demo.dir/model.cpp.obj CMakeFiles/demo.dir/shader_resource.cpp.obj CMakeFiles/demo.dir/text_renderer.cpp.obj
-C:/TDM-GCC-64/bin/ranlib.exe libdemo.a

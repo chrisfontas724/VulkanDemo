@@ -322,7 +322,7 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
                                /*command_buffer_count*/1U,
                                /*command_buffers*/&compute_buffer->vk(), 
                                /*signal_semaphore_count*/1U, 
-                              /*signal_semaphores*/&compute_semaphores_[frame]);
+                               /*signal_semaphores*/&compute_semaphores_[frame]);
     logical_device->getQueue(gfx::Queue::Type::kCompute).submit(submit_info, vk::Fence());
 
     if (signal_semaphores) {
