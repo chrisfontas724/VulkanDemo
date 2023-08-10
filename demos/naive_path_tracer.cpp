@@ -32,7 +32,6 @@ NaivePathTracer::~NaivePathTracer() {
     compute_command_buffers_.clear();
 }
 
-
 void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, int32_t width, int32_t height) {
     num_swap_images_ = num_swap;
     logical_device_ = logical_device;

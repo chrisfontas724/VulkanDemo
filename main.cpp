@@ -14,7 +14,6 @@
 // Set up the demos.
 int main(int argc, char** argv) {
     START_EASYLOGGINGPP(argc, argv);
-    CXL_LOG(INFO) << "HMMM....?";
 
     uint32_t x_res = 512;
     uint32_t y_res = 512;
@@ -28,7 +27,6 @@ int main(int argc, char** argv) {
         }
     }
 
-    CXL_LOG(INFO) << "Do I get here?";
     auto harness = DemoHarness(x_res, y_res);
     harness.addDemo(std::move(std::make_shared<NaivePathTracer>()));
     harness.addDemo(std::move(std::make_shared<VikingRoom>()));

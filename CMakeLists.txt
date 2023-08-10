@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.21)
 
 project("VulkanDemo"
     VERSION 0.9.1
@@ -7,6 +7,8 @@ project("VulkanDemo"
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 add_executable(${PROJECT_NAME})
 
@@ -24,7 +26,6 @@ find_package(glm REQUIRED)
 
 find_package(VulkanWrappers CONFIG REQUIRED)
 include_directories(${VulkanWrappers_INCLUDE_DIRS})
-link_directories(${VulkanWrappers_LIBRARY_DIRS})
 
 add_subdirectory(demos)
 add_subdirectory(src)
@@ -39,3 +40,9 @@ target_sources(${PROJECT_NAME}
 include_directories(${INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC gfx::VulkanWrappers PRIVATE glm demo Vulkan::Vulkan glfw display::Windowing)
+
+# Copy over the DLLs we need.
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+                   "c:/Program Files (x86)/VulkanWrappers/bin/libVulkanWrappers.dll"
+                   ${CMAKE_CURRENT_BINARY_DIR}/bin)
