@@ -25,7 +25,7 @@ find_package(glfw3 3.3 REQUIRED)
 find_package(glm REQUIRED)
 
 find_package(VulkanWrappers CONFIG REQUIRED)
-include_directories(${VulkanWrappers_INCLUDE_DIRS})
+include(GNUInstallDirs)
 
 add_subdirectory(demos)
 add_subdirectory(src)
@@ -44,5 +44,5 @@ target_link_libraries(${PROJECT_NAME} PUBLIC gfx::VulkanWrappers PRIVATE glm dem
 # Copy over the DLLs we need.
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_if_different 
-                   "c:/Program Files (x86)/VulkanWrappers/bin/libVulkanWrappers.dll"
+                   ${VulkanWrappers_RUNTIME_LIBS}
                    ${CMAKE_CURRENT_BINARY_DIR}/bin)
