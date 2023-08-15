@@ -80,7 +80,7 @@ int32_t DemoHarness::run() {
 }
 
 void DemoHarness::render() {
-    while (true) {
+    while (should_render_) {
         CXL_DCHECK(current_demo_);
 
         swap_chain_->beginFrame([&](vk::Semaphore& image_available_semaphore, vk::Fence& in_flight_fence, uint32_t image_index,
@@ -189,12 +189,14 @@ void DemoHarness::WindowDelegate::onStart(display::Window* window)  {
     harness_->recreateSwapchain(width, height);
     harness_->render_thread_ = std::thread([this]{
         harness_->current_demo_ = harness_->demos_[0];
+        harness_->should_render_ = true;
         harness_->render();
     });
 }
     
 void DemoHarness::WindowDelegate::onClose() {
-
+    harness_->should_render_ = false;
+    harness_->render_thread_.join();
 }
 
 

@@ -15,8 +15,7 @@
 #include <Windowing/platform.hpp>
 
 #include <thread>
-#include <mutex>
-#include <condition_variable>
+#include <atomic>
 
 class DemoHarness {
 public:
@@ -68,6 +67,7 @@ private:
     std::shared_ptr<Demo> current_demo_ = nullptr;
 
     std::thread render_thread_;
+    std::atomic<bool> should_render_ = false;
 };
 
 #endif // DEMO_HARNESS_HPP_
