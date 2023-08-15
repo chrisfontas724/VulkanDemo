@@ -85,6 +85,8 @@ void DemoHarness::render() {
     while (should_render_) {
         CXL_DCHECK(current_demo_);
 
+        processInputEvents();
+
         swap_chain_->beginFrame([&](vk::Semaphore& image_available_semaphore, vk::Fence& in_flight_fence, uint32_t image_index,
                                     uint32_t frame) -> std::vector<vk::Semaphore> {
             auto command_buffer = command_buffers_[image_index];
@@ -121,6 +123,23 @@ void DemoHarness::render() {
 
             return {render_semaphores_[frame]};
          });
+    }
+}
+
+void DemoHarness::processInputEvents() {
+    // Retrieve input events from platform layer.
+    std::queue<display::InputEvent> inputEvents = platform_->getInputEvents();
+
+    // Process input events
+    while (!inputEvents.empty()) {
+        display::InputEvent event = inputEvents.front();
+        inputEvents.pop();
+
+        if (event.type == display::InputEventType::KeyPressed && event.key == display::KeyCode::A) {
+            index++;
+            index %= demos_.size();
+            current_demo_ = demos_[index];
+        }
     }
 }
 

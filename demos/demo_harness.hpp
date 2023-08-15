@@ -46,7 +46,7 @@ private:
 
     void initialize(PlatformNativeWindowHandle window, std::vector<const char*> extensions, int32_t width, int32_t height);
     void recreateSwapchain(int32_t width, int32_t height);
-    void checkInputManager(const display::InputManager* mngr);
+    void processInputEvents();
     void render();
 
     std::shared_ptr<WindowDelegate> window_delegate_ = nullptr;
