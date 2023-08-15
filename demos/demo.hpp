@@ -8,7 +8,6 @@
 #include <string>
 #include <VulkanWrappers/logical_device.hpp>
 #include <VulkanWrappers/swap_chain.hpp>
-#include <Windowing/glfw_window.hpp>
 
 class Demo {
 

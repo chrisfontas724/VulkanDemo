@@ -12,8 +12,11 @@
 #include <VulkanWrappers/render_pass.hpp>
 #include <VulkanWrappers/swap_chain.hpp>
 
-#include <Windowing/glfw_window.hpp>
+#include <Windowing/platform.hpp>
 
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
 class DemoHarness {
 public:
@@ -22,12 +25,7 @@ public:
     ~DemoHarness();
 
     void addDemo(std::shared_ptr<Demo> demo) {
-        demo->setup(logical_device_, swap_chain_->textures().size(), window_config_.width, window_config_.height);
         demos_.push_back(demo);
-        if (demos_.size() == 1) {
-            current_demo_ = demo;
-            window_->set_title(current_demo_->name());
-        }
     }
 
     int32_t run();
@@ -49,6 +47,7 @@ private:
 
     void recreateSwapchain(int32_t width, int32_t height);
     void checkInputManager(const display::InputManager* mngr);
+    void render();
 
     std::shared_ptr<WindowDelegate> window_delegate_ = nullptr;
     std::vector<std::shared_ptr<Demo>> demos_;
@@ -59,7 +58,7 @@ private:
     std::shared_ptr<christalz::ShaderResource> post_shader_ = nullptr;
 
     display::Window::Config window_config_;
-    std::shared_ptr<display::GLFWWindow> window_ = nullptr;
+    std::shared_ptr<display::Platform> platform_ = nullptr;
     std::shared_ptr<display::WindowDelegate> delegate_ = nullptr;
     vk::SurfaceKHR surface_;
 
@@ -67,6 +66,8 @@ private:
     std::vector<gfx::RenderPassInfo> display_render_passes_;
     std::vector<vk::Semaphore> render_semaphores_;
     std::shared_ptr<Demo> current_demo_ = nullptr;
+
+    std::thread render_thread_;
 };
 
 #endif // DEMO_HARNESS_HPP_

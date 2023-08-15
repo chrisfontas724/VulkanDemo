@@ -17,19 +17,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 add_executable(${PROJECT_NAME})
 
 find_package(Windowing CONFIG REQUIRED)
-
 find_package(Vulkan REQUIRED)
-include_directories(${VUlkan_INCLUDE_DIRS})
-
 find_package(UsefulUtils CONFIG REQUIRED)
 find_package(FileStreaming CONFIG REQUIRED)
-
 find_package(glfw3 3.3 REQUIRED)
-
 find_package(glm REQUIRED)
-
 find_package(VulkanWrappers CONFIG REQUIRED)
-include(GNUInstallDirs)
 
 add_subdirectory(src)
 add_subdirectory(demos)

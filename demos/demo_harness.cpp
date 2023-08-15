@@ -10,6 +10,7 @@
 
 #include <VulkanWrappers/command_buffer.hpp>
 #include <VulkanWrappers/instance.hpp>
+#include <vulkan/vulkan_win32.h>
 
 namespace {
 
@@ -29,7 +30,6 @@ void DemoHarness::checkInputManager(const display::InputManager* mngr) {
         index++;
         index %= demos_.size();
         current_demo_ = demos_[index];
-        window_->set_title(current_demo_->name());
     }
 }
 
@@ -39,13 +39,25 @@ DemoHarness::DemoHarness(uint32_t width, uint32_t height) {
     window_config_.width = width;
     window_config_.height = height;
     window_delegate_ = std::make_shared<WindowDelegate>(this);
-    window_ = std::make_shared<display::GLFWWindow>(window_config_, window_delegate_); 
-    CXL_DCHECK(window_);
 
-    instance_ = gfx::Instance::create(title, window_->getExtensions(), /*validation*/true);   
+    platform_ = std::make_shared<display::Platform>(window_config_, window_delegate_);
+    CXL_DCHECK(platform_);
+
+    auto window = platform_->getWindow();
+
+    instance_ = gfx::Instance::create(title, window->getExtensions(), /*validation*/true);   
     CXL_DCHECK(instance_);
 
-    surface_ = window_->createVKSurface(instance_->vk());
+    VkWin32SurfaceCreateInfoKHR createInfo = {};
+    createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+    createInfo.hinstance = GetModuleHandle(nullptr); // Modify this according to your use case
+    createInfo.hwnd = window->getNativeWindowHandle();
+
+    VkSurfaceKHR vkSurface;
+    VkResult result = vkCreateWin32SurfaceKHR(instance_->vk(), &createInfo, nullptr, &vkSurface);
+    CXL_DCHECK(result == VK_SUCCESS);
+
+    surface_ = vk::SurfaceKHR(vkSurface);
     CXL_DCHECK(surface_);
 
     physical_device_ = instance_->pickBestDevice(surface_, kDeviceExtensions);
@@ -59,18 +71,16 @@ DemoHarness::DemoHarness(uint32_t width, uint32_t height) {
     cxl::FileSystem fs("c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/shaders/");
     post_shader_ = christalz::ShaderResource::createGraphics(logical_device_, fs, "posteffects/post");
     CXL_DCHECK(post_shader_);
-
-    int32_t display_width, display_height;
-    window_->getSize(&display_width, &display_height);
-
-    recreateSwapchain(display_width, display_height);
 }
 
 
-int32_t DemoHarness::run() {   
-    while (!window_->shouldClose()) {
-        window_->poll();
-        checkInputManager(window_->input_manager());
+int32_t DemoHarness::run() {  
+    platform_->runEventLoop();
+    return 0;
+}
+
+void DemoHarness::render() {
+    while (true) {
         CXL_DCHECK(current_demo_);
 
         swap_chain_->beginFrame([&](vk::Semaphore& image_available_semaphore, vk::Fence& in_flight_fence, uint32_t image_index,
@@ -110,11 +120,11 @@ int32_t DemoHarness::run() {
             return {render_semaphores_[frame]};
          });
     }
-    return 0;
 }
 
 
 void DemoHarness::recreateSwapchain(int32_t width, int32_t height) {
+    CXL_DCHECK(logical_device_);
     logical_device_->waitIdle();
     if (swap_chain_) {
         for (const auto &semaphore : render_semaphores_) {
@@ -154,7 +164,7 @@ void DemoHarness::recreateSwapchain(int32_t width, int32_t height) {
 
     // Update the demos.
     for (auto demo : demos_) {
-        demo->resize(width, height);
+        demo->setup(logical_device_, num_swap, width, height); //resize(width, height);
     }
 }
 
@@ -173,8 +183,14 @@ void DemoHarness::WindowDelegate::onWindowMove(int32_t x, int32_t y) {
 
 }
     
-void DemoHarness::WindowDelegate::onStart(display::Window*)  {
-
+void DemoHarness::WindowDelegate::onStart(display::Window* window)  {
+    int width, height;
+    window->getSize(&width, &height);
+    harness_->recreateSwapchain(width, height);
+    harness_->render_thread_ = std::thread([this]{
+        harness_->current_demo_ = harness_->demos_[0];
+        harness_->render();
+    });
 }
     
 void DemoHarness::WindowDelegate::onClose() {
