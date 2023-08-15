@@ -24,14 +24,14 @@ const std::vector<const char*> kDeviceExtensions = {
 
 } // anonymous namespace
 
-void DemoHarness::checkInputManager(const display::InputManager* mngr) {
-    CXL_DCHECK(mngr);
-    if (mngr->key_up(display::KeyCode::A)) {
-        index++;
-        index %= demos_.size();
-        current_demo_ = demos_[index];
-    }
-}
+// void DemoHarness::checkInputManager(const display::InputManager* mngr) {
+//     CXL_DCHECK(mngr);
+//     if (mngr->key_up(display::KeyCode::A)) {
+//         index++;
+//         index %= demos_.size();
+//         current_demo_ = demos_[index];
+//     }
+// }
 
 DemoHarness::DemoHarness(uint32_t width, uint32_t height) {
     std::string title = "DemoHarness";
@@ -42,16 +42,16 @@ DemoHarness::DemoHarness(uint32_t width, uint32_t height) {
 
     platform_ = std::make_shared<display::Platform>(window_config_, window_delegate_);
     CXL_DCHECK(platform_);
+}
 
-    auto window = platform_->getWindow();
-
-    instance_ = gfx::Instance::create(title, window->getExtensions(), /*validation*/true);   
+void DemoHarness::initialize(PlatformNativeWindowHandle window, std::vector<const char*> extensions, int32_t width, int32_t height) {
+    instance_ = gfx::Instance::create("DemoHarness", extensions, /*validation*/true);   
     CXL_DCHECK(instance_);
 
     VkWin32SurfaceCreateInfoKHR createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
     createInfo.hinstance = GetModuleHandle(nullptr); // Modify this according to your use case
-    createInfo.hwnd = window->getNativeWindowHandle();
+    createInfo.hwnd = window;
 
     VkSurfaceKHR vkSurface;
     VkResult result = vkCreateWin32SurfaceKHR(instance_->vk(), &createInfo, nullptr, &vkSurface);
@@ -71,6 +71,8 @@ DemoHarness::DemoHarness(uint32_t width, uint32_t height) {
     cxl::FileSystem fs("c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/shaders/");
     post_shader_ = christalz::ShaderResource::createGraphics(logical_device_, fs, "posteffects/post");
     CXL_DCHECK(post_shader_);
+
+    recreateSwapchain(width, height);    
 }
 
 
@@ -183,10 +185,8 @@ void DemoHarness::WindowDelegate::onWindowMove(int32_t x, int32_t y) {
 
 }
     
-void DemoHarness::WindowDelegate::onStart(display::Window* window)  {
-    int width, height;
-    window->getSize(&width, &height);
-    harness_->recreateSwapchain(width, height);
+void DemoHarness::WindowDelegate::onStart(PlatformNativeWindowHandle window, std::vector<const char*> extensions, int32_t width, int32_t height) {
+    harness_->initialize(window, extensions, width, height);
     harness_->render_thread_ = std::thread([this]{
         harness_->current_demo_ = harness_->demos_[0];
         harness_->should_render_ = true;

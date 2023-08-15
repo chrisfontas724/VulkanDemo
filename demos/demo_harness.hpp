@@ -35,15 +35,16 @@ private:
     public:
         WindowDelegate(DemoHarness* harness):
         harness_(harness){}
+        void onStart(PlatformNativeWindowHandle, std::vector<const char*> extensions, int32_t width, int32_t height) override;
         void onUpdate() override;
         void onResize(int32_t width, int32_t height) override;
         void onWindowMove(int32_t x, int32_t y) override;
-        void onStart(display::Window*) override;
         void onClose() override;
      private:
         DemoHarness* harness_;
     };
 
+    void initialize(PlatformNativeWindowHandle window, std::vector<const char*> extensions, int32_t width, int32_t height);
     void recreateSwapchain(int32_t width, int32_t height);
     void checkInputManager(const display::InputManager* mngr);
     void render();
