@@ -10,7 +10,6 @@
 
 #include <VulkanWrappers/command_buffer.hpp>
 #include <VulkanWrappers/instance.hpp>
-#include <vulkan/vulkan_win32.h>
 
 namespace {
 
@@ -24,14 +23,6 @@ const std::vector<const char*> kDeviceExtensions = {
 
 } // anonymous namespace
 
-// void DemoHarness::checkInputManager(const display::InputManager* mngr) {
-//     CXL_DCHECK(mngr);
-//     if (mngr->key_up(display::KeyCode::A)) {
-//         index++;
-//         index %= demos_.size();
-//         current_demo_ = demos_[index];
-//     }
-// }
 
 DemoHarness::DemoHarness(uint32_t width, uint32_t height) {
     std::string title = "DemoHarness";
@@ -48,17 +39,7 @@ void DemoHarness::initialize(PlatformNativeWindowHandle window, std::vector<cons
     instance_ = gfx::Instance::create("DemoHarness", extensions, /*validation*/true);   
     CXL_DCHECK(instance_);
 
-    VkWin32SurfaceCreateInfoKHR createInfo = {};
-    createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-    createInfo.hinstance = GetModuleHandle(nullptr); // Modify this according to your use case
-    createInfo.hwnd = window;
-
-    VkSurfaceKHR vkSurface;
-    VkResult result = vkCreateWin32SurfaceKHR(instance_->vk(), &createInfo, nullptr, &vkSurface);
-    CXL_DCHECK(result == VK_SUCCESS);
-
-    surface_ = vk::SurfaceKHR(vkSurface);
-    CXL_DCHECK(surface_);
+    surface_ = instance_->createSurface(window);
 
     physical_device_ = instance_->pickBestDevice(surface_, kDeviceExtensions);
     CXL_DCHECK(physical_device_);
