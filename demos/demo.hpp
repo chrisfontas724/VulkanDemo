@@ -6,9 +6,8 @@
 #define DEMO_HPP_
 
 #include <string>
-#include "logical_device.hpp"
-#include "swap_chain.hpp"
-#include <Windowing/glfw_window.hpp>
+#include <VulkanWrappers/logical_device.hpp>
+#include <VulkanWrappers/swap_chain.hpp>
 
 class Demo {
 

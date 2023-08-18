@@ -7,6 +7,8 @@
 #include <map>
 #include <cmath>
 
+#include <FileStreaming/file_stream.hpp>
+
 namespace {
 
 const std::map<char, glm::vec2> kGlyphMap = 
@@ -57,8 +59,8 @@ TextRenderer::TextRenderer(const gfx::LogicalDevicePtr& device)
 
     gfx::SpirV vertex_spirv, fragment_spirv;
     gfx::ShaderCompiler compiler;
-    compiler.compile(EShLanguage::EShLangVertex, vert_shader.text(), {}, {}, &vertex_spirv);
-    compiler.compile(EShLanguage::EShLangFragment, frag_shader.text(), {}, {}, &fragment_spirv);
+    compiler.compile(gfx::ShaderCompiler::Type::eVert, vert_shader.text(), {}, {}, &vertex_spirv);
+    compiler.compile(gfx::ShaderCompiler::Type::eFrag, frag_shader.text(), {}, {}, &fragment_spirv);
     CXL_DCHECK(vertex_spirv.size() > 0);
     CXL_DCHECK(fragment_spirv.size() > 0);
 

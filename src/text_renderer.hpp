@@ -6,8 +6,8 @@
 #define TEXT_RENDERER_HPP_
 
 #include <glm/vec2.hpp>
-#include <shader_program.hpp>
-#include <command_buffer.hpp>
+#include <VulkanWrappers/shader_program.hpp>
+#include <VulkanWrappers/command_buffer.hpp>
 
 class TextRenderer {
 

@@ -11,9 +11,7 @@
 
 #define GLM_ENABLE_EXPERIMENTAL 
 
-INITIALIZE_EASYLOGGINGPP
-
-// Set up a window with the delegate and start polling.
+// Set up the demos.
 int main(int argc, char** argv) {
     START_EASYLOGGINGPP(argc, argv);
 

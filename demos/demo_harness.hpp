@@ -6,11 +6,16 @@
 #define DEMO_HARNESS_HPP_
 
 #include "demo.hpp"
-#include "logical_device.hpp"
-#include "swap_chain.hpp"
-#include <Windowing/glfw_window.hpp>
-#include "render_pass.hpp"
-#include "shader_resource.hpp"
+#include "src/shader_resource.hpp"
+
+#include <VulkanWrappers/logical_device.hpp>
+#include <VulkanWrappers/render_pass.hpp>
+#include <VulkanWrappers/swap_chain.hpp>
+
+#include <Windowing/platform.hpp>
+
+#include <thread>
+#include <atomic>
 
 class DemoHarness {
 public:
@@ -19,12 +24,7 @@ public:
     ~DemoHarness();
 
     void addDemo(std::shared_ptr<Demo> demo) {
-        demo->setup(logical_device_, swap_chain_->textures().size(), window_config_.width, window_config_.height);
         demos_.push_back(demo);
-        if (demos_.size() == 1) {
-            current_demo_ = demo;
-            window_->set_title(current_demo_->name());
-        }
     }
 
     int32_t run();
@@ -35,17 +35,19 @@ private:
     public:
         WindowDelegate(DemoHarness* harness):
         harness_(harness){}
+        void onStart(PlatformNativeWindowHandle, std::vector<const char*> extensions, int32_t width, int32_t height) override;
         void onUpdate() override;
         void onResize(int32_t width, int32_t height) override;
         void onWindowMove(int32_t x, int32_t y) override;
-        void onStart(display::Window*) override;
         void onClose() override;
      private:
         DemoHarness* harness_;
     };
 
+    void initialize(PlatformNativeWindowHandle window, std::vector<const char*> extensions, int32_t width, int32_t height);
     void recreateSwapchain(int32_t width, int32_t height);
-    void checkInputManager(const display::InputManager* mngr);
+    void processInputEvents();
+    void render();
 
     std::shared_ptr<WindowDelegate> window_delegate_ = nullptr;
     std::vector<std::shared_ptr<Demo>> demos_;
@@ -56,7 +58,7 @@ private:
     std::shared_ptr<christalz::ShaderResource> post_shader_ = nullptr;
 
     display::Window::Config window_config_;
-    std::shared_ptr<display::GLFWWindow> window_ = nullptr;
+    std::shared_ptr<display::Platform> platform_ = nullptr;
     std::shared_ptr<display::WindowDelegate> delegate_ = nullptr;
     vk::SurfaceKHR surface_;
 
@@ -64,6 +66,9 @@ private:
     std::vector<gfx::RenderPassInfo> display_render_passes_;
     std::vector<vk::Semaphore> render_semaphores_;
     std::shared_ptr<Demo> current_demo_ = nullptr;
+
+    std::thread render_thread_;
+    std::atomic<bool> should_render_ = false;
 };
 
 #endif // DEMO_HARNESS_HPP_
