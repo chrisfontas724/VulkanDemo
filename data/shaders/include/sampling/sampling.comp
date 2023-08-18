@@ -6,7 +6,7 @@
 // #define VULKAN_HEADER_FILES_SAMPLING_SAMPLING_COMP_
 
 // #include"sampling/random.comp"
-#include "mwc64x/glsl/mwc64x/mwc64x_rng.comp"
+#include "mwc64x/mwc64x_rng.comp"
 
 float uniformRandomVariable(inout mwc64x_state_t state) {
     uint randMax = 0xFFFFFFFF;

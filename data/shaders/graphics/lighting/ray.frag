@@ -1,6 +1,7 @@
-// Copyright 2019 Sic Studios. All rights reserved.
-// Use of this source code is governed by our license that can be
-// found in the LICENSE file.
+#version 450
+precision highp float;
+#extension GL_GOOGLE_include_directive : enable
+#extension GL_ARB_separate_shader_objects : enable
 
 // Outputs
 layout (location = 0) in vec4 accumulation;

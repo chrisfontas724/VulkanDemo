@@ -43,3 +43,6 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_if_different 
                    ${VulkanWrappers_RUNTIME_LIBS}
                    ${CMAKE_CURRENT_BINARY_DIR}/bin)
+
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(CompileShaders)

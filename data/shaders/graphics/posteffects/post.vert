@@ -1,3 +1,8 @@
+#version 450
+precision highp float;
+#extension GL_GOOGLE_include_directive : enable
+#extension GL_ARB_separate_shader_objects : enable
+
 // Harded values for a fullscreen quad in clip space coordinates.
 // Instead of actually rendering a quad, we render an oversized triangle
 // that fits over the rendered screen.

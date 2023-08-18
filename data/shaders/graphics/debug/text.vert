@@ -1,3 +1,8 @@
+#version 450
+precision highp float;
+#extension GL_GOOGLE_include_directive : enable
+#extension GL_ARB_separate_shader_objects : enable
+
 // This shader avoids the need for binding index and vertex buffers; this array
 // plays a key role.
 //
@@ -9,8 +14,7 @@
 // position/UV coords corresponding to the current vertex. Position coords
 // are hardcoded into the shader, and UV coords are provided as push constants.
 uint remapped_indices[6] = uint[](
- // 0,1,2,0,2,3
-  0,2,1,0,3,2
+  0u,2u,1u,0u,3u,2u
 );
 
 // Push constants needed to render each glyph.

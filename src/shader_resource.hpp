@@ -16,16 +16,12 @@ public:
 static std::shared_ptr<ShaderResource> createGraphics(
     const gfx::LogicalDevicePtr& device,
     const cxl::FileSystem& fs,
-    const std::string& program_name,
-    std::vector<std::string> include_paths = {},
-    std::vector<std::string> macros = {});
+    const std::string& program_name);
 
 static std::shared_ptr<ShaderResource> createCompute(
     const gfx::LogicalDevicePtr& device,
     const cxl::FileSystem& fs,
-    const std::string& program_name,
-    std::vector<std::string> include_paths = {},
-    std::vector<std::string> macros = {});
+    const std::string& program_name);
 
 ~ShaderResource();
 
