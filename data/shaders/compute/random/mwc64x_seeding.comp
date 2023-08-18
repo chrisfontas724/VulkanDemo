@@ -1,6 +1,7 @@
-// Copyright 2019 Sic Studios. All rights reserved.
-// Use of this source code is governed by our license that can be
-// found in the LICENSE file.
+#version 450
+precision highp float;
+#extension GL_GOOGLE_include_directive : enable
+#extension GL_ARB_separate_shader_objects : enable
 
 #include "mwc64x.comp"
 
@@ -17,6 +18,8 @@ layout(set = 0, binding = 0) buffer buf {
 layout(push_constant) uniform PushBlock {
     layout(offset=0)  uint64_t offset;
 };
+
+
 
 float uniformRandomVariable(inout mwc64x_state_t state) {
     uint randMax = 0xFFFFFFFF;
