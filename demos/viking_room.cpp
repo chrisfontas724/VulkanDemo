@@ -73,29 +73,29 @@ void VikingRoom::resize(uint32_t width, uint32_t height) {
 
     color_textures_.resize(num_swap_images_);
     for (uint32_t i = 0; i < num_swap_images_; i++) {
-        color_textures_[i] = gfx::ImageUtils::createColorAttachment(logical_device, width, height, samples);
-        CXL_DCHECK(color_textures_[i]);
+        color_textures_[0] = gfx::ImageUtils::createColorAttachment(logical_device, width, height, samples);
+        CXL_DCHECK(color_textures_[0]);
     }
     
     resolve_textures_.resize(num_swap_images_);
     for (uint32_t i = 0; i < num_swap_images_; i++) {
-        resolve_textures_[i] = gfx::ImageUtils::createColorAttachment(logical_device, width,
+        resolve_textures_[0] = gfx::ImageUtils::createColorAttachment(logical_device, width,
                                                                      height, vk::SampleCountFlagBits::e1);
-        CXL_DCHECK(resolve_textures_[i]);
+        CXL_DCHECK(resolve_textures_[0]);
     }
 
     depth_textures_.resize(num_swap_images_);
     for (uint32_t i = 0; i < num_swap_images_; i++) {
-      depth_textures_[i] =
+      depth_textures_[0] =
         gfx::ImageUtils::createDepthTexture(logical_device, width, height, samples);
-      CXL_DCHECK(depth_textures_[i]);
+      CXL_DCHECK(depth_textures_[0]);
     }
 
     for (int32_t tex_index = 0; tex_index < num_swap_images_; tex_index++) {
         builder.reset();
-        builder.addColorAttachment(color_textures_[tex_index]);
-        builder.addDepthAttachment(depth_textures_[tex_index]);
-        builder.addResolveAttachment(resolve_textures_[tex_index]);
+        builder.addColorAttachment(color_textures_[0]);
+        builder.addDepthAttachment(depth_textures_[0]);
+        builder.addResolveAttachment(resolve_textures_[0]);
 
         builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
                             .input_indices = {},
@@ -142,7 +142,7 @@ VikingRoom::renderFrame(gfx::CommandBufferPtr command_buffer,
     degrees += 0.01;
          
     // Record graphics commands.
-    resolve_textures_[image_index]->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eColorAttachmentOptimal);
+    resolve_textures_[0]->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eColorAttachmentOptimal);
     command_buffer->beginRenderPass(render_passes_[image_index]);
  
     command_buffer->setVertexAttribute(/*binding*/ 0, /*location*/ 0, /*format*/ vk::Format::eR32G32B32A32Sfloat);
@@ -163,8 +163,8 @@ VikingRoom::renderFrame(gfx::CommandBufferPtr command_buffer,
     sample++;
 
     command_buffer->endRenderPass();
-    resolve_textures_[image_index]->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal); 
-    return resolve_textures_[image_index];
+    resolve_textures_[0]->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal); 
+    return resolve_textures_[0];
 }
 
 

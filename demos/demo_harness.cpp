@@ -67,7 +67,6 @@ void DemoHarness::render() {
         CXL_DCHECK(current_demo_);
 
         processInputEvents();
-
         swap_chain_->beginFrame([&](vk::Semaphore& image_available_semaphore, vk::Fence& in_flight_fence, uint32_t image_index,
                                     uint32_t frame) -> std::vector<vk::Semaphore> {
             auto command_buffer = command_buffers_[image_index];

@@ -17,18 +17,12 @@ NaivePathTracer::~NaivePathTracer() {
     auto logical_device = logical_device_.lock();
     logical_device->waitIdle();
 
-    for (auto& pass : render_passes_) {
-        logical_device->vk().destroyRenderPass(pass.render_pass);
-    }
-
     for (auto& semaphore : compute_semaphores_) {
         logical_device->vk().destroy(semaphore);
     }
 
-    for (auto& texture: resolve_textures_) {
-        texture.reset();
-    }
-
+    logical_device->vk().destroyRenderPass(render_pass_.render_pass);
+    resolve_texture_.reset();
     compute_command_buffers_.clear();
 }
 
@@ -76,46 +70,32 @@ void NaivePathTracer::resize(uint32_t width, uint32_t height) {
     width_ = width;
     height_ = height;
 
-    for (auto& pass : render_passes_) {
-        logical_device->vk().destroyRenderPass(pass.render_pass);
-    }
-
-    for (auto& texture: resolve_textures_) {
-        texture.reset();
-    }
-
+    logical_device->vk().destroyRenderPass(render_pass_.render_pass);
+    resolve_texture_.reset();
     accum_texture_.reset();
-    render_passes_.clear();
-    resolve_textures_.clear();
 
-    gfx::RenderPassBuilder builder(logical_device);
     accum_texture_ = gfx::ImageUtils::createAccumulationAttachment(logical_device, width, height);
     CXL_DCHECK(accum_texture_);
     
-    resolve_textures_.resize(num_swap_images_);
-    for (uint32_t i = 0; i < num_swap_images_; i++) {
-        resolve_textures_[i] = gfx::ImageUtils::createColorAttachment(logical_device, width,
-                                                                     height, vk::SampleCountFlagBits::e1);
-        CXL_DCHECK(resolve_textures_[i]);
-    }
+    resolve_texture_ = gfx::ImageUtils::createColorAttachment(logical_device, width,
+                                                              height, vk::SampleCountFlagBits::e1);
+    CXL_DCHECK(resolve_texture_);
 
 
-    for (int32_t tex_index = 0; tex_index < num_swap_images_; tex_index++) {
-        builder.reset();
-        builder.addColorAttachment(accum_texture_, {
+    gfx::RenderPassBuilder builder(logical_device);
+    builder.addColorAttachment(accum_texture_, {
             .load_op = vk::AttachmentLoadOp::eLoad,
             .store_op = vk::AttachmentStoreOp::eStore,
-         });
-        builder.addColorAttachment(resolve_textures_[tex_index]);
+    });
+    builder.addColorAttachment(resolve_texture_);
 
-        builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
+    builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
                             .input_indices = {},
                             .color_indices = {0}});
-        builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
+    builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
                             .input_indices = {0},
                             .color_indices = {1}});
-        render_passes_.push_back(std::move(builder.build()));
-    }
+    render_pass_ = builder.build();
 
     std::vector<HitPoint> hits;
     hits.resize(width_ * height_);
@@ -330,8 +310,8 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
     }
 
     // Render to the accumulation buffer.
-    resolve_textures_[image_index]->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eColorAttachmentOptimal);
-    command_buffer->beginRenderPass(render_passes_[image_index]); 
+    resolve_texture_->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eColorAttachmentOptimal);
+    command_buffer->beginRenderPass(render_pass_); 
     command_buffer->setProgram(lighter_->program());
     command_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kCustomRaytrace);
     command_buffer->setDepth(/*test*/ false, /*write*/ false);
@@ -353,6 +333,6 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
     sample++;
 
     command_buffer->endRenderPass();
-    resolve_textures_[image_index]->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal); 
-    return resolve_textures_[image_index];
+    resolve_texture_->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal); 
+    return resolve_texture_;
 }

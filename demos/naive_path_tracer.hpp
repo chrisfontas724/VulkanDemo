@@ -137,7 +137,7 @@ private:
 
     std::shared_ptr<TextRenderer> text_renderer_;
 
-    std::vector<gfx::RenderPassInfo> render_passes_;
+    gfx::RenderPassInfo render_pass_;
 
     std::shared_ptr<christalz::ShaderResource> mwc64x_seeder_;
     std::shared_ptr<christalz::ShaderResource> ray_generator_;
@@ -147,13 +147,11 @@ private:
     std::shared_ptr<christalz::ShaderResource> resolve_;
 
     gfx::ComputeTexturePtr accum_texture_;
-    std::vector<gfx::ComputeTexturePtr> resolve_textures_;
+    gfx::ComputeTexturePtr resolve_texture_;
 
     std::vector<gfx::CommandBufferPtr> compute_command_buffers_;
 
     std::vector<vk::Semaphore> compute_semaphores_;
-
-    std::vector<vk::Fence> compute_fences_;
 
     std::vector<gfx::ComputeBufferPtr> rays_;
     std::vector<gfx::ComputeBufferPtr> hits_;
