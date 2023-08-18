@@ -132,6 +132,7 @@ void DemoHarness::recreateSwapchain(int32_t width, int32_t height) {
             logical_device_->vk().destroy(semaphore);
         }
         for (auto& pass : display_render_passes_) {
+            logical_device_->vk().destroyFramebuffer(pass.frame_buffer);
             logical_device_->vk().destroyRenderPass(pass.render_pass);
         }
 
@@ -169,9 +170,7 @@ void DemoHarness::recreateSwapchain(int32_t width, int32_t height) {
     }
 }
 
-void DemoHarness::WindowDelegate::onUpdate() {
-
-}
+void DemoHarness::WindowDelegate::onUpdate() {}
 
 void DemoHarness::WindowDelegate::onResize(int32_t width, int32_t height) {
   if (harness_->logical_device_) {
@@ -201,21 +200,30 @@ void DemoHarness::WindowDelegate::onClose() {
 
 DemoHarness::~DemoHarness() {
     logical_device_->waitIdle();
-    command_buffers_.clear();
 
-    for (auto demo : demos_) {
-        demo.reset();
-    }
+    command_buffers_.clear();
     demos_.clear();
+    current_demo_.reset();
 
     for (auto& semaphore : render_semaphores_) {
         logical_device_->vk().destroy(semaphore);
     }
+    render_semaphores_.clear();
 
-    for (auto& pass : display_render_passes_) {
-        logical_device_->vk().destroyRenderPass(pass.render_pass);
-    }
 
     post_shader_.reset();
     swap_chain_.reset();
+    instance_->vk().destroySurfaceKHR(surface_);
+
+    for (auto& pass : display_render_passes_) {
+        logical_device_->vk().destroyFramebuffer(pass.frame_buffer);
+        logical_device_->vk().destroyRenderPass(pass.render_pass);
+    }
+
+    display_render_passes_.clear();
+
+    logical_device_.reset();
+    physical_device_.reset();
+    instance_.reset();
+    platform_.reset();
 }

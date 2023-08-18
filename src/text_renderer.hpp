@@ -14,6 +14,7 @@ class TextRenderer {
 public:
 
     TextRenderer(const gfx::LogicalDevicePtr& device);
+    ~TextRenderer();
 
     void set_color(glm::vec4 color) {
         color_ = color;

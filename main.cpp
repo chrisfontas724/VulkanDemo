@@ -30,6 +30,5 @@ int main(int argc, char** argv) {
     auto harness = DemoHarness(x_res, y_res);
     harness.addDemo(std::move(std::make_shared<NaivePathTracer>()));
     harness.addDemo(std::move(std::make_shared<VikingRoom>()));
-    harness.addDemo(std::move(std::make_shared<MultipassExample>()));
     return harness.run();
 }

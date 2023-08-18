@@ -49,24 +49,26 @@ private:
     void processInputEvents();
     void render();
 
-    std::shared_ptr<WindowDelegate> window_delegate_ = nullptr;
-    std::vector<std::shared_ptr<Demo>> demos_;
+    // Vulkan
     gfx::InstancePtr instance_ = nullptr;
     gfx::PhysicalDevicePtr physical_device_ = nullptr;
     gfx::LogicalDevicePtr logical_device_ = nullptr;
     gfx::SwapChainPtr swap_chain_ = nullptr;
     std::shared_ptr<christalz::ShaderResource> post_shader_ = nullptr;
-
-    display::Window::Config window_config_;
-    std::shared_ptr<display::Platform> platform_ = nullptr;
-    std::shared_ptr<display::WindowDelegate> delegate_ = nullptr;
     vk::SurfaceKHR surface_;
 
     std::vector<gfx::CommandBufferPtr> command_buffers_;
     std::vector<gfx::RenderPassInfo> display_render_passes_;
     std::vector<vk::Semaphore> render_semaphores_;
-    std::shared_ptr<Demo> current_demo_ = nullptr;
 
+    // Platform
+    display::Window::Config window_config_;
+    std::shared_ptr<WindowDelegate> window_delegate_ = nullptr;
+    std::shared_ptr<display::Platform> platform_ = nullptr;
+
+    // Demos
+    std::vector<std::shared_ptr<Demo>> demos_;
+    std::shared_ptr<Demo> current_demo_ = nullptr;
     std::thread render_thread_;
     std::atomic<bool> should_render_ = false;
 };
