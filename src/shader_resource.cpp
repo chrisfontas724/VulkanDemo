@@ -11,7 +11,6 @@ std::shared_ptr<ShaderResource> ShaderResource::createGraphics(
 
   cxl::MemoryStream vert_stream;
   cxl::MemoryStream frag_stream;
-  std::cout << "DIRECTORY: " << fs.directory() << std::endl;
   bool result = vert_stream.load(&fs, program_name + ".vert.spv");
   CXL_DCHECK(result) << "Couldn't load " << program_name  << ".vert.spv";
   result |= frag_stream.load(&fs, program_name + ".frag.spv");

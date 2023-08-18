@@ -49,7 +49,7 @@ void DemoHarness::initialize(PlatformNativeWindowHandle window, std::vector<cons
         std::make_shared<gfx::LogicalDevice>(physical_device_, surface_, kDeviceExtensions);
     CXL_DCHECK(logical_device_);
 
-    cxl::FileSystem fs(cxl::FileSystem::currentPath() + "resources/spirv");
+    cxl::FileSystem fs(cxl::FileSystem::currentExecutablePath() + "/resources/spirv");
     post_shader_ = christalz::ShaderResource::createGraphics(logical_device_, fs, "post");
     CXL_DCHECK(post_shader_);
 

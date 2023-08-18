@@ -48,7 +48,7 @@ TextRenderer::TextRenderer(const gfx::LogicalDevicePtr& device)
 
   // Create Shader
   {
-    cxl::FileSystem fs(cxl::FileSystem::currentPath() + "resources/spirv");
+    cxl::FileSystem fs(cxl::FileSystem::currentExecutablePath() + "/resources/spirv");
     shader_ = christalz::ShaderResource::createGraphics(device, fs, "text");
     CXL_DCHECK(shader_);
   }  

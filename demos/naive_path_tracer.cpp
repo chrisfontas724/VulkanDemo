@@ -40,7 +40,7 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
     CXL_DCHECK(compute_command_buffers_.size() == num_swap);
     compute_semaphores_ = logical_device->createSemaphores(MAX_FRAMES_IN_FLIGHT);
 
-    cxl::FileSystem fs(cxl::FileSystem::currentPath() + "resources/spirv");
+    cxl::FileSystem fs(cxl::FileSystem::currentExecutablePath() + "/resources/spirv");
     mwc64x_seeder_ = christalz::ShaderResource::createCompute(logical_device, fs, "mwc64x_seeding");
     CXL_DCHECK(mwc64x_seeder_);
  

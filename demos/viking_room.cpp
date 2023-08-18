@@ -29,7 +29,7 @@ void VikingRoom::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, i
 
     text_renderer_ = std::make_shared<TextRenderer>(logical_device);
 
-    cxl::FileSystem fs(cxl::FileSystem::currentPath() + "resources/spirv");
+    cxl::FileSystem fs(cxl::FileSystem::currentExecutablePath() + "/resources/spirv");
     model_shader_ = christalz::ShaderResource::createGraphics(logical_device, fs, "model");
     model_ = std::make_shared<christalz::Model>(logical_device, 
         "C:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/models/viking_room.obj", 
