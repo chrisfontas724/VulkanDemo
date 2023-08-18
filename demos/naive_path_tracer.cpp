@@ -40,29 +40,23 @@ void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_sw
     CXL_DCHECK(compute_command_buffers_.size() == num_swap);
     compute_semaphores_ = logical_device->createSemaphores(MAX_FRAMES_IN_FLIGHT);
 
-    cxl::FileSystem fs("c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/shaders");
-    mwc64x_seeder_ = christalz::ShaderResource::createCompute(logical_device, fs, "mwc64x/glsl/mwc64x_seeding", {
-        fs.directory(),
-        fs.directory() + "/mwc64x/glsl"});
+    cxl::FileSystem fs(cxl::FileSystem::currentPath() + "resources/spirv");
+    mwc64x_seeder_ = christalz::ShaderResource::createCompute(logical_device, fs, "mwc64x_seeding");
     CXL_DCHECK(mwc64x_seeder_);
  
-    ray_generator_ = christalz::ShaderResource::createCompute(logical_device, fs, "cameras/pinhole_camera", {
-        fs.directory(),
-        fs.directory() + "/mwc64x/glsl"});
+    ray_generator_ = christalz::ShaderResource::createCompute(logical_device, fs, "pinhole_camera");
     CXL_DCHECK(ray_generator_);
 
-    hit_tester_ = christalz::ShaderResource::createCompute(logical_device, fs, "raytraversal/intersect", {fs.directory()});
+    hit_tester_ = christalz::ShaderResource::createCompute(logical_device, fs, "intersect");
     CXL_DCHECK(hit_tester_);
 
-    bouncer_ = christalz::ShaderResource::createCompute(logical_device, fs, "raytraversal/bounce", {
-        fs.directory(),
-        fs.directory() + "/mwc64x/glsl"});
+    bouncer_ = christalz::ShaderResource::createCompute(logical_device, fs, "bounce");
     CXL_DCHECK(bouncer_);
 
-    lighter_ = christalz::ShaderResource::createGraphics(logical_device, fs, "lighting/ray", {fs.directory()});
+    lighter_ = christalz::ShaderResource::createGraphics(logical_device, fs, "ray");
     CXL_DCHECK(lighter_);
 
-    resolve_ = christalz::ShaderResource::createGraphics(logical_device, fs, "lighting/resolve", {fs.directory()});
+    resolve_ = christalz::ShaderResource::createGraphics(logical_device, fs, "resolve");
     CXL_DCHECK(resolve_);
 
     resize(width, height);

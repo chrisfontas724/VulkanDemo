@@ -6,7 +6,7 @@
 #define TEXT_RENDERER_HPP_
 
 #include <glm/vec2.hpp>
-#include <VulkanWrappers/shader_program.hpp>
+#include "shader_resource.hpp"
 #include <VulkanWrappers/command_buffer.hpp>
 
 class TextRenderer {
@@ -28,8 +28,8 @@ public:
 
 private:
 
+    std::shared_ptr<christalz::ShaderResource> shader_;
     gfx::LogicalDeviceWeakPtr device_;
-    gfx::ShaderProgramPtr shader_;
     gfx::ComputeTexturePtr glyph_texture_;
     glm::vec4 color_ = glm::vec4(1.f);
 };

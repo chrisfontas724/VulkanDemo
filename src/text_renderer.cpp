@@ -48,23 +48,9 @@ TextRenderer::TextRenderer(const gfx::LogicalDevicePtr& device)
 
   // Create Shader
   {
-    cxl::FileSystem fs("c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/shaders/debug/");
-    cxl::FileStream vert_shader;
-    cxl::FileStream frag_shader;
-    bool result = vert_shader.load(&fs, "text.vert");
-    CXL_DCHECK(result);
-
-    result = frag_shader.load(&fs, "text.frag");
-    CXL_DCHECK(result);
-
-    gfx::SpirV vertex_spirv, fragment_spirv;
-    gfx::ShaderCompiler compiler;
-    compiler.compile(gfx::ShaderCompiler::Type::eVert, vert_shader.text(), {}, {}, &vertex_spirv);
-    compiler.compile(gfx::ShaderCompiler::Type::eFrag, frag_shader.text(), {}, {}, &fragment_spirv);
-    CXL_DCHECK(vertex_spirv.size() > 0);
-    CXL_DCHECK(fragment_spirv.size() > 0);
-
-    shader_ = gfx::ShaderProgram::createGraphics(device_.lock(), vertex_spirv, fragment_spirv); 
+    cxl::FileSystem fs(cxl::FileSystem::currentPath() + "resources/spirv");
+    shader_ = christalz::ShaderResource::createGraphics(device, fs, "text");
+    CXL_DCHECK(shader_);
   }  
 
   // Create Texture
@@ -89,7 +75,7 @@ void TextRenderer::renderText(gfx::CommandBufferPtr cmd_buffer,
     float glyph_width = fabs(bottom_right.x - top_left.x) / num_per_row;
     float glyph_height = fabs(bottom_right.y - top_left.y) / num_rows;
 
-    cmd_buffer->setProgram(shader_);
+    cmd_buffer->setProgram(shader_->program());
     cmd_buffer->bindTexture(0, 0, glyph_texture_);
     cmd_buffer->setDepth(/*test*/ false, /*write*/ false);
     cmd_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kTranslucent);

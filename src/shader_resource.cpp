@@ -1,5 +1,5 @@
 #include "Shader_resource.hpp"
-#include <FileStreaming/file_stream.hpp>
+#include <FileStreaming/memory_stream.hpp>
 #include <VulkanWrappers/shader_compiler.hpp>
 
 namespace christalz {
@@ -7,25 +7,24 @@ namespace christalz {
 std::shared_ptr<ShaderResource> ShaderResource::createGraphics(
     const gfx::LogicalDevicePtr& device,
     const cxl::FileSystem& fs,
-    const std::string& program_name,
-    std::vector<std::string> include_paths,
-    std::vector<std::string> macros) {
+    const std::string& program_name) {
 
-  cxl::FileStream vert_shader;
-  cxl::FileStream frag_shader;
-  bool result = vert_shader.load(&fs, program_name + ".vert");
-  result |= frag_shader.load(&fs, program_name + ".frag");
-  CXL_DCHECK(result);
+  cxl::MemoryStream vert_stream;
+  cxl::MemoryStream frag_stream;
+  std::cout << "DIRECTORY: " << fs.directory() << std::endl;
+  bool result = vert_stream.load(&fs, program_name + ".vert.spv");
+  CXL_DCHECK(result) << "Couldn't load " << program_name  << ".vert.spv";
+  result |= frag_stream.load(&fs, program_name + ".frag.spv");
+  CXL_DCHECK(result) << "Couldn't load " << program_name << ".frag.spv";
 
-  gfx::SpirV vertex_spirv, fragment_spirv;
-  gfx::ShaderCompiler compiler;
-  compiler.compile(gfx::ShaderCompiler::Type::eVert, vert_shader.text(), include_paths, macros, &vertex_spirv);
-  compiler.compile(gfx::ShaderCompiler::Type::eFrag, frag_shader.text(), include_paths, macros, &fragment_spirv);
-  CXL_DCHECK(vertex_spirv.size() > 0);
-  CXL_DCHECK(fragment_spirv.size() > 0);
+  auto vert_data = vert_stream.data<uint32_t>();
+  auto frag_data = frag_stream.data<uint32_t>();
+
+  gfx::SpirV vertex_spirv(vert_data, vert_data + vert_stream.size<uint32_t>());
+  gfx::SpirV frag_spirv(frag_data, frag_data + frag_stream.size<uint32_t>());
 
   auto shader_program =
-        gfx::ShaderProgram::createGraphics(device, vertex_spirv, fragment_spirv);
+        gfx::ShaderProgram::createGraphics(device, vertex_spirv, frag_spirv);
   CXL_DCHECK(shader_program);
 
   auto resource = std::make_shared<ShaderResource>();
@@ -38,18 +37,16 @@ std::shared_ptr<ShaderResource> ShaderResource::createGraphics(
 std::shared_ptr<ShaderResource> ShaderResource::createCompute(
     const gfx::LogicalDevicePtr& device,
     const cxl::FileSystem& fs,
-    const std::string& program_name,
-    std::vector<std::string> include_paths,
-    std::vector<std::string> macros) {
+    const std::string& program_name) {
 
-  cxl::FileStream shader;
-  bool result = shader.load(&fs, program_name + ".comp");
-  CXL_DCHECK(result) << "Could not load shader " << program_name << ".comp";
+  cxl::MemoryStream stream;
+  cxl::MemoryStream frag_stream;
+  bool result = stream.load(&fs, program_name + ".comp.spv");
+  CXL_DCHECK(result) << "Couldn't load " << program_name << ".comp.spv";
 
-  gfx::SpirV spirv;
-  gfx::ShaderCompiler compiler;
-  compiler.compile(gfx::ShaderCompiler::Type::eComp, shader.text(), include_paths, macros, &spirv);
-  CXL_DCHECK(spirv.size() > 0);
+  auto data = stream.data<uint32_t>();
+
+  gfx::SpirV spirv(data, data + stream.size<uint32_t>());
 
   CXL_VLOG(1) << "Starting to create compute shader";
   auto shader_program =

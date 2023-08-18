@@ -25,7 +25,7 @@ file(GLOB_RECURSE SHADER_FILES
     "${SHADER_SOURCE_DIR}/*.vert" 
     "${SHADER_SOURCE_DIR}/*.frag"
     "${SHADER_SOURCE_DIR}/compute/*.comp"
-   )
+)
 
 # Iterate over shader files and add custom commands to compile them
 foreach(SHADER_FILE ${SHADER_FILES})
