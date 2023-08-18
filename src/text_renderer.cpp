@@ -65,7 +65,6 @@ TextRenderer::TextRenderer(const gfx::LogicalDevicePtr& device)
     CXL_DCHECK(fragment_spirv.size() > 0);
 
     shader_ = gfx::ShaderProgram::createGraphics(device_.lock(), vertex_spirv, fragment_spirv); 
-    shader_->name = "Test name";
   }  
 
   // Create Texture
@@ -118,4 +117,9 @@ void TextRenderer::renderText(gfx::CommandBufferPtr cmd_buffer,
         cmd_buffer->pushConstants(color_, 64);
         cmd_buffer->draw(6);
     }
+}
+
+TextRenderer::~TextRenderer() {
+  shader_.reset();
+  glyph_texture_.reset();
 }

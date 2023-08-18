@@ -48,20 +48,6 @@ void VikingRoom::resize(uint32_t width, uint32_t height) {
     width_ = width;
     height_ = height;
 
-    for (auto& pass : render_passes_) {
-        logical_device->vk().destroyRenderPass(pass.render_pass);
-    }
-
-    for (auto& texture: color_textures_) {
-        texture.reset();
-    }
-    for (auto& texture: resolve_textures_) {
-        texture.reset();
-    }
-    for (auto& texture: depth_textures_) {
-        texture.reset();
-    }
-
     render_passes_.clear();
     color_textures_.clear();
     resolve_textures_.clear();
@@ -110,21 +96,20 @@ VikingRoom::~VikingRoom() {
     auto logical_device = logical_device_.lock();
     logical_device->waitIdle();
 
+    ubo_buffer_.reset();
+
     for (auto& pass : render_passes_) {
+        logical_device->vk().destroyFramebuffer(pass.frame_buffer);
         logical_device->vk().destroyRenderPass(pass.render_pass);
     }
 
-    for (auto& texture: color_textures_) {
-        texture.reset();
-    }
-    for (auto& texture: resolve_textures_) {
-        texture.reset();
-    }
-    for (auto& texture: depth_textures_) {
-        texture.reset();
-    }
+    color_textures_.clear();
+    resolve_textures_.clear();
+    depth_textures_.clear();
 
+    model_.reset();
     model_shader_.reset();
+    text_renderer_.reset();
 }
 
 

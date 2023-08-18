@@ -17,13 +17,17 @@ NaivePathTracer::~NaivePathTracer() {
     auto logical_device = logical_device_.lock();
     logical_device->waitIdle();
 
+    compute_command_buffers_.clear();
+
     for (auto& semaphore : compute_semaphores_) {
         logical_device->vk().destroy(semaphore);
     }
 
+    logical_device->vk().destroyFramebuffer(render_pass_.frame_buffer);
     logical_device->vk().destroyRenderPass(render_pass_.render_pass);
     resolve_texture_.reset();
     compute_command_buffers_.clear();
+    text_renderer_.reset();
 }
 
 void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, int32_t width, int32_t height) {
@@ -70,7 +74,6 @@ void NaivePathTracer::resize(uint32_t width, uint32_t height) {
     width_ = width;
     height_ = height;
 
-    logical_device->vk().destroyRenderPass(render_pass_.render_pass);
     resolve_texture_.reset();
     accum_texture_.reset();
 
@@ -95,7 +98,7 @@ void NaivePathTracer::resize(uint32_t width, uint32_t height) {
     builder.addSubpass({.bind_point = vk::PipelineBindPoint::eGraphics,
                             .input_indices = {0},
                             .color_indices = {1}});
-    render_pass_ = builder.build();
+    render_pass_ = std::move(builder.build());
 
     std::vector<HitPoint> hits;
     hits.resize(width_ * height_);
