@@ -46,5 +46,16 @@ foreach(SHADER_FILE ${SHADER_FILES})
     )
 endforeach()
 
+file(COPY
+    "${CMAKE_CURRENT_SOURCE_DIR}/data/models/"
+    DESTINATION "${CMAKE_BINARY_DIR}/bin/resources/models/"
+)
+
+file(COPY
+    "${CMAKE_CURRENT_SOURCE_DIR}/data/textures/"
+    DESTINATION "${CMAKE_BINARY_DIR}/bin/resources/textures/"
+)
+
+
 # Make sure the top level project is connected to this target.
 add_dependencies(${PROJECT_NAME} CompileShaders)

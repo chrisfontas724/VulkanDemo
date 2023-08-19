@@ -55,7 +55,7 @@ TextRenderer::TextRenderer(const gfx::LogicalDevicePtr& device)
 
   // Create Texture
   {
-    std::string texture_path = "c:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/textures/text_bitmap.png";
+    std::string texture_path = cxl::FileSystem::currentExecutablePath() + "/resources/textures/text_bitmap.png";
     int32_t texWidth, texHeight, texChannels;
     stbi_uc* pixels =
         stbi_load(texture_path.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
