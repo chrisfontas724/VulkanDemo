@@ -32,8 +32,8 @@ void VikingRoom::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, i
     cxl::FileSystem fs(cxl::FileSystem::currentExecutablePath() + "/resources/spirv");
     model_shader_ = christalz::ShaderResource::createGraphics(logical_device, fs, "model");
     model_ = std::make_shared<christalz::Model>(logical_device, 
-        "C:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/models/viking_room.obj", 
-        "C:/Users/Chris/Desktop/Rendering Projects/VulkanDemo/data/textures/viking_room.png");
+       cxl::FileSystem::currentExecutablePath() + "/resources//models/viking_room.obj", 
+       cxl::FileSystem::currentExecutablePath() + "/resources/textures/viking_room.png");
     CXL_DCHECK(model_shader_);
     CXL_DCHECK(model_);
 
