@@ -37,7 +37,6 @@ std::shared_ptr<ShaderResource> ShaderResource::createCompute(
     const gfx::LogicalDevicePtr& device,
     const cxl::FileSystem& fs,
     const std::string& program_name) {
-
   cxl::MemoryStream stream;
   cxl::MemoryStream frag_stream;
   bool result = stream.load(&fs, program_name + ".comp.spv");
@@ -47,7 +46,6 @@ std::shared_ptr<ShaderResource> ShaderResource::createCompute(
 
   gfx::SpirV spirv(data, data + stream.size<uint32_t>());
 
-  CXL_VLOG(1) << "Starting to create compute shader";
   auto shader_program =
         gfx::ShaderProgram::createCompute(device, spirv);
   CXL_DCHECK(shader_program);
