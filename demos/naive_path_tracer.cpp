@@ -312,7 +312,6 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
     command_buffer->setProgram(lighter_->program());
     command_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kCustomRaytrace);
     command_buffer->setDepth(/*test*/ false, /*write*/ false);
-    command_buffer->setProgram(lighter_->program());
     command_buffer->bindUniformBuffer(0, 0, rays_[image_index]);
     command_buffer->draw(width_ * height_);
 
