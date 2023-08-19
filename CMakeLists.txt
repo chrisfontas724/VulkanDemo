@@ -36,7 +36,7 @@ target_sources(${PROJECT_NAME}
 # Set the include directories.
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE gfx::VulkanWrappers glm glfw display::Windowing cxl::UsefulUtils cxl::FileStreaming)
+target_link_libraries(${PROJECT_NAME} PRIVATE gfx::VulkanWrappers glm glfw display::Windowing cxl::FileStreaming)
 
 # Copy over the DLLs we need.
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
