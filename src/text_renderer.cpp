@@ -60,8 +60,8 @@ TextRenderer::TextRenderer(const gfx::LogicalDevicePtr& device)
     stbi_uc* pixels =
         stbi_load(texture_path.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
     CXL_DCHECK(pixels);
-    glyph_texture_ = gfx::ImageUtils::create8BitUnormImage(device, texWidth, texHeight, 4,
-                                                    vk::SampleCountFlagBits::e1, pixels);
+    glyph_texture_ = gfx::ImageUtils::create8BitImage(device, texWidth, texHeight, vk::Format::eR8G8B8A8Unorm,
+                                                      vk::SampleCountFlagBits::e1, pixels);
     CXL_DCHECK(glyph_texture_);
   }
 }
