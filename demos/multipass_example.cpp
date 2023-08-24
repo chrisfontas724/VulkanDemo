@@ -102,4 +102,5 @@ gfx::ComputeTexturePtr MultipassExample::renderFrame(
 
     // second_pass_textures_[image_index]->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal); 
     // return second_pass_textures_[image_index];
+    return nullptr;
 }

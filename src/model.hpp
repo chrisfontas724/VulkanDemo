@@ -4,6 +4,8 @@
 
 #include <VulkanWrappers/compute_buffer.hpp>
 #include <functional>
+
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 #include <glm/vec2.hpp>
 
