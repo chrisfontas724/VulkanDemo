@@ -13,11 +13,12 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+#set(ENV{VULKAN_SDK} "C:/VulkanSDK/1.3.261.0")
 
 add_executable(${PROJECT_NAME})
 
 find_package(Windowing CONFIG REQUIRED)
-find_package(Vulkan REQUIRED)
+
 find_package(UsefulUtils CONFIG REQUIRED)
 find_package(FileStreaming CONFIG REQUIRED)
 find_package(glfw3 3.3 REQUIRED)

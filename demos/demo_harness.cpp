@@ -147,8 +147,7 @@ void DemoHarness::recreateSwapchain(int32_t width, int32_t height) {
             logical_device_->vk().destroy(semaphore);
         }
         for (auto& pass : display_render_passes_) {
-            logical_device_->vk().destroyFramebuffer(pass.frame_buffer);
-            logical_device_->vk().destroyRenderPass(pass.render_pass);
+            pass.reset();
         }
 
         render_semaphores_.clear();
@@ -228,11 +227,10 @@ DemoHarness::~DemoHarness() {
 
     post_shader_.reset();
     swap_chain_.reset();
-    instance_->vk().destroySurfaceKHR(surface_);
+    instance_->destroySurface(surface_);
 
     for (auto& pass : display_render_passes_) {
-        logical_device_->vk().destroyFramebuffer(pass.frame_buffer);
-        logical_device_->vk().destroyRenderPass(pass.render_pass);
+        pass.reset();
     }
 
     display_render_passes_.clear();

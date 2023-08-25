@@ -99,8 +99,7 @@ VikingRoom::~VikingRoom() {
     ubo_buffer_.reset();
 
     for (auto& pass : render_passes_) {
-        logical_device->vk().destroyFramebuffer(pass.frame_buffer);
-        logical_device->vk().destroyRenderPass(pass.render_pass);
+        pass.reset();
     }
 
     color_textures_.clear();

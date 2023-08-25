@@ -1,5 +1,7 @@
 # Find glslangValidator executable
-find_program(GLSLANG_VALIDATOR_EXECUTABLE NAMES glslangValidator)
+find_program(GLSLANG_VALIDATOR_EXECUTABLE 
+             NAMES glslangValidator
+             PATHS "C:/VulkanSDK/1.3.261.0/bin")
 if(NOT GLSLANG_VALIDATOR_EXECUTABLE)
     message(FATAL_ERROR "glslangValidator not found. Make sure you have Vulkan SDK installed.")
 endif()

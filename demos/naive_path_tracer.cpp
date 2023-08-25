@@ -23,8 +23,7 @@ NaivePathTracer::~NaivePathTracer() {
         logical_device->vk().destroy(semaphore);
     }
 
-    logical_device->vk().destroyFramebuffer(render_pass_.frame_buffer);
-    logical_device->vk().destroyRenderPass(render_pass_.render_pass);
+    render_pass_.reset();
     resolve_texture_.reset();
     compute_command_buffers_.clear();
     text_renderer_.reset();

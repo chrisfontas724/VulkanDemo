@@ -8,7 +8,7 @@ MultipassExample::~MultipassExample() {
     logical_device->waitIdle();
 
     for (auto& pass : render_passes_) {
-        logical_device->vk().destroyRenderPass(pass.render_pass);
+        pass.reset();
     }
 
     for (auto& texture: first_pass_textures_) {
