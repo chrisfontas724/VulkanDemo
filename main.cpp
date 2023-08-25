@@ -6,6 +6,7 @@
 #include <UsefulUtils/logging.hpp>
 #include "demos/multipass_example.hpp"
 #include "demos/naive_path_tracer.hpp"
+#include "demos/path_tracer_khr.hpp"
 #include "demos/viking_room.hpp"
 #include "demos/demo_harness.hpp"
 
@@ -30,5 +31,6 @@ int main(int argc, char** argv) {
     auto harness = DemoHarness(x_res, y_res);
     harness.addDemo(std::move(std::make_shared<NaivePathTracer>()));
     harness.addDemo(std::move(std::make_shared<VikingRoom>()));
+    harness.addDemo(std::move(std::make_shared<PathTracerKHR>()));
     return harness.run();
 }

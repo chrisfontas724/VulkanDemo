@@ -9,32 +9,13 @@
 #include <UsefulUtils/logging.hpp>
 
 #include <VulkanWrappers/command_buffer.hpp>
+#include <VulkanWrappers/physical_device.hpp>
 #include <VulkanWrappers/instance.hpp>
 
 namespace {
 
 uint32_t index = 0;
 const int MAX_FRAMES_IN_FLIGHT = 2;
-
-
-const std::vector<const char*> kDeviceExtensions = {
-    VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-
-    // Ray tracing extensions
-    // VK_KHR_acceleration_structure - for acceleration structure building and management
-    // VK_KHR_ray_tracing_pipeline - for ray tracing shader stages and pipelines, and
-    // VK_KHR_ray_query - providing ray query intrinsics for all shader stages.
-    VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
-    VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME,
-    VK_KHR_RAY_QUERY_EXTENSION_NAME,
-
-    // Dependency extensions for ray tracing 
-    VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME,
-    VK_KHR_SPIRV_1_4_EXTENSION_NAME,
-
-    VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
-    VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME
-};
 
 } // anonymous namespace
 
@@ -56,12 +37,17 @@ void DemoHarness::initialize(PlatformNativeWindowHandle window, std::vector<cons
 
     surface_ = instance_->createSurface(window);
 
-    physical_device_ = instance_->pickBestDevice(surface_, kDeviceExtensions);
+    auto device_extensions = gfx::PhysicalDevice::kRayTracingExtensions;
+    device_extensions.insert(device_extensions.end(), 
+                gfx::PhysicalDevice::kSwapchainExtensions.begin(), 
+                gfx::PhysicalDevice::kSwapchainExtensions.end());
+
+    physical_device_ = instance_->pickBestDevice(surface_, device_extensions);
     CXL_DCHECK(physical_device_);
 
     // Make a logical device from the physical device.
     logical_device_ =
-        std::make_shared<gfx::LogicalDevice>(physical_device_, surface_, kDeviceExtensions);
+        std::make_shared<gfx::LogicalDevice>(physical_device_, surface_, device_extensions);
     CXL_DCHECK(logical_device_);
 
     cxl::FileSystem fs(cxl::FileSystem::currentExecutablePath() + "/resources/spirv");
