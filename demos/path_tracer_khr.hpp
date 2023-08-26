@@ -12,6 +12,7 @@
 #include "src/shader_resource.hpp"
 #include "src/model.hpp"
 #include <UsefulUtils/dispatch_queue.hpp>
+#include <VulkanWrappers/acceleration_structure.hpp>
 
 class PathTracerKHR : public Demo {
 public:
@@ -31,6 +32,7 @@ public:
 
 private:
 
+    std::shared_ptr<gfx::AccelerationStructure> as_;
 };
 
 #endif // PATH_TRACER_KHR_HPP_
