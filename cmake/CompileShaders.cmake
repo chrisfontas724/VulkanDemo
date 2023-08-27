@@ -20,6 +20,7 @@ set(SHADER_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data/shaders")
 set(SHADER_INCLUDE_DIRS
     "${CMAKE_CURRENT_SOURCE_DIR}/data/shaders/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/data/shaders/mwc64x/glsl"
+    "${CMAKE_CURRENT_SOURCE_DIR}/data/shaders/raytrace_khr"
 )
 
 # List all the shader files to compile
@@ -27,6 +28,11 @@ file(GLOB_RECURSE SHADER_FILES
     "${SHADER_SOURCE_DIR}/*.vert" 
     "${SHADER_SOURCE_DIR}/*.frag"
     "${SHADER_SOURCE_DIR}/compute/*.comp"
+
+    # Ray tracing shaders
+    "${SHADER_SOURCE_DIR}/raytrace_khr/*.rchit"
+   # "${SHADER_SOURCE_DIR}/raytrace_khr/*.rgen"
+   # "${SHADER_SOURCE_DIR}/raytrace_khr/*.rmiss"
 )
 
 # Iterate over shader files and add custom commands to compile them
@@ -40,9 +46,11 @@ foreach(SHADER_FILE ${SHADER_FILES})
         list(APPEND INCLUDE_FLAGS "-I${INCLUDE_DIR}")
     endforeach()
 
+    # Requires --target-env vulkan1.3 in order to access ray tracing.
+    # https://vulkan.lunarg.com/issue/home?limit=10;q=;mine=false;org=false;khronos=false;lunarg=false;indie=false;status=new,open
     add_custom_command(
         TARGET CompileShaders
-        COMMAND ${GLSLANG_VALIDATOR_EXECUTABLE} ${INCLUDE_FLAGS} -V -o "${SPIRV_OUTPUT}" "${SHADER_FILE}"
+        COMMAND ${GLSLANG_VALIDATOR_EXECUTABLE} ${INCLUDE_FLAGS} --target-env vulkan1.3 -V -o "${SPIRV_OUTPUT}" "${SHADER_FILE}"
         DEPENDS ${SHADER_FILE}
         COMMENT "Compiling ${SHADER_NAME} to SPIR-V"
     )
