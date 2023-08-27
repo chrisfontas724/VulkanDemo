@@ -9,9 +9,6 @@
 #include "demos/path_tracer_khr.hpp"
 #include "demos/viking_room.hpp"
 #include "demos/demo_harness.hpp"
-#include <VulkanWrappers/shader_compiler.hpp>
-#include <FileStreaming/file_system.hpp>
-#include <FileStreaming/file_stream.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL 
 
