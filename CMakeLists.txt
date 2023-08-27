@@ -40,14 +40,10 @@ target_sources(${PROJECT_NAME}
 # Set the include directories.
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Vulkan::Vulkan gfx::VulkanWrappers
-glm glfw display::Windowing cxl::FileStreaming)
-
-# Copy over the DLLs we need.
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy_if_different 
-                   ${VulkanWrappers_RUNTIME_LIBS}
-                   ${CMAKE_CURRENT_BINARY_DIR}/bin)
+target_link_libraries(${PROJECT_NAME} 
+                PRIVATE Vulkan::Vulkan 
+                gfx::VulkanWrappers
+                glm glfw display::Windowing cxl::FileStreaming)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(CompileShaders)
