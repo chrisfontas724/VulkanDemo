@@ -82,6 +82,7 @@ void TextRenderer::renderText(gfx::CommandBufferPtr cmd_buffer,
 
     for (int i = 0; i < text.size(); i++) {
         auto glyph = text[i];
+        CXL_DCHECK(kGlyphMap.find(glyph) != kGlyphMap.end());
         auto glyph_coords = kGlyphMap.at(glyph);
 
         int curr_col = i % num_per_row;

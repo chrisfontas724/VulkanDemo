@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
 
     auto harness = DemoHarness(x_res, y_res);
     harness.addDemo(std::move(std::make_shared<NaivePathTracer>()));
-    harness.addDemo(std::move(std::make_shared<PathTracerKHR>()));
-    harness.addDemo(std::move(std::make_shared<VikingRoom>()));
+ //   harness.addDemo(std::move(std::make_shared<PathTracerKHR>()));
+ //   harness.addDemo(std::move(std::make_shared<VikingRoom>()));
     return harness.run();
 }
