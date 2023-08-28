@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 
-#ifndef PATH_TRACER_KHR_HPP_
-#define PATH_TRACER_KHR_HPP_
+#ifndef RAY_TRACE_TRIANGLE_KHR_HPP_
+#define RAY_TRACE_TRIANGLE_KHR_HPP_
 
 #include <string>
 #include "demo.hpp"
@@ -13,6 +13,7 @@
 #include "src/model.hpp"
 #include <UsefulUtils/dispatch_queue.hpp>
 #include <VulkanWrappers/acceleration_structure.hpp>
+#include <VulkanWrappers/ray_tracing_shader_manager.hpp>
 
 class RayTraceTriangleKHR : public Demo {
 public:
@@ -33,6 +34,9 @@ public:
 private:
 
     std::shared_ptr<gfx::AccelerationStructure> as_;
+    std::shared_ptr<gfx::RayTracingShaderManager> shader_manager_;
+
+    gfx::ComputeTexturePtr resolve_texture_;
 };
 
-#endif // PATH_TRACER_KHR_HPP_
+#endif // RAY_TRACE_TRIANGLE_KHR_HPP_

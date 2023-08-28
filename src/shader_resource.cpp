@@ -39,7 +39,6 @@ std::shared_ptr<ShaderResource> ShaderResource::createCompute(
     const cxl::FileSystem& fs,
     const std::string& program_name) {
   cxl::MemoryStream stream;
-  cxl::MemoryStream frag_stream;
   bool result = stream.load(&fs, program_name + ".comp.spv");
   CXL_DCHECK(result) << "Couldn't load " << program_name << ".comp.spv";
 
