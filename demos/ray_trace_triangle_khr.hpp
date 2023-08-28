@@ -14,9 +14,13 @@
 #include <UsefulUtils/dispatch_queue.hpp>
 #include <VulkanWrappers/acceleration_structure.hpp>
 #include <VulkanWrappers/ray_tracing_shader_manager.hpp>
+#include <VulkanWrappers/descriptor_set.hpp>
+#include <VulkanWrappers/sampler.hpp>
 
 class RayTraceTriangleKHR : public Demo {
 public:
+
+    ~RayTraceTriangleKHR();
 
     void setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, int32_t width, int32_t height) override;
 
@@ -36,7 +40,13 @@ private:
     std::shared_ptr<gfx::AccelerationStructure> as_;
     std::shared_ptr<gfx::RayTracingShaderManager> shader_manager_;
 
+    std::vector<gfx::CommandBufferPtr> compute_command_buffers_;
     gfx::ComputeTexturePtr resolve_texture_;
+    std::vector<vk::Semaphore> compute_semaphores_;
+
+    gfx::DescriptorSetPtr descriptor_set_;
+
+    gfx::SamplerPtr sampler_;
 };
 
 #endif // RAY_TRACE_TRIANGLE_KHR_HPP_
