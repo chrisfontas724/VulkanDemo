@@ -58,7 +58,7 @@ void RayTraceTriangleKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t nu
     auto closest_id = shader_manager_->add_closest_hit_shader(closest);
     auto miss_id = shader_manager_->add_miss_shader(miss);
 
-    auto hit_group_id = shader_manager_->create_hit_group(/*any*/0, closest_id, /*intersect*/0);
+    auto hit_group_id = shader_manager_->create_hit_group(/*any*/10000, closest_id, /*intersect*/10000);
 
     shader_manager_->build();
 
@@ -91,6 +91,11 @@ void RayTraceTriangleKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t nu
 
     descriptor_set_ = descriptor_set_layout->createDescriptorSet();
     CXL_DCHECK(descriptor_set_);
+
+    descriptor_set_->set_acceleration_structure(/*index*/0, as_->handle());
+
+    vk::DescriptorImageInfo image_info(sampler_->vk(), resolve_texture_->image_view(), resolve_texture_->layout());
+    descriptor_set_->set_storage_image(/*index*/1, image_info);
 }
 
 void RayTraceTriangleKHR::resize(uint32_t width, uint32_t height) {
@@ -105,9 +110,6 @@ gfx::ComputeTexturePtr RayTraceTriangleKHR::renderFrame(
                 uint32_t frame,
                 std::vector<vk::Semaphore>* signal_semaphores,
                 std::vector<vk::PipelineStageFlags>* signal_wait_stages) {
-    
-    CXL_LOG(INFO) << "Render triangle khr!";
-
     auto logical_device = logical_device_.lock();    
     CXL_DCHECK(logical_device);
 
@@ -120,18 +122,9 @@ gfx::ComputeTexturePtr RayTraceTriangleKHR::renderFrame(
 
     resolve_texture_->transitionImageLayout(*compute_buffer.get(), vk::ImageLayout::eGeneral);
 
-
-    CXL_LOG(INFO) << "Write descriptors!";
-    descriptor_set_->set_acceleration_structure(/*index*/0, as_->handle());
-
-    vk::DescriptorImageInfo image_info(sampler_->vk(), resolve_texture_->image_view(), resolve_texture_->layout());
-    descriptor_set_->set_storage_image(/*index*/1, image_info);
-
-    CXL_LOG(INFO) << "Bind pipeline!";
 	vkCmdBindPipeline(compute_buffer->vk(), VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, shader_manager_->pipeline());
 
    
-    CXL_LOG(INFO) << "Bind descriptors!";
     const auto& vkDescriptor = descriptor_set_->vk();
     compute_buffer->vk().bindDescriptorSets(vk::PipelineBindPoint::eRayTracingKHR, 
                                              shader_manager_->pipeline_layout()->vk(), 
@@ -142,8 +135,6 @@ gfx::ComputeTexturePtr RayTraceTriangleKHR::renderFrame(
     auto hit_table = shader_manager_->hit_shader_entry();
     VkStridedDeviceAddressRegionKHR callableShaderSbtEntry{};
 	
-    CXL_LOG(INFO) << "Trace rays!";
-    CXL_LOG(INFO) << "width: " << width_ << ", height: " << height_;
     logical_device->cmdTraceRaysKHR(
 				compute_buffer,
 				&raygen_table,
@@ -154,7 +145,6 @@ gfx::ComputeTexturePtr RayTraceTriangleKHR::renderFrame(
 				height_,
 				/*depth*/1);
 
-    CXL_LOG(INFO) << "transition image back...";
     resolve_texture_->transitionImageLayout(*compute_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal); 
 
     compute_buffer->endRecording();
