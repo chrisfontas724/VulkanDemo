@@ -22,7 +22,6 @@ std::shared_ptr<ShaderResource> ShaderResource::createGraphics(
   gfx::SpirV vertex_spirv(vert_data, vert_data + vert_stream.size<uint32_t>());
   gfx::SpirV frag_spirv(frag_data, frag_data + frag_stream.size<uint32_t>());
 
-  std::cout << "Create graphics program..." << std::endl;
   auto shader_program =
         gfx::ShaderProgram::createGraphics(device, vertex_spirv, frag_spirv);
   CXL_DCHECK(shader_program);

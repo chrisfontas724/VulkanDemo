@@ -111,7 +111,6 @@ gfx::ComputeTexturePtr RayTraceTriangleKHR::renderFrame(
     compute_buffer->bindStorageImage(0, 1, resolve_texture_);
     compute_buffer->traceRays(width_, height_);
 	
-
     resolve_texture_->transitionImageLayout(*compute_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal); 
 
     compute_buffer->endRecording();

@@ -168,7 +168,6 @@ void DemoHarness::recreateSwapchain(int32_t width, int32_t height) {
 
     // Update the demos.
     for (auto demo : demos_) {
-        std::cout << "Updating demo: " << demo->name();
         demo->setup(logical_device_, num_swap, width, height); //resize(width, height);
     }
 }
