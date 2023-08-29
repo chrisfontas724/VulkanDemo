@@ -136,7 +136,7 @@ gfx::ComputeTexturePtr RayTraceTriangleKHR::renderFrame(
     VkStridedDeviceAddressRegionKHR callableShaderSbtEntry{};
 	
     logical_device->cmdTraceRaysKHR(
-				compute_buffer,
+				compute_buffer->vk(),
 				&raygen_table,
 				&miss_table,
 				&hit_table,
