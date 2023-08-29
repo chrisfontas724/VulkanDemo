@@ -47,9 +47,9 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
     shader_manager_ = std::make_shared<gfx::RayTracingShaderManager>(logical_device);
     CXL_DCHECK(shader_manager_);
 
-    auto raygen = getModule(logical_device, "pinhole_camera.rgen.spv", vk::ShaderStageFlagBits::eRaygenKHR);
-    auto closest = getModule(logical_device, "closesthit.rchit.spv", vk::ShaderStageFlagBits::eClosestHitKHR);
-    auto miss = getModule(logical_device, "miss.rmiss.spv", vk::ShaderStageFlagBits::eMissKHR);
+    auto raygen = getModule(logical_device, "pathtrace.rgen.spv", vk::ShaderStageFlagBits::eRaygenKHR);
+    auto closest = getModule(logical_device, "pathtrace.rchit.spv", vk::ShaderStageFlagBits::eClosestHitKHR);
+    auto miss = getModule(logical_device, "pathtrace.rmiss.spv", vk::ShaderStageFlagBits::eMissKHR);
     CXL_DCHECK(raygen);
     CXL_DCHECK(closest);
     CXL_DCHECK(miss);
