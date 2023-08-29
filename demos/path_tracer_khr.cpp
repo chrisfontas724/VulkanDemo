@@ -26,6 +26,19 @@ std::shared_ptr<gfx::ShaderModule> getModule(gfx::LogicalDevicePtr device,
   return std::make_shared<gfx::ShaderModule>(device, stage, spirv);
 }
 
+gfx::Geometry createGeometry(const gfx::LogicalDevicePtr& logical_device, const std::vector<float>& positions, const std::vector<uint32_t>& indices) {
+    static uint64_t identifier = 1;
+    gfx::Geometry geometry; 
+    vk::BufferUsageFlags flags = vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eAccelerationStructureBuildInputReadOnlyKHR;
+    geometry.attributes[gfx::VTX_POS] = gfx::ComputeBuffer::createFromVector(logical_device, positions, flags);
+    geometry.indices = gfx::ComputeBuffer::createFromVector(logical_device, indices, flags);
+    geometry.flags = gfx::VTX_POS_FLAG;
+    geometry.num_indices = 6;
+    geometry.num_vertices = 4;
+    geometry.identifier = identifier++;
+    return geometry;
+}
+
 } // anonymous namespace
 
 void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, int32_t width, int32_t height) {
@@ -68,24 +81,40 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
     camera_.focal_length = 0.035;
     camera_.matrix = glm::translate(glm::mat4(1), glm::vec3(278, 273, -800));
 
-    // Back wall.
-    std::vector<float> positions = {
-                    549.6, 0.0, 559.2,
-                    0.0,  0.0, 559.2,
-                    0.0, 548.8, 559.2,
-                    556.0, 548.8, 559.2};
-    std::vector<uint32_t> indices = {0,1,2,0,2,3};                                
+    std::vector<gfx::Geometry> geometries;
 
-    gfx::Geometry geometry; 
-    vk::BufferUsageFlags flags = vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eAccelerationStructureBuildInputReadOnlyKHR;
-    geometry.attributes[gfx::VTX_POS] = gfx::ComputeBuffer::createFromVector(logical_device, positions, flags);
-    geometry.indices = gfx::ComputeBuffer::createFromVector(logical_device, indices, flags);
-    geometry.flags = gfx::VTX_POS_FLAG;
-    geometry.num_indices = 6;
-    geometry.num_vertices = 4;
-    geometry.identifier = 5;
+    // Light
+    geometries.push_back(createGeometry(
+                        logical_device, 
+                        {343.0, 548.75, 227.0,
+                        343.0, 548.75, 332.0,
+                        213.0, 548.75, 332.0,
+                        213.0, 548.75, 227.0},
+                        {0,1,2,0,2,3}));  
+
+    // Back wall.
+    geometries.push_back(createGeometry(
+                        logical_device,
+                        {549.6, 0.0, 559.2,
+                        0.0,  0.0, 559.2,
+                        0.0, 548.8, 559.2,
+                        556.0, 548.8, 559.},
+                        {0,1,2,0,2,3}));  
+
+     // Floor
+    geometries.push_back(createGeometry(
+                        logical_device,
+                        {552.8, 0.0, 0.0,
+                        0, 0, 0,
+                        0,0, 559.2,
+                        549.6, 0.0, 559.2},
+                        {0,1,2,0,2,3}));  
+
+
+    std::vector<uint32_t> instances = {1, 2, 3};                            
+
     as_ = std::make_shared<gfx::AccelerationStructure>(logical_device);
-    as_->buildTopLevel({geometry.identifier}, {geometry});
+    as_->buildTopLevel(instances, geometries);
     CXL_DCHECK(as_);
 }
 
