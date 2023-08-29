@@ -26,7 +26,15 @@ std::shared_ptr<gfx::ShaderModule> getModule(gfx::LogicalDevicePtr device,
   return std::make_shared<gfx::ShaderModule>(device, stage, spirv);
 }
 
-gfx::Geometry createGeometry(const gfx::LogicalDevicePtr& logical_device, const std::vector<float>& positions, const std::vector<uint32_t>& indices) {
+
+} // anonymous namespace
+
+
+
+gfx::Geometry PathTracerKHR::createGeometry(const gfx::LogicalDevicePtr& logical_device, 
+                            const std::vector<float>& positions, 
+                            const std::vector<uint32_t>& indices,
+                            const Material& material) {
     static uint64_t identifier = 1;
     gfx::Geometry geometry; 
     vk::BufferUsageFlags flags = vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eAccelerationStructureBuildInputReadOnlyKHR;
@@ -36,10 +44,12 @@ gfx::Geometry createGeometry(const gfx::LogicalDevicePtr& logical_device, const 
     geometry.num_indices = 6;
     geometry.num_vertices = 4;
     geometry.identifier = identifier++;
+
+    auto mat_buf = gfx::ComputeBuffer::createHostAccessableBuffer(logical_device, sizeof(Material), vk::BufferUsageFlagBits::eShaderDeviceAddress);
+    mat_buf->write(&material, 1);
+    materials_map_[geometry.identifier] = mat_buf;
     return geometry;
 }
-
-} // anonymous namespace
 
 void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, int32_t width, int32_t height) {
     CXL_DCHECK(logical_device);
@@ -90,7 +100,10 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
                         343.0, 548.75, 332.0,
                         213.0, 548.75, 332.0,
                         213.0, 548.75, 227.0},
-                        {0,1,2,0,2,3}));  
+                        {0,1,2,0,2,3}, 
+                        Material(glm::vec4(0,0,0,0), glm::vec4(50,50,50,1)))); 
+
+
 
     // Back wall.
     geometries.push_back(createGeometry(
@@ -99,7 +112,28 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
                         0.0,  0.0, 559.2,
                         0.0, 548.8, 559.2,
                         556.0, 548.8, 559.},
-                        {0,1,2,0,2,3}));  
+                        {0,1,2,0,2,3}, 
+                        Material(glm::vec4(0.9, 0.9, 0.9, 1.0)))); 
+
+    // Left wall
+    geometries.push_back(createGeometry(
+                        logical_device,
+                        {552.8,   0.0,   0.0,
+                        549.6,   0.0, 559.2,
+                        556.0, 548.8, 559.2,
+                        556.0, 548.8,   0.0},
+                        {0,1,2,0,2,3}, 
+                        Material(glm::vec4(0.9,0.05,0.05, 1.0)))); 
+
+    // Right wall
+    geometries.push_back(createGeometry(
+                        logical_device,
+                        {0.0,  0.0, 559.2,
+                        0.0,   0.0,   0.0,
+                        0.0, 548.8,   0.0,
+                        0.0, 548.8, 559.2},
+                        {0,1,2,0,2,3}, 
+                        Material(glm::vec4(0.05,0.9,0.05, 1.0)))); 
 
      // Floor
     geometries.push_back(createGeometry(
@@ -108,10 +142,22 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
                         0, 0, 0,
                         0,0, 559.2,
                         549.6, 0.0, 559.2},
-                        {0,1,2,0,2,3}));  
+                        {0,1,2,0,2,3}, 
+                        Material(glm::vec4(0.9, 0.9, 0.9, 1.0)))); 
+
+    
 
 
-    std::vector<uint32_t> instances = {1, 2, 3};                            
+    std::vector<uint32_t> instances = {1, 2, 3, 4, 5};   
+
+    std::vector<ObjDesc> obj_descs;
+    for (auto instance : instances) {
+        ObjDesc desc;
+        desc.materialAddress = materials_map_[instance]->device_address();
+        obj_descs.push_back(desc);
+    }                         
+
+    obj_descriptions_ = gfx::ComputeBuffer::createFromVector(logical_device, obj_descs, vk::BufferUsageFlagBits::eStorageBuffer);
 
     as_ = std::make_shared<gfx::AccelerationStructure>(logical_device);
     as_->buildTopLevel(instances, geometries);
