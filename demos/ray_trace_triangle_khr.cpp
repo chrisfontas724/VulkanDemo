@@ -123,11 +123,11 @@ gfx::ComputeTexturePtr RayTraceTriangleKHR::renderFrame(
                                /*signal_semaphores*/&compute_semaphores_[frame]);
     logical_device->getQueue(gfx::Queue::Type::kCompute).submit(submit_info, vk::Fence());
 
+
     if (signal_semaphores) {
         signal_semaphores->push_back(compute_semaphores_[frame]);
         signal_wait_stages->push_back(vk::PipelineStageFlagBits::eComputeShader);
     }
-
 
     return resolve_texture_;
 }

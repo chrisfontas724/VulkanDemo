@@ -13,10 +13,12 @@
 #include "src/model.hpp"
 #include <UsefulUtils/dispatch_queue.hpp>
 #include <VulkanWrappers/acceleration_structure.hpp>
+#include <VulkanWrappers/ray_tracing_shader_manager.hpp>
 
 class PathTracerKHR : public Demo {
 public:
 
+    ~PathTracerKHR();
     void setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, int32_t width, int32_t height) override;
 
     void resize(uint32_t width, uint32_t height) override;
@@ -32,7 +34,22 @@ public:
 
 private:
 
+    struct Camera {
+        glm::mat4 matrix;
+        float focal_length;
+        float sensor_width;
+        float sensor_height;
+    };
+
+
     std::shared_ptr<gfx::AccelerationStructure> as_;
+    std::shared_ptr<gfx::RayTracingShaderManager> shader_manager_;
+
+    Camera camera_;
+
+    std::vector<gfx::CommandBufferPtr> compute_command_buffers_;
+    gfx::ComputeTexturePtr resolve_texture_;
+    std::vector<vk::Semaphore> compute_semaphores_;
 };
 
 #endif // PATH_TRACER_KHR_HPP_

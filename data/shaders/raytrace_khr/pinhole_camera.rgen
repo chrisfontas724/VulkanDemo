@@ -1,0 +1,66 @@
+#version 460
+#extension GL_EXT_ray_tracing : enable
+
+layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
+layout(binding = 1, set = 0, rgba8) uniform image2D image;
+
+
+//#include "transform_functions.h"
+//#include "sampling/sampling.comp"
+// layout(set = 0, binding = 1) buffer buf2 {
+//    mwc64x_state_t seeds[];
+// };
+
+layout(std140, push_constant) uniform PushBlock {
+    layout(offset=0)  mat4 matrix;
+    layout(offset=64) float focal_length;
+    layout(offset=68) float sensor_width;
+    layout(offset=72) float sensor_height;
+    layout(offset=76) uint image_width;
+    layout(offset=80) uint image_height;
+};
+
+layout(location = 0) rayPayloadEXT vec3 hitValue;
+
+void main() {
+  const uint x_coord = gl_LaunchIDEXT.x;
+  const uint y_coord = gl_LaunchIDEXT.y;
+
+  // uint index = image_width * gl_GlobalInvocationID.y + gl_GlobalInvocationID.x;
+  // mwc64x_state_t seed = seeds[index];
+  // float rand1 = uniformRandomVariable(seed);
+
+  float image_aspect_ratio = float(image_width) / float(image_height);
+  float alpha = 2.0 * atan(1.0 / (2.0 * focal_length));
+
+  float s_1 = 0.0; //uniformRandomVariable(seed);
+  float s_2 = 0.0; //uniformRandomVariable(seed);
+
+  float pixel_normalized_x = (x_coord + s_1) / image_width;
+  float pixel_normalized_y = (y_coord + s_2) / image_height; 
+
+  float pixel_ndc_x = 2.0 * pixel_normalized_x - 1.0;
+  float pixel_ndc_y = 2.0 * pixel_normalized_y - 1.0;
+
+  float pixel_camera_x = pixel_ndc_x * sensor_width * image_aspect_ratio * tan(alpha/2.0);
+  float pixel_camera_y = pixel_ndc_y * sensor_height * tan(alpha/2.0);
+
+  vec4 camera_point = vec4(pixel_camera_x, pixel_camera_y, -1.0, 0.0);
+
+
+  vec4 local_origin = vec4(0,0,0,1);
+  vec4 local_focus = local_origin + normalize(-camera_point);
+  vec4 world_origin = matrix * local_origin;
+  vec4 world_focus = matrix * local_focus;
+  vec4 direction = normalize(world_focus - world_origin);
+
+  hitValue = vec3(0.0);
+	float tmin = 0.001;
+	float tmax = 10000.0;
+
+  traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, world_origin.xyz, tmin, direction.xyz, tmax, 0);
+
+	imageStore(image, ivec2(gl_LaunchIDEXT.xy), vec4(hitValue, 0.0));
+
+ // seeds[index] = seed;
+}
