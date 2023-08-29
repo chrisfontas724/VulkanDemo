@@ -25,7 +25,6 @@ NaivePathTracer::~NaivePathTracer() {
 
     render_pass_.reset();
     resolve_texture_.reset();
-    compute_command_buffers_.clear();
     text_renderer_.reset();
 }
 

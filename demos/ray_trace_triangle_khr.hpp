@@ -43,10 +43,6 @@ private:
     std::vector<gfx::CommandBufferPtr> compute_command_buffers_;
     gfx::ComputeTexturePtr resolve_texture_;
     std::vector<vk::Semaphore> compute_semaphores_;
-
-    gfx::DescriptorSetPtr descriptor_set_;
-
-    gfx::SamplerPtr sampler_;
 };
 
 #endif // RAY_TRACE_TRIANGLE_KHR_HPP_

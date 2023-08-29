@@ -80,28 +80,11 @@ void RayTraceTriangleKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t nu
     as_ = std::make_shared<gfx::AccelerationStructure>(logical_device);
     as_->buildTopLevel({geometry.identifier}, {geometry});
     CXL_DCHECK(as_);
-
-    sampler_ = gfx::Sampler::create(logical_device);
-
-    auto pipeline_layout = shader_manager_->pipeline_layout();
-    CXL_DCHECK(pipeline_layout);
-
-    auto descriptor_set_layout = pipeline_layout->descriptor_set_layout(0);
-    CXL_DCHECK(descriptor_set_layout);
-
-    descriptor_set_ = descriptor_set_layout->createDescriptorSet();
-    CXL_DCHECK(descriptor_set_);
-
-    descriptor_set_->set_acceleration_structure(/*index*/0, as_->handle());
-
-    vk::DescriptorImageInfo image_info(sampler_->vk(), resolve_texture_->image_view(), resolve_texture_->layout());
-    descriptor_set_->set_storage_image(/*index*/1, image_info);
 }
 
 void RayTraceTriangleKHR::resize(uint32_t width, uint32_t height) {
 
 }
-
 
 
 gfx::ComputeTexturePtr RayTraceTriangleKHR::renderFrame(
@@ -122,28 +105,12 @@ gfx::ComputeTexturePtr RayTraceTriangleKHR::renderFrame(
 
     resolve_texture_->transitionImageLayout(*compute_buffer.get(), vk::ImageLayout::eGeneral);
 
-	vkCmdBindPipeline(compute_buffer->vk(), VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, shader_manager_->pipeline());
-
-   
-    const auto& vkDescriptor = descriptor_set_->vk();
-    compute_buffer->vk().bindDescriptorSets(vk::PipelineBindPoint::eRayTracingKHR, 
-                                             shader_manager_->pipeline_layout()->vk(), 
-                                             /*index*/0, 1, &vkDescriptor, 0, nullptr);
-
-    auto raygen_table = shader_manager_->raygen_shader_entry();
-    auto miss_table = shader_manager_->miss_shader_entry();
-    auto hit_table = shader_manager_->hit_shader_entry();
-    VkStridedDeviceAddressRegionKHR callableShaderSbtEntry{};
+    compute_buffer->setRayTracingShaders(shader_manager_);
+    compute_buffer->setRecursiveDepth(1);
+    compute_buffer->bindAccelerationStructure(0,0, as_);
+    compute_buffer->bindStorageImage(0, 1, resolve_texture_);
+    compute_buffer->traceRays(width_, height_);
 	
-    logical_device->cmdTraceRaysKHR(
-				compute_buffer->vk(),
-				&raygen_table,
-				&miss_table,
-				&hit_table,
-				&callableShaderSbtEntry,
-				width_,
-				height_,
-				/*depth*/1);
 
     resolve_texture_->transitionImageLayout(*compute_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal); 
 
@@ -167,6 +134,14 @@ gfx::ComputeTexturePtr RayTraceTriangleKHR::renderFrame(
 }
 
 RayTraceTriangleKHR::~RayTraceTriangleKHR() {
+    auto logical_device = logical_device_.lock();
     as_.reset();
+    shader_manager_.reset();
     resolve_texture_.reset();
+
+    for (auto& semaphore : compute_semaphores_) {
+        logical_device->vk().destroy(semaphore);
+    }
+
+    compute_command_buffers_.clear();
 }
