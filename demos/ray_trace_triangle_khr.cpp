@@ -105,7 +105,7 @@ gfx::ComputeTexturePtr RayTraceTriangleKHR::renderFrame(
 
     resolve_texture_->transitionImageLayout(*compute_buffer.get(), vk::ImageLayout::eGeneral);
 
-    compute_buffer->setRayTracingShaders(shader_manager_);
+    compute_buffer->setProgram(shader_manager_);
     compute_buffer->setRecursiveDepth(1);
     compute_buffer->bindAccelerationStructure(0,0, as_);
     compute_buffer->bindStorageImage(0, 1, resolve_texture_);

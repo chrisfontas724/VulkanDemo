@@ -35,8 +35,6 @@ void DemoHarness::initialize(PlatformNativeWindowHandle window, std::vector<cons
     instance_ = gfx::Instance::create("DemoHarness", extensions, /*validation*/true);   
     CXL_DCHECK(instance_);
 
-    std::cout << "Initialize harness" << std::endl;
-
     surface_ = instance_->createSurface(window);
 
     auto device_extensions = gfx::PhysicalDevice::kRayTracingExtensions;
@@ -44,26 +42,21 @@ void DemoHarness::initialize(PlatformNativeWindowHandle window, std::vector<cons
                 gfx::PhysicalDevice::kSwapchainExtensions.begin(), 
                 gfx::PhysicalDevice::kSwapchainExtensions.end());
 
-    std::cout << "Make physical device...";
 
     physical_device_ = instance_->pickBestDevice(surface_, device_extensions);
     CXL_DCHECK(physical_device_);
 
-    std::cout << "Make logical device..." << std::endl;
 
     // Make a logical device from the physical device.
     logical_device_ =
         std::make_shared<gfx::LogicalDevice>(physical_device_, surface_, device_extensions);
     CXL_DCHECK(logical_device_);
 
-    std::cout << "Make post shader" << std::endl;
     cxl::FileSystem fs(cxl::FileSystem::currentExecutablePath() + "/resources/spirv");
     post_shader_ = christalz::ShaderResource::createGraphics(logical_device_, fs, "post");
     CXL_DCHECK(post_shader_);
 
-    std::cout << "Recreate swapchain" << std::endl;
     recreateSwapchain(width, height);    
-    std::cout << "Finish initialize" << std::endl;
 }
 
 
