@@ -187,14 +187,20 @@ gfx::ComputeTexturePtr PathTracerKHR::renderFrame(
 
     compute_buffer->setProgram(shader_manager_);
     compute_buffer->setRecursiveDepth(1);
+
+    // Set descriptors.
     compute_buffer->bindAccelerationStructure(0,0, as_);
     compute_buffer->bindStorageImage(0, 1, resolve_texture_);
+    compute_buffer->bindUniformBuffer(1, 0, obj_descriptions_);
+
+    // set push constants.
     compute_buffer->pushConstants(camera_.matrix);
     compute_buffer->pushConstants(camera_.focal_length, 64u);
     compute_buffer->pushConstants(camera_.sensor_width, 68u);
     compute_buffer->pushConstants(camera_.sensor_height, 72u);
     compute_buffer->pushConstants(width_, 76u);
     compute_buffer->pushConstants(height_, 80u);
+
     compute_buffer->traceRays(width_, height_);
 	
     resolve_texture_->transitionImageLayout(*compute_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal); 
