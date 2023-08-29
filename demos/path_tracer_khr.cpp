@@ -10,6 +10,7 @@
 namespace {
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
+int sample = 1;
 
 std::shared_ptr<gfx::ShaderModule> getModule(gfx::LogicalDevicePtr device, 
                                              const std::string& program_name,
@@ -60,8 +61,8 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
     compute_command_buffers_ = gfx::CommandBuffer::create(logical_device, gfx::Queue::Type::kCompute,
                                                           vk::CommandBufferLevel::ePrimary, num_swap);
 
-    accum_texture_ = gfx::ImageUtils::createAccumulationAttachment(logical_device, width, height, vk::ImageUsageFlagBits::eStorage, vk::ImageLayout::eGeneral);
-    CXL_DCHECK(accum_texture_);
+    accum_textures_[0] = gfx::ImageUtils::createAccumulationAttachment(logical_device, width, height, vk::ImageUsageFlagBits::eStorage, vk::ImageLayout::eGeneral);
+    accum_textures_[1] = gfx::ImageUtils::createAccumulationAttachment(logical_device, width, height, vk::ImageUsageFlagBits::eStorage, vk::ImageLayout::eGeneral);
 
     resolve_texture_ = gfx::ImageUtils::createStorageImage(logical_device, width,
                                                            height, vk::SampleCountFlagBits::e1);
@@ -193,9 +194,11 @@ gfx::ComputeTexturePtr PathTracerKHR::renderFrame(
 
     // Set descriptors.
     compute_buffer->bindAccelerationStructure(0,0, as_);
-   // compute_buffer->bindStorageImage(0, 1, accum_texture_);
-    compute_buffer->bindStorageImage(0, 1, resolve_texture_);
+    compute_buffer->bindStorageImage(0, 1, accum_textures_[texture_index]);
+    compute_buffer->bindStorageImage(0, 2, accum_textures_[(texture_index + 1) % 2]);
+    compute_buffer->bindStorageImage(0, 3, resolve_texture_);
     compute_buffer->bindUniformBuffer(1, 0, obj_descriptions_);
+    texture_index = (texture_index + 1) % 2;
 
     // set push constants.
     compute_buffer->pushConstants(camera_.matrix);
@@ -204,6 +207,8 @@ gfx::ComputeTexturePtr PathTracerKHR::renderFrame(
     compute_buffer->pushConstants(camera_.sensor_height, 72u);
     compute_buffer->pushConstants(width_, 76u);
     compute_buffer->pushConstants(height_, 80u);
+    compute_buffer->pushConstants(sample, 84u);
+    sample++;
 
     compute_buffer->traceRays(width_, height_);
 	
@@ -232,7 +237,8 @@ PathTracerKHR::~PathTracerKHR() {
     auto logical_device = logical_device_.lock();
     as_.reset();
     shader_manager_.reset();
-    accum_texture_.reset();
+    accum_textures_[0].reset();
+    accum_textures_[1].reset();
     resolve_texture_.reset();
 
     for (auto& semaphore : compute_semaphores_) {

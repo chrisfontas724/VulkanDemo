@@ -65,8 +65,9 @@ private:
     std::vector<vk::Semaphore> compute_semaphores_;
 
     // Textures
-    gfx::ComputeTexturePtr accum_texture_;
+    gfx::ComputeTexturePtr accum_textures_[2];
     gfx::ComputeTexturePtr resolve_texture_;
+    uint32_t texture_index = 0;
 
     // Scene data.
     Camera camera_;
@@ -78,6 +79,7 @@ private:
                                 const std::vector<float>& positions, 
                                 const std::vector<uint32_t>& indices,
                                 const Material& material);
+
 };
 
 #endif // PATH_TRACER_KHR_HPP_
