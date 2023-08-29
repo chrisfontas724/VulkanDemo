@@ -17,6 +17,8 @@
 #include <VulkanWrappers/descriptor_set.hpp>
 #include <VulkanWrappers/sampler.hpp>
 
+
+// This demo makes use of the KHR ray tracing extensions to draw a simple triangle.
 class RayTraceTriangleKHR : public Demo {
 public:
 
