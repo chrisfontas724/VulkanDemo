@@ -69,7 +69,10 @@ void NaivePathTracer::resize(uint32_t width, uint32_t height) {
     resolve_texture_.reset();
     accum_texture_.reset();
 
-    accum_texture_ = gfx::ImageUtils::createAccumulationAttachment(logical_device, width, height);
+    accum_texture_ = gfx::ImageUtils::createAccumulationAttachment(logical_device, width, height, 
+                                                                    (vk::ImageUsageFlagBits::eColorAttachment | 
+                                                                    vk::ImageUsageFlagBits::eSampled |
+                                                                    vk::ImageUsageFlagBits::eInputAttachment));
     CXL_DCHECK(accum_texture_);
     
     resolve_texture_ = gfx::ImageUtils::createColorAttachment(logical_device, width,

@@ -59,18 +59,21 @@ private:
         alignas(16) glm::vec4 emissive_color = glm::vec4(0.f);
     };
 
-    std::shared_ptr<gfx::AccelerationStructure> as_;
-    std::shared_ptr<gfx::RayTracingShaderManager> shader_manager_;
 
-    Camera camera_;
-
+    // GPU data
     std::vector<gfx::CommandBufferPtr> compute_command_buffers_;
-    gfx::ComputeTexturePtr resolve_texture_;
     std::vector<vk::Semaphore> compute_semaphores_;
 
+    // Textures
+    gfx::ComputeTexturePtr accum_texture_;
+    gfx::ComputeTexturePtr resolve_texture_;
+
+    // Scene data.
+    Camera camera_;
     gfx::ComputeBufferPtr obj_descriptions_;
     std::map<uint64_t, gfx::ComputeBufferPtr> materials_map_;
-
+    std::shared_ptr<gfx::AccelerationStructure> as_;
+    std::shared_ptr<gfx::RayTracingShaderManager> shader_manager_;
     gfx::Geometry createGeometry(const gfx::LogicalDevicePtr& logical_device, 
                                 const std::vector<float>& positions, 
                                 const std::vector<uint32_t>& indices,

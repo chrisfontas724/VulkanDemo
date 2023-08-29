@@ -60,6 +60,9 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
     compute_command_buffers_ = gfx::CommandBuffer::create(logical_device, gfx::Queue::Type::kCompute,
                                                           vk::CommandBufferLevel::ePrimary, num_swap);
 
+    accum_texture_ = gfx::ImageUtils::createAccumulationAttachment(logical_device, width, height, vk::ImageUsageFlagBits::eStorage, vk::ImageLayout::eGeneral);
+    CXL_DCHECK(accum_texture_);
+
     resolve_texture_ = gfx::ImageUtils::createStorageImage(logical_device, width,
                                                            height, vk::SampleCountFlagBits::e1);
     CXL_DCHECK(resolve_texture_);
@@ -190,6 +193,7 @@ gfx::ComputeTexturePtr PathTracerKHR::renderFrame(
 
     // Set descriptors.
     compute_buffer->bindAccelerationStructure(0,0, as_);
+   // compute_buffer->bindStorageImage(0, 1, accum_texture_);
     compute_buffer->bindStorageImage(0, 1, resolve_texture_);
     compute_buffer->bindUniformBuffer(1, 0, obj_descriptions_);
 
@@ -228,6 +232,7 @@ PathTracerKHR::~PathTracerKHR() {
     auto logical_device = logical_device_.lock();
     as_.reset();
     shader_manager_.reset();
+    accum_texture_.reset();
     resolve_texture_.reset();
 
     for (auto& semaphore : compute_semaphores_) {
