@@ -31,7 +31,6 @@ public:
     std::string name() override { return "Multipass Example"; }
 private:
 
-    std::shared_ptr<TextRenderer> text_renderer_;
     std::vector<gfx::RenderPassInfo> render_passes_;
 
     std::shared_ptr<christalz::ShaderResource> model_shader_;

@@ -231,25 +231,31 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
 
                         Material(glm::vec4(0.7))));
 
-    std::vector<uint32_t> instances = {1, 2, 3, 4, 5, 6, 7, 8};   
+
+    std::vector<gfx::Instance> instances;
+    for (uint32_t i = 1; i <= geometries.size(); i++) {
+        gfx::Instance instance;
+        instance.geometryID = i;
+        instances.push_back(instance);
+    }
 
     std::vector<ObjDesc> obj_descs;
     uint32_t k = 0;
     for (auto instance : instances) {
         ObjDesc desc;
-        desc.materialAddress = materials_map_[instance]->device_address();
+        desc.materialAddress = materials_map_[instance.geometryID]->device_address();
         desc.indexAddress = geometries[k].indices->device_address();
         desc.vertexAddress = geometries[k].attributes[gfx::VTX_POS]->device_address();
         obj_descs.push_back(desc);
         k++;
     }                         
 
+
     obj_descriptions_ = gfx::ComputeBuffer::createFromVector(logical_device, obj_descs, vk::BufferUsageFlagBits::eStorageBuffer);
 
     as_ = std::make_shared<gfx::AccelerationStructure>(logical_device);
     as_->buildTopLevel(instances, geometries);
     CXL_DCHECK(as_);
-
 
     // Random seeds
     cxl::FileSystem fs(cxl::FileSystem::currentExecutablePath() + "/resources/spirv");

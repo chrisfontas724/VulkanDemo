@@ -78,7 +78,10 @@ void RayTraceTriangleKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t nu
     geometry.num_vertices = positions.size();
     geometry.identifier = 5;
     as_ = std::make_shared<gfx::AccelerationStructure>(logical_device);
-    as_->buildTopLevel({geometry.identifier}, {geometry});
+
+    gfx::Instance instance;
+    instance.geometryID = geometry.identifier;
+    as_->buildTopLevel({instance}, {geometry});
     CXL_DCHECK(as_);
 }
 

@@ -31,6 +31,7 @@ struct Payload{
   vec3 hitWeight;
   vec3 origin;
   vec3 direction;
+  bool alive;
 };
 
 layout(location = 0) rayPayloadInEXT Payload payload;

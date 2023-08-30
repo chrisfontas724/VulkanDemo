@@ -14,13 +14,13 @@ layout(binding = 4, set = 0) buffer rngs { mwc64x_state_t seeds[]; };
 
 
 layout(std140, push_constant) uniform PushBlock {
-    layout(offset=0)  mat4 matrix;
-    layout(offset=64) float focal_length;
-    layout(offset=68) float sensor_width;
-    layout(offset=72) float sensor_height;
-    layout(offset=76) uint image_width;
-    layout(offset=80) uint image_height;
-    layout(offset=84) uint samples;
+  layout(offset=0)  mat4 matrix;
+  layout(offset=64) float focal_length;
+  layout(offset=68) float sensor_width;
+  layout(offset=72) float sensor_height;
+  layout(offset=76) uint image_width;
+  layout(offset=80) uint image_height;
+  layout(offset=84) uint samples;
 };
 
 struct Payload {
@@ -29,6 +29,7 @@ struct Payload {
   vec3 hitWeight;
   vec3 origin;
   vec3 direction;
+  bool alive;
 };
 
 layout(location = 0) rayPayloadEXT Payload payload;
@@ -65,19 +66,24 @@ void main() {
   vec4 world_focus = matrix * local_focus;
   vec4 direction = normalize(world_focus - world_origin);
 
+
   payload.hitValue = vec3(0.0);
   payload.hitWeight = vec3(1.0);
   payload.seed = seed;
+  payload.origin = world_origin.xyz;
+  payload.direction = direction.xyz;
+  payload.alive = true;
 	float tmin = 0.001;
 	float tmax = 10000.0;
 
   vec4 accum_value = imageLoad(back_buffer, ivec2(gl_LaunchIDEXT.xy));
 
   for (uint i = 0; i < 8; i++) {
-    if (payload.hitWeight != vec3(0)) {
-        traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, world_origin.xyz, tmin, direction.xyz, tmax, 0);
+    if (!payload.alive) {
+        break;
     }
-  
+    
+    traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, world_origin.xyz, tmin, direction.xyz, tmax, 0);
     world_origin.xyz = payload.origin;
     direction.xyz = payload.direction;
   }
@@ -86,6 +92,6 @@ void main() {
   vec4 resolve_value = accum_value / samples;
 
   imageStore(front_buffer, ivec2(gl_LaunchIDEXT.xy), accum_value);
-	imageStore(resolve_texture, ivec2(gl_LaunchIDEXT.xy), resolve_value);
+	imageStore(resolve_texture, ivec2(gl_LaunchIDEXT.xy), vec4(resolve_value.xyz, 1.0));
   seeds[index] = seed;
 }

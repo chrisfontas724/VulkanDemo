@@ -11,6 +11,7 @@ struct Payload {
   vec3 hitWeight;
   vec3 origin;
   vec3 direction;
+  bool alive;
 };
 
 layout(location = 0) rayPayloadEXT Payload payload;
@@ -19,4 +20,5 @@ void main()
 {
     payload.hitValue = vec3(0.0, 0.0, 0.0);
     payload.hitWeight = vec3(0.0, 0.0, 0.0);
+    payload.alive = false;
 }
