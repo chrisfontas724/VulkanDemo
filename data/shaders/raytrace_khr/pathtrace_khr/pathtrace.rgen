@@ -67,6 +67,7 @@ void main() {
 
   payload.hitValue = vec3(0.0);
   payload.hitWeight = vec3(1.0);
+  payload.seed = seed;
 	float tmin = 0.001;
 	float tmax = 10000.0;
 
