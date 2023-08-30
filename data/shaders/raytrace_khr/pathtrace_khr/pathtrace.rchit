@@ -25,8 +25,15 @@ struct Material {
 };
 
 
-layout(location = 0) rayPayloadInEXT vec3 hitValue;
-layout(location = 1) rayPayloadInEXT vec3 hitWeight;
+struct Payload{
+  mwc64x_state_t seed;
+  vec3 hitValue;
+  vec3 hitWeight;
+  vec3 origin;
+  vec3 direction;
+};
+
+layout(location = 0) rayPayloadInEXT Payload payload;
 
 
 layout(buffer_reference, scalar) buffer ObjMaterial { Material m; }; // Current object material
@@ -35,7 +42,6 @@ layout(buffer_reference, scalar) buffer Vertices { float v[]; };       // Positi
 
 
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
-layout(binding = 4, set = 0) buffer rngs { mwc64x_state_t seeds[]; };
 layout(set = 1, binding = 0, scalar) buffer ObjDesc_ { ObjDesc i[]; } objDesc;
 
 
@@ -43,8 +49,6 @@ hitAttributeEXT vec2 attribs;
 
 void main()
 {
-  mwc64x_state_t seed = seeds[gl_LaunchIDEXT.x];
-
   ObjDesc  objResource = objDesc.i[gl_InstanceCustomIndexEXT];
   ObjMaterial material  = ObjMaterial(objResource.materialAddress);
   Indices    indices     = Indices(objResource.indexAddress);
@@ -73,9 +77,8 @@ void main()
 
 
   // Calculate new ray here
-  float xi1 = uniformRandomVariable(seed); 
-  float xi2 = uniformRandomVariable(seed); 
-  seeds[gl_LaunchIDEXT.x] = seed;
+  float xi1 = uniformRandomVariable(payload.seed); 
+  float xi2 = uniformRandomVariable(payload.seed); 
 
   float theta = acos(sqrt(1.0 -xi1));
   float phi = 2.0 * 3.14159265 * xi2;
@@ -101,18 +104,23 @@ void main()
   vec3 new_dir = normalize(xs*x + ys*y + zs*z);
   float pdf = dot(new_dir, worldNrm.xyz) / 3.14159265;
 
-  vec3 new_pos = worldPos + 0.01 * new_dir;
+  vec3 new_pos = worldPos + 0.001 * new_dir;
 
   // Add a small epsilon to the new ray starting point to prevent self-intersection
   // with the object its already on.
-  hitValue += hitWeight * material.m.emissive_color.xyz;
+  payload.hitValue += payload.hitWeight * material.m.emissive_color.xyz;
 
   // The new weight is BRDF * cosTheta / pdf.
   vec3 brdf = material.m.diffuse_color.xyz / vec3(3.14159265);
   float cos_theta = dot(new_dir.xyz, worldNrm.xyz);
-  hitWeight *= brdf * cos_theta / pdf;
+  payload.hitWeight *= brdf * cos_theta / pdf;
+
+  payload.origin = new_pos;
+  payload.direction = new_dir;
 
   float tmin     = 0.001;
   float tmax     = 10000.0;
-  traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, new_pos.xyz, tmin, new_dir.xyz, tmax, 0);
+
+  //payload.hitValue = material.m.diffuse_color.xyz * abs(dot(worldNrm, gl_WorldRayDirectionEXT));
+  // traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, new_pos, tmin, new_dir, tmax, 0);
 }

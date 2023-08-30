@@ -42,8 +42,8 @@ gfx::Geometry PathTracerKHR::createGeometry(const gfx::LogicalDevicePtr& logical
     geometry.attributes[gfx::VTX_POS] = gfx::ComputeBuffer::createFromVector(logical_device, positions, flags);
     geometry.indices = gfx::ComputeBuffer::createFromVector(logical_device, indices, flags);
     geometry.flags = gfx::VTX_POS_FLAG;
-    geometry.num_indices = 6;
-    geometry.num_vertices = 4;
+    geometry.num_indices = indices.size();
+    geometry.num_vertices = positions.size() / 3;
     geometry.identifier = identifier++;
 
     auto mat_buf = gfx::ComputeBuffer::createHostAccessableBuffer(logical_device, sizeof(Material), vk::BufferUsageFlagBits::eShaderDeviceAddress);
@@ -107,6 +107,15 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
                         Material(glm::vec4(0,0,0,0), glm::vec4(50,50,50,1)))); 
 
 
+    // Ceiling - White
+    geometries.push_back(createGeometry(
+                        logical_device,
+                        {556.0, 548.8, 0.0,
+                        556.0, 548.8, 559.2,
+                        0.0, 548.8, 559.2,
+                        0.0, 548.8, 0.0},
+                        {0,1,2,0,2,3},
+                        Material(glm::vec4(0.9, 0.9, 0.9, 1.0))));
 
     // Back wall.
     geometries.push_back(createGeometry(
@@ -116,7 +125,7 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
                         0.0, 548.8, 559.2,
                         556.0, 548.8, 559.},
                         {0,1,2,0,2,3}, 
-                        Material(glm::vec4(0.9, 0.9, 0.9, 1.0)))); 
+                        Material(glm::vec4(0.9, 0.5, 0.9, 1.0)))); 
 
     // Left wall
     geometries.push_back(createGeometry(
@@ -149,7 +158,80 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
                         Material(glm::vec4(0.9, 0.9, 0.9, 1.0))));
 
 
-    std::vector<uint32_t> instances = {1, 2, 3, 4, 5};   
+    // Tall box - White
+    geometries.push_back(createGeometry(
+                        logical_device,
+                        {423.0, 330.0, 247.0,
+                        265.0, 330.0, 296.0,
+                        314.0, 330.0, 456.0,
+                        472.0, 330.0, 406.0,
+
+                        423.0,   0.0, 247.0,
+                        423.0, 330.0, 247.0,
+                        472.0, 330.0, 406.0,
+                        472.0,   0.0, 406.0,
+
+                        472.0,   0.0, 406.0,
+                        472.0, 330.0, 406.0,
+                        314.0, 330.0, 456.0,
+                        314.0,   0.0, 456.0,
+
+                        314.0,   0.0, 456.0,
+                        314.0, 330.0, 456.0,
+                        265.0, 330.0, 296.0,
+                        265.0,   0.0, 296.0,
+
+                        265.0,   0.0, 296.0,
+                        265.0, 330.0, 296.0,
+                        423.0, 330.0, 247.0,
+                        423.0,   0.0, 247.0},
+
+                        {0, 1, 2, 0, 2, 3,
+                        4, 5, 6, 4, 6, 7,
+                        8, 9, 10, 8, 10, 11,
+                        12, 13, 14, 12, 14, 15,
+                        16, 17, 18, 16, 18, 19},
+
+                        Material(glm::vec4(0.7))));
+
+
+    // Short box - White
+    geometries.push_back(createGeometry(
+                        logical_device,
+                        {130.0, 165.0, 65.0,
+                        82.0, 165.0, 225.0,
+                        240.0, 165.0, 272.0,
+                        290.0, 165.0, 114.0,
+
+                        290.0, 0.0, 114.0,
+                        290.0, 165.0, 114.0,
+                        240.0, 165.0, 272.0,
+                        240.0,   0.0, 272.0,
+
+                        130.0,   0.0,  65.0,
+                        130.0, 165.0,  65.0,
+                        290.0, 165.0, 114.0,
+                        290.0,   0.0, 114.0,
+
+                        82.0,   0.0, 225.0,
+                        82.0, 165.0, 225.0,
+                        130.0, 165.0,  65.0,
+                        130.0,   0.0,  65.0,
+
+                        240.0,   0.0, 272.0,
+                        240.0, 165.0, 272.0,
+                        82.0, 165.0, 225.0,
+                        82.0,   0.0, 225.0},
+
+                        {0, 1, 2, 0, 2, 3,
+                        4, 5, 6, 4, 6, 7,
+                        8, 9, 10, 8, 10, 11,
+                        12, 13, 14, 12, 14, 15,
+                        16, 17, 18, 16, 18, 19},
+
+                        Material(glm::vec4(0.7))));
+
+    std::vector<uint32_t> instances = {1, 2, 3, 4, 5, 6, 7, 8};   
 
     std::vector<ObjDesc> obj_descs;
     uint32_t k = 0;
@@ -217,7 +299,7 @@ gfx::ComputeTexturePtr PathTracerKHR::renderFrame(
     resolve_texture_->transitionImageLayout(*compute_buffer.get(), vk::ImageLayout::eGeneral);
 
     compute_buffer->setProgram(shader_manager_);
-    compute_buffer->setRecursiveDepth(8);
+    compute_buffer->setRecursiveDepth(3);
 
     // Set descriptors.
     compute_buffer->bindAccelerationStructure(0,0, as_);

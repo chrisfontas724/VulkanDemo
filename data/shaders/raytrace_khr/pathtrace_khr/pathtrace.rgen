@@ -23,8 +23,15 @@ layout(std140, push_constant) uniform PushBlock {
     layout(offset=84) uint samples;
 };
 
-layout(location = 0) rayPayloadEXT vec3 hitValue;
-layout(location = 1) rayPayloadEXT vec3 hitWeight;
+struct Payload {
+  mwc64x_state_t seed;
+  vec3 hitValue;
+  vec3 hitWeight;
+  vec3 origin;
+  vec3 direction;
+};
+
+layout(location = 0) rayPayloadEXT Payload payload;
 
 void main() {
   const uint x_coord = gl_LaunchIDEXT.x;
@@ -39,7 +46,6 @@ void main() {
 
   float s_1 = uniformRandomVariable(seed);
   float s_2 = uniformRandomVariable(seed);
-  seeds[index] = seed;
 
   float pixel_normalized_x = (x_coord + s_1) / image_width;
   float pixel_normalized_y = (y_coord + s_2) / image_height; 
@@ -59,19 +65,24 @@ void main() {
   vec4 world_focus = matrix * local_focus;
   vec4 direction = normalize(world_focus - world_origin);
 
-  hitValue = vec3(0.0);
-  hitWeight = vec3(1.0);
+  payload.hitValue = vec3(0.0);
+  payload.hitWeight = vec3(1.0);
 	float tmin = 0.001;
 	float tmax = 10000.0;
 
   vec4 accum_value = imageLoad(back_buffer, ivec2(gl_LaunchIDEXT.xy));
 
-  traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, world_origin.xyz, tmin, direction.xyz, tmax, 0);
+  for (uint i = 0; i < 2; i++) {
+    traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, world_origin.xyz, tmin, direction.xyz, tmax, 0);
 
-  accum_value.xyz += hitValue;
+    world_origin.xyz = payload.origin;
+    direction.xyz = payload.direction;
+  }
+
+  accum_value.xyz += payload.hitValue;
   vec4 resolve_value = accum_value / samples;
 
   imageStore(front_buffer, ivec2(gl_LaunchIDEXT.xy), accum_value);
 	imageStore(resolve_texture, ivec2(gl_LaunchIDEXT.xy), resolve_value);
-
+  seeds[index] = seed;
 }
