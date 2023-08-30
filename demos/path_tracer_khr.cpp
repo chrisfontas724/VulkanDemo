@@ -55,6 +55,7 @@ gfx::Geometry PathTracerKHR::createGeometry(const gfx::LogicalDevicePtr& logical
 void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, int32_t width, int32_t height) {
     CXL_DCHECK(logical_device);
     logical_device_ = logical_device;
+    num_swap_images_ = num_swap;
     width_ = width;
     height_ = height;
 
@@ -94,8 +95,6 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
     camera_.sensor_height = 0.025;
     camera_.focal_length = 0.035;
     camera_.matrix = glm::translate(glm::mat4(1), glm::vec3(278, 273, -800));
-
-    std::vector<gfx::Geometry> geometries;
 
     // Light
     geometries.push_back(createGeometry(
@@ -147,18 +146,20 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
                         0,0, 559.2,
                         549.6, 0.0, 559.2},
                         {0,1,2,0,2,3}, 
-                        Material(glm::vec4(0.9, 0.9, 0.9, 1.0)))); 
-
-    
+                        Material(glm::vec4(0.9, 0.9, 0.9, 1.0))));
 
 
     std::vector<uint32_t> instances = {1, 2, 3, 4, 5};   
 
     std::vector<ObjDesc> obj_descs;
+    uint32_t k = 0;
     for (auto instance : instances) {
         ObjDesc desc;
         desc.materialAddress = materials_map_[instance]->device_address();
+        desc.indexAddress = geometries[k].indices->device_address();
+        desc.vertexAddress = geometries[k].attributes[gfx::VTX_POS]->device_address();
         obj_descs.push_back(desc);
+        k++;
     }                         
 
     obj_descriptions_ = gfx::ComputeBuffer::createFromVector(logical_device, obj_descs, vk::BufferUsageFlagBits::eStorageBuffer);
@@ -166,6 +167,32 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
     as_ = std::make_shared<gfx::AccelerationStructure>(logical_device);
     as_->buildTopLevel(instances, geometries);
     CXL_DCHECK(as_);
+
+
+    // Random seeds
+    cxl::FileSystem fs(cxl::FileSystem::currentExecutablePath() + "/resources/spirv");
+    mwc64x_seeder_ = christalz::ShaderResource::createCompute(logical_device, fs, "mwc64x_seeding");
+    CXL_DCHECK(mwc64x_seeder_);
+    for (uint32_t i = 0; i < num_swap_images_; i++) {
+        random_seeds_.push_back(gfx::ComputeBuffer::createStorageBuffer(logical_device, sizeof(uint32_t) * width_ * height_ * 2));
+    }
+
+    auto compute_buffer = compute_command_buffers_[0];
+    compute_buffer->reset();
+    compute_buffer->beginRecording();
+
+    uint64_t offset = 0;
+    for (uint32_t i = 0; i < num_swap_images_; i++) {
+        compute_buffer->setProgram(mwc64x_seeder_->program());
+        compute_buffer->bindUniformBuffer(0, 0, random_seeds_[i]);
+        compute_buffer->pushConstants(offset);
+        compute_buffer->dispatch(width_ * height_/ 16, 1, 1);
+        offset += width_ * height_;
+    }
+
+    compute_buffer->endRecording();
+    logical_device->getQueue(gfx::Queue::Type::kCompute).submit(compute_buffer);
+    logical_device->waitIdle();
 }
 
 void PathTracerKHR::resize(uint32_t width, uint32_t height) {
@@ -190,13 +217,14 @@ gfx::ComputeTexturePtr PathTracerKHR::renderFrame(
     resolve_texture_->transitionImageLayout(*compute_buffer.get(), vk::ImageLayout::eGeneral);
 
     compute_buffer->setProgram(shader_manager_);
-    compute_buffer->setRecursiveDepth(1);
+    compute_buffer->setRecursiveDepth(8);
 
     // Set descriptors.
     compute_buffer->bindAccelerationStructure(0,0, as_);
     compute_buffer->bindStorageImage(0, 1, accum_textures_[texture_index]);
     compute_buffer->bindStorageImage(0, 2, accum_textures_[(texture_index + 1) % 2]);
     compute_buffer->bindStorageImage(0, 3, resolve_texture_);
+    compute_buffer->bindUniformBuffer(0, 4, random_seeds_[image_index]);
     compute_buffer->bindUniformBuffer(1, 0, obj_descriptions_);
     texture_index = (texture_index + 1) % 2;
 

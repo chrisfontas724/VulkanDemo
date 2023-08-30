@@ -1,17 +1,17 @@
 #version 460
 #extension GL_EXT_ray_tracing : enable
+#extension GL_GOOGLE_include_directive : enable
+#extension GL_ARB_separate_shader_objects : enable
+
+
+#include "sampling/sampling.comp"
 
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 1, set = 0, rgba32f) uniform image2D  back_buffer;
 layout(binding = 2, set = 0, rgba32f) uniform image2D front_buffer;
 layout(binding = 3, set = 0, rgba8)   uniform image2D  resolve_texture;
+layout(binding = 4, set = 0) buffer rngs { mwc64x_state_t seeds[]; };
 
-
-//#include "transform_functions.h"
-//#include "sampling/sampling.comp"
-// layout(set = 0, binding = 1) buffer buf2 {
-//    mwc64x_state_t seeds[];
-// };
 
 layout(std140, push_constant) uniform PushBlock {
     layout(offset=0)  mat4 matrix;
@@ -24,20 +24,22 @@ layout(std140, push_constant) uniform PushBlock {
 };
 
 layout(location = 0) rayPayloadEXT vec3 hitValue;
+layout(location = 1) rayPayloadEXT vec3 hitWeight;
 
 void main() {
   const uint x_coord = gl_LaunchIDEXT.x;
   const uint y_coord = gl_LaunchIDEXT.y;
 
-  // uint index = image_width * gl_GlobalInvocationID.y + gl_GlobalInvocationID.x;
-  // mwc64x_state_t seed = seeds[index];
-  // float rand1 = uniformRandomVariable(seed);
+  uint index = image_width * y_coord + x_coord;
+  mwc64x_state_t seed = seeds[index];
+  float rand1 = uniformRandomVariable(seed);
 
   float image_aspect_ratio = float(image_width) / float(image_height);
   float alpha = 2.0 * atan(1.0 / (2.0 * focal_length));
 
-  float s_1 = 0.0; //uniformRandomVariable(seed);
-  float s_2 = 0.0; //uniformRandomVariable(seed);
+  float s_1 = uniformRandomVariable(seed);
+  float s_2 = uniformRandomVariable(seed);
+  seeds[index] = seed;
 
   float pixel_normalized_x = (x_coord + s_1) / image_width;
   float pixel_normalized_y = (y_coord + s_2) / image_height; 
@@ -58,6 +60,7 @@ void main() {
   vec4 direction = normalize(world_focus - world_origin);
 
   hitValue = vec3(0.0);
+  hitWeight = vec3(1.0);
 	float tmin = 0.001;
 	float tmax = 10000.0;
 
@@ -71,5 +74,4 @@ void main() {
   imageStore(front_buffer, ivec2(gl_LaunchIDEXT.xy), accum_value);
 	imageStore(resolve_texture, ivec2(gl_LaunchIDEXT.xy), resolve_value);
 
- // seeds[index] = seed;
 }

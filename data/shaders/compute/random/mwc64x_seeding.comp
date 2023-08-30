@@ -3,6 +3,8 @@ precision highp float;
 #extension GL_GOOGLE_include_directive : enable
 #extension GL_ARB_separate_shader_objects : enable
 
+#define COMPUTE_SHADER
+
 #include "mwc64x.comp"
 
 #define WORKGROUP_SIZE 16

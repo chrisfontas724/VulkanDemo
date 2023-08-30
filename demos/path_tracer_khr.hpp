@@ -59,6 +59,9 @@ private:
         alignas(16) glm::vec4 emissive_color = glm::vec4(0.f);
     };
 
+    // Random
+    std::shared_ptr<christalz::ShaderResource> mwc64x_seeder_;
+    std::vector<gfx::ComputeBufferPtr> random_seeds_;
 
     // GPU data
     std::vector<gfx::CommandBufferPtr> compute_command_buffers_;
@@ -71,6 +74,7 @@ private:
 
     // Scene data.
     Camera camera_;
+    std::vector<gfx::Geometry> geometries;
     gfx::ComputeBufferPtr obj_descriptions_;
     std::map<uint64_t, gfx::ComputeBufferPtr> materials_map_;
     std::shared_ptr<gfx::AccelerationStructure> as_;

@@ -17,8 +17,8 @@
 int main(int argc, char** argv) {
     START_EASYLOGGINGPP(argc, argv);
 
-    uint32_t x_res = 512;
-    uint32_t y_res = 512;
+    uint32_t x_res = 1024;
+    uint32_t y_res = 1024;
     for (uint32_t i = 0; i < argc; i++) {
         std::string arg(argv[i]);
         if (arg.find("--xres=") != std::string::npos) {
@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
     }
 
     auto harness = DemoHarness(x_res, y_res);
-    harness.addDemo(std::move(std::make_shared<PathTracerKHR>()));
+  //  harness.addDemo(std::move(std::make_shared<PathTracerKHR>()));
     harness.addDemo(std::move(std::make_shared<RayTraceTriangleKHR>()));
     harness.addDemo(std::move(std::make_shared<NaivePathTracer>()));
     harness.addDemo(std::move(std::make_shared<VikingRoom>()));

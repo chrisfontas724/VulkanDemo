@@ -63,6 +63,7 @@ uvec2 MWC_SkipImpl_Mod64(uvec2 curr, uint64_t A, uint64_t M, uint64_t distance)
 
 uvec2 MWC_SeedImpl_Mod64(uint64_t A, uint64_t M, uint vecSize, uint vecOffset, uint64_t streamBase, uint64_t streamGap)
 {
+	#ifdef COMPUTE_SHADER
 	// This is an arbitrary constant for starting LCG jumping from. I didn't
 	// want to start from 1, as then you end up with the two or three first values
 	// being a bit poor in ones - once you've decided that, one constant is as
@@ -75,6 +76,9 @@ uvec2 MWC_SeedImpl_Mod64(uint64_t A, uint64_t M, uint vecSize, uint vecOffset, u
 	
 	uint64_t x=MWC_MulMod64(MWC_BASEID, m, M);
 	return uvec2(uint(x/A), uint(x%A));
+#else 
+	return uvec2(0);
+#endif
 }
 
 #endif
