@@ -9,7 +9,6 @@
 namespace {
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
-uint32_t sample = 1;
 
 struct UniformBufferObject {
     alignas(16) glm::mat4 model;
@@ -26,8 +25,6 @@ float degrees = 90;
 void VikingRoom::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, int32_t width, int32_t height) {
     logical_device_ = logical_device;
     num_swap_images_ = num_swap;
-
-    text_renderer_ = std::make_shared<TextRenderer>(logical_device);
 
     cxl::FileSystem fs(cxl::FileSystem::currentExecutablePath() + "/resources/spirv");
     model_shader_ = christalz::ShaderResource::createGraphics(logical_device, fs, "model");
@@ -108,7 +105,6 @@ VikingRoom::~VikingRoom() {
 
     model_.reset();
     model_shader_.reset();
-    text_renderer_.reset();
 }
 
 
@@ -140,11 +136,7 @@ VikingRoom::renderFrame(gfx::CommandBufferPtr command_buffer,
     command_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kOpaque);
     command_buffer->setDepth(/*test*/ true, /*write*/ true);
     command_buffer->drawIndexed(model_->num_indices());
-            
-    // Render Debug Text.
-    std::string text = "sample: " + std::to_string(sample);
-    text_renderer_->renderText(command_buffer, text, {-0.9, 0.8}, {-0.5, 0.9}, text.size());
-    sample++;
+    sample_++;
 
     command_buffer->endRenderPass();
     resolve_textures_[0]->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal); 

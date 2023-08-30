@@ -122,7 +122,7 @@ gfx::ComputeTexturePtr RayTraceTriangleKHR::renderFrame(
                                /*signal_semaphore_count*/1U, 
                                /*signal_semaphores*/&compute_semaphores_[frame]);
     logical_device->getQueue(gfx::Queue::Type::kCompute).submit(submit_info, vk::Fence());
-
+    sample_++;
 
     if (signal_semaphores) {
         signal_semaphores->push_back(compute_semaphores_[frame]);

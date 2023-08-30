@@ -52,6 +52,9 @@ void DemoHarness::initialize(PlatformNativeWindowHandle window, std::vector<cons
         std::make_shared<gfx::LogicalDevice>(physical_device_, surface_, device_extensions);
     CXL_DCHECK(logical_device_);
 
+
+    text_renderer_ = std::make_shared<TextRenderer>(logical_device_);
+
     cxl::FileSystem fs(cxl::FileSystem::currentExecutablePath() + "/resources/spirv");
     post_shader_ = christalz::ShaderResource::createGraphics(logical_device_, fs, "post");
     CXL_DCHECK(post_shader_);
@@ -86,6 +89,11 @@ void DemoHarness::render() {
             command_buffer->bindTexture(0, 0, texture);
             command_buffer->setDepth(/*test*/ false, /*write*/ false);
             command_buffer->draw(3);
+
+            // Render Debug Text.
+            std::string text = "sample: " + std::to_string(current_demo_->sample());
+            text_renderer_->renderText(command_buffer, text, {-0.9, 0.8}, {-0.5, 0.9}, text.size());
+
             command_buffer->endRenderPass();
             command_buffer->endRecording();
 
@@ -212,7 +220,7 @@ DemoHarness::~DemoHarness() {
     }
     render_semaphores_.clear();
 
-
+    text_renderer_.reset();
     post_shader_.reset();
     swap_chain_.reset();
     instance_->destroySurface(surface_);

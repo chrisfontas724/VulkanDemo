@@ -9,7 +9,6 @@ namespace {
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 const int MAX_BOUNCES = 8;
-uint32_t sample = 1;
 
 } // anonymous namespace
 
@@ -25,13 +24,11 @@ NaivePathTracer::~NaivePathTracer() {
 
     render_pass_.reset();
     resolve_texture_.reset();
-    text_renderer_.reset();
 }
 
 void NaivePathTracer::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap, int32_t width, int32_t height) {
     num_swap_images_ = num_swap;
     logical_device_ = logical_device;
-    text_renderer_ = std::make_shared<TextRenderer>(logical_device);
 
     compute_command_buffers_ = gfx::CommandBuffer::create(logical_device, gfx::Queue::Type::kCompute,
                                                           vk::CommandBufferLevel::ePrimary, num_swap);
@@ -321,13 +318,9 @@ gfx::ComputeTexturePtr NaivePathTracer::renderFrame(gfx::CommandBufferPtr comman
     command_buffer->setProgram(resolve_->program());
     command_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kOpaque);
     command_buffer->bindInputAttachment(0, 0, accum_texture_);
-    command_buffer->pushConstants(sample);
+    command_buffer->pushConstants(sample_);
     command_buffer->draw(3);
-
-    // Render Debug Text.
-    std::string text = "sample: " + std::to_string(sample);
-    text_renderer_->renderText(command_buffer, text, {-0.9, 0.8}, {-0.5, 0.9}, text.size());
-    sample++;
+    sample_++;
 
     command_buffer->endRenderPass();
     resolve_texture_->transitionImageLayout(*command_buffer.get(), vk::ImageLayout::eShaderReadOnlyOptimal); 

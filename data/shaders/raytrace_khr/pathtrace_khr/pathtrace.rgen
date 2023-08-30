@@ -73,9 +73,11 @@ void main() {
 
   vec4 accum_value = imageLoad(back_buffer, ivec2(gl_LaunchIDEXT.xy));
 
-  for (uint i = 0; i < 2; i++) {
-    traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, world_origin.xyz, tmin, direction.xyz, tmax, 0);
-
+  for (uint i = 0; i < 8; i++) {
+    if (payload.hitWeight != vec3(0)) {
+        traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, world_origin.xyz, tmin, direction.xyz, tmax, 0);
+    }
+  
     world_origin.xyz = payload.origin;
     direction.xyz = payload.direction;
   }

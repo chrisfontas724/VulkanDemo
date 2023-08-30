@@ -22,9 +22,12 @@ public:
 
     virtual std::string name() = 0;
 
+    uint32_t sample() const { return sample_; }
+
 protected:
     gfx::LogicalDeviceWeakPtr logical_device_;
     uint32_t width_, height_, num_swap_images_;
+    uint32_t sample_ = 1;
 };
 
 #endif // DEMO_HPP_

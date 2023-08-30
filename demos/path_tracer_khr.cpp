@@ -317,8 +317,8 @@ gfx::ComputeTexturePtr PathTracerKHR::renderFrame(
     compute_buffer->pushConstants(camera_.sensor_height, 72u);
     compute_buffer->pushConstants(width_, 76u);
     compute_buffer->pushConstants(height_, 80u);
-    compute_buffer->pushConstants(sample, 84u);
-    sample++;
+    compute_buffer->pushConstants(sample_, 84u);
+    sample_++;
 
     compute_buffer->traceRays(width_, height_);
 	

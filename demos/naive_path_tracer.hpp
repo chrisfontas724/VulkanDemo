@@ -134,9 +134,6 @@ private:
 
     Camera camera_;
     std::vector<Mesh> meshes_;
-
-    std::shared_ptr<TextRenderer> text_renderer_;
-
     gfx::RenderPassInfo render_pass_;
 
     std::shared_ptr<christalz::ShaderResource> mwc64x_seeder_;

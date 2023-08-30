@@ -7,6 +7,7 @@
 
 #include "demo.hpp"
 #include "src/shader_resource.hpp"
+#include "src/text_renderer.hpp"
 
 #include <VulkanWrappers/logical_device.hpp>
 #include <VulkanWrappers/render_pass.hpp>
@@ -71,6 +72,9 @@ private:
     std::shared_ptr<Demo> current_demo_ = nullptr;
     std::thread render_thread_;
     std::atomic<bool> should_render_ = false;
+
+    // Text renderer
+    std::shared_ptr<TextRenderer> text_renderer_;
 };
 
 #endif // DEMO_HARNESS_HPP_
