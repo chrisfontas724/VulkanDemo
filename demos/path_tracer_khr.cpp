@@ -28,6 +28,46 @@ std::shared_ptr<gfx::ShaderModule> getModule(gfx::LogicalDevicePtr device,
 }
 
 
+void readObjFile(const std::string& filename, std::vector<float>& positions, std::vector<uint32_t>& indices) {
+   
+    std::string path = cxl::FileSystem::currentExecutablePath() + "/resources/models/" + filename;
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file: " << path << std::endl;
+        return;
+    }
+
+    std::string line;
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        std::string type;
+        iss >> type;
+
+        if (type == "v") {
+            float x, y, z;
+            iss >> x >> y >> z;
+            positions.push_back(x);
+            positions.push_back(y);
+            positions.push_back(z);
+        } else if (type == "f") {
+            uint32_t idx1, idx2, idx3;
+            iss >> idx1 >> idx2 >> idx3;
+            indices.push_back(idx1 - 1); // OBJ indices are 1-based
+            indices.push_back(idx2 - 1);
+            indices.push_back(idx3 - 1);
+        }
+    }
+
+    // Do Checks.
+    CXL_DCHECK(positions.size() % 3 == 0);
+    CXL_DCHECK(indices.size( ) % 3 == 0);
+    for (auto ind : indices) {
+        CXL_DCHECK(ind < positions.size() / 3) << ind << " " << positions.size() / 3;
+    }
+
+    file.close();
+}
+
 } // anonymous namespace
 
 
@@ -159,77 +199,86 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
 
 
     // Tall box - White
-    geometries.push_back(createGeometry(
-                        logical_device,
-                        {423.0, 330.0, 247.0,
-                        265.0, 330.0, 296.0,
-                        314.0, 330.0, 456.0,
-                        472.0, 330.0, 406.0,
+    // geometries.push_back(createGeometry(
+    //                     logical_device,
+    //                     {423.0, 330.0, 247.0,
+    //                     265.0, 330.0, 296.0,
+    //                     314.0, 330.0, 456.0,
+    //                     472.0, 330.0, 406.0,
 
-                        423.0,   0.0, 247.0,
-                        423.0, 330.0, 247.0,
-                        472.0, 330.0, 406.0,
-                        472.0,   0.0, 406.0,
+    //                     423.0,   0.0, 247.0,
+    //                     423.0, 330.0, 247.0,
+    //                     472.0, 330.0, 406.0,
+    //                     472.0,   0.0, 406.0,
 
-                        472.0,   0.0, 406.0,
-                        472.0, 330.0, 406.0,
-                        314.0, 330.0, 456.0,
-                        314.0,   0.0, 456.0,
+    //                     472.0,   0.0, 406.0,
+    //                     472.0, 330.0, 406.0,
+    //                     314.0, 330.0, 456.0,
+    //                     314.0,   0.0, 456.0,
 
-                        314.0,   0.0, 456.0,
-                        314.0, 330.0, 456.0,
-                        265.0, 330.0, 296.0,
-                        265.0,   0.0, 296.0,
+    //                     314.0,   0.0, 456.0,
+    //                     314.0, 330.0, 456.0,
+    //                     265.0, 330.0, 296.0,
+    //                     265.0,   0.0, 296.0,
 
-                        265.0,   0.0, 296.0,
-                        265.0, 330.0, 296.0,
-                        423.0, 330.0, 247.0,
-                        423.0,   0.0, 247.0},
+    //                     265.0,   0.0, 296.0,
+    //                     265.0, 330.0, 296.0,
+    //                     423.0, 330.0, 247.0,
+    //                     423.0,   0.0, 247.0},
 
-                        {0, 1, 2, 0, 2, 3,
-                        4, 5, 6, 4, 6, 7,
-                        8, 9, 10, 8, 10, 11,
-                        12, 13, 14, 12, 14, 15,
-                        16, 17, 18, 16, 18, 19},
+    //                     {0, 1, 2, 0, 2, 3,
+    //                     4, 5, 6, 4, 6, 7,
+    //                     8, 9, 10, 8, 10, 11,
+    //                     12, 13, 14, 12, 14, 15,
+    //                     16, 17, 18, 16, 18, 19},
 
-                        Material(glm::vec4(0.7))));
+    //                     Material(glm::vec4(0.7))));
 
 
-    // Short box - White
-    geometries.push_back(createGeometry(
-                        logical_device,
-                        {130.0, 165.0, 65.0,
-                        82.0, 165.0, 225.0,
-                        240.0, 165.0, 272.0,
-                        290.0, 165.0, 114.0,
+    // // Short box - White
+    // geometries.push_back(createGeometry(
+    //                     logical_device,
+    //                     {130.0, 165.0, 65.0,
+    //                     82.0, 165.0, 225.0,
+    //                     240.0, 165.0, 272.0,
+    //                     290.0, 165.0, 114.0,
 
-                        290.0, 0.0, 114.0,
-                        290.0, 165.0, 114.0,
-                        240.0, 165.0, 272.0,
-                        240.0,   0.0, 272.0,
+    //                     290.0, 0.0, 114.0,
+    //                     290.0, 165.0, 114.0,
+    //                     240.0, 165.0, 272.0,
+    //                     240.0,   0.0, 272.0,
 
-                        130.0,   0.0,  65.0,
-                        130.0, 165.0,  65.0,
-                        290.0, 165.0, 114.0,
-                        290.0,   0.0, 114.0,
+    //                     130.0,   0.0,  65.0,
+    //                     130.0, 165.0,  65.0,
+    //                     290.0, 165.0, 114.0,
+    //                     290.0,   0.0, 114.0,
 
-                        82.0,   0.0, 225.0,
-                        82.0, 165.0, 225.0,
-                        130.0, 165.0,  65.0,
-                        130.0,   0.0,  65.0,
+    //                     82.0,   0.0, 225.0,
+    //                     82.0, 165.0, 225.0,
+    //                     130.0, 165.0,  65.0,
+    //                     130.0,   0.0,  65.0,
 
-                        240.0,   0.0, 272.0,
-                        240.0, 165.0, 272.0,
-                        82.0, 165.0, 225.0,
-                        82.0,   0.0, 225.0},
+    //                     240.0,   0.0, 272.0,
+    //                     240.0, 165.0, 272.0,
+    //                     82.0, 165.0, 225.0,
+    //                     82.0,   0.0, 225.0},
 
-                        {0, 1, 2, 0, 2, 3,
-                        4, 5, 6, 4, 6, 7,
-                        8, 9, 10, 8, 10, 11,
-                        12, 13, 14, 12, 14, 15,
-                        16, 17, 18, 16, 18, 19},
+    //                     {0, 1, 2, 0, 2, 3,
+    //                     4, 5, 6, 4, 6, 7,
+    //                     8, 9, 10, 8, 10, 11,
+    //                     12, 13, 14, 12, 14, 15,
+    //                     16, 17, 18, 16, 18, 19},
 
-                        Material(glm::vec4(0.7))));
+    //                     Material(glm::vec4(0.7))));
+    
+    
+    // Bunny
+    std::vector<float> bunny_pos;
+    std::vector<uint32_t> bunny_indices;
+    readObjFile("lucy_resized.obj", bunny_pos, bunny_indices);
+    CXL_LOG(INFO) << "MODEL VERTS: " << bunny_pos.size();
+    CXL_LOG(INFO) << "MODEL INDICES: " << bunny_indices.size();
+    geometries.push_back(createGeometry(logical_device, bunny_pos, bunny_indices, Material(glm::vec4(0.8))));
 
 
     std::vector<gfx::Instance> instances;
@@ -239,23 +288,53 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
         instances.push_back(instance);
     }
 
+    // Duplicate lucy
+    gfx::Instance instance;
+    instance.geometryID = geometries.size();
+    instances.push_back(instance);
+
+ //   Bunny params
+ //   glm::vec3 scaleFactors(2000.0f, 2000.f, 2000.f);
+ //   glm::vec3 translation(250, -80, 300);
+
+    // Lucy params
+    {
+        glm::vec3 scaleFactors(210.0f, 210.f, 210.f);
+        glm::vec3 translation(410, 0, 250);
+        glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), scaleFactors);
+        glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), translation);
+        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 finalMatrix = translationMatrix * rotationMatrix * scaleMatrix;
+        instances[instances.size()-2].world_transform = finalMatrix;
+    }
+    {
+        glm::vec3 scaleFactors(210.0f, 210.f, 210.f);
+        glm::vec3 translation(160, 0, 320);
+        glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), scaleFactors);
+        glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), translation);
+        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 finalMatrix = translationMatrix * rotationMatrix * scaleMatrix;
+        instances[instances.size()-1].world_transform = finalMatrix;
+    }
+
     std::vector<ObjDesc> obj_descs;
     uint32_t k = 0;
     for (auto instance : instances) {
         ObjDesc desc;
         desc.materialAddress = materials_map_[instance.geometryID]->device_address();
-        desc.indexAddress = geometries[k].indices->device_address();
-        desc.vertexAddress = geometries[k].attributes[gfx::VTX_POS]->device_address();
+        desc.indexAddress = geometries[instance.geometryID-1].indices->device_address();
+        desc.vertexAddress = geometries[instance.geometryID-1].attributes[gfx::VTX_POS]->device_address();
         obj_descs.push_back(desc);
         k++;
     }                         
-
 
     obj_descriptions_ = gfx::ComputeBuffer::createFromVector(logical_device, obj_descs, vk::BufferUsageFlagBits::eStorageBuffer);
 
     as_ = std::make_shared<gfx::AccelerationStructure>(logical_device);
     as_->buildTopLevel(instances, geometries);
     CXL_DCHECK(as_);
+
+    CXL_LOG(INFO) << "Made the AS!";
 
     // Random seeds
     cxl::FileSystem fs(cxl::FileSystem::currentExecutablePath() + "/resources/spirv");

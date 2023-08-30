@@ -75,6 +75,7 @@ private:
     // Scene data.
     Camera camera_;
     std::vector<gfx::Geometry> geometries;
+
     gfx::ComputeBufferPtr obj_descriptions_;
     std::map<uint64_t, gfx::ComputeBufferPtr> materials_map_;
     std::shared_ptr<gfx::AccelerationStructure> as_;
