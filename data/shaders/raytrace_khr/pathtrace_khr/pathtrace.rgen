@@ -7,10 +7,12 @@
 #include "sampling/sampling.comp"
 
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
-layout(binding = 1, set = 0, rgba32f) uniform image2D  back_buffer;
-layout(binding = 2, set = 0, rgba32f) uniform image2D front_buffer;
-layout(binding = 3, set = 0, rgba8)   uniform image2D  resolve_texture;
-layout(binding = 4, set = 0) buffer rngs { mwc64x_state_t seeds[]; };
+
+
+layout(binding = 1, set = 1, rgba32f) uniform image2D  back_buffer;
+layout(binding = 2, set = 1, rgba32f) uniform image2D front_buffer;
+layout(binding = 3, set = 1, rgba8)   uniform image2D  resolve_texture;
+layout(binding = 4, set = 1) buffer rngs { mwc64x_state_t seeds[]; };
 
 
 layout(std140, push_constant) uniform PushBlock {

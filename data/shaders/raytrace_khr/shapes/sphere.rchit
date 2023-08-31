@@ -34,8 +34,7 @@ struct Payload{
 };
 
 layout(buffer_reference, scalar) buffer ObjMaterial { Material m; }; // Current object material
-layout(set = 1, binding = 0, scalar) buffer ObjDesc_ { ObjDesc i[]; } objDesc;
-
+layout(set = 2, binding = 0, scalar) buffer ObjDesc_ { ObjDesc i[]; } objDesc;
 
 
 layout(location = 0) rayPayloadInEXT Payload payload;

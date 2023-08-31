@@ -232,6 +232,7 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
     std::vector<gfx::GeomInstance> instances;
     for (uint32_t i = 1; i <= geometries.size(); i++) {
         gfx::GeomInstance instance;
+        instance.identifier = i;
         instance.geometryID = i;
         instances.push_back(instance);
     }
@@ -239,6 +240,7 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
 
     // Duplicate lucy
     gfx::GeomInstance instance;
+    instance.identifier = geometries.size();
     instance.geometryID = geometries.size();
     instances.push_back(instance);
 
@@ -269,18 +271,17 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
     // Create sphere.
     geometries.push_back(createBBox(logical_device, Material(glm::vec4(0), glm::vec4(50))));
     {
-        gfx::GeomInstance instance;
-        instance.geometryID = geometries[geometries.size()-1].identifier;
+        sphere_.identifier = instance.geometryID;
+        sphere_.geometryID = geometries[geometries.size()-1].identifier;
         glm::vec3 scaleFactors(30, 30, 30);
-        glm::vec3 translation(265, 25, 275);
+        glm::vec3 translation(265, 510, 230);
         glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), scaleFactors);
         glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), translation);
         glm::mat4 finalMatrix = translationMatrix * scaleMatrix;
-        instance.world_transform = finalMatrix;
-        instance.shaderTableOffset = shader_manager_->index_for_hit_group(sphere_hit_group);
-        instances.push_back(instance);
+        sphere_.world_transform = finalMatrix;
+        sphere_.shaderTableOffset = shader_manager_->index_for_hit_group(sphere_hit_group);
+        instances.push_back(sphere_);
     }
-
 
     std::vector<ObjDesc> obj_descs;
     uint32_t k = 0;
@@ -336,19 +337,31 @@ void PathTracerKHR::resize(uint32_t width, uint32_t height) {
 
 void PathTracerKHR::processEvent(display::InputEvent event) {
     if (event.type == display::InputEventType::KeyPressed && event.key == display::KeyCode::I) {
-        // Apply translation to the existing matrix
         camera_.matrix = glm::translate(camera_.matrix, glm::vec3(0,0,1));
         clear_image_ = true;
     } else if (event.type == display::InputEventType::KeyPressed && event.key == display::KeyCode::K) {
-
+        camera_.matrix = glm::translate(camera_.matrix, glm::vec3(0,0,-1));
+        clear_image_ = true;
     } else if (event.type == display::InputEventType::KeyPressed && event.key == display::KeyCode::J) {
-
+        camera_.matrix = glm::translate(camera_.matrix, glm::vec3(1,0,0));
+        clear_image_ = true;
     } else if (event.type == display::InputEventType::KeyPressed && event.key == display::KeyCode::L) {
-
+        camera_.matrix = glm::translate(camera_.matrix, glm::vec3(-1,0,0));
+        clear_image_ = true;
     } else if (event.type == display::InputEventType::KeyPressed && event.key == display::KeyCode::O) {
-
+        camera_.matrix = glm::translate(camera_.matrix, glm::vec3(0,1,0));
+        clear_image_ = true;
     } else if (event.type == display::InputEventType::KeyPressed && event.key == display::KeyCode::P) {
-
+        camera_.matrix = glm::translate(camera_.matrix, glm::vec3(0,-1,0));
+        clear_image_ = true;
+    } else if (event.type == display::InputEventType::KeyPressed && event.key == display::KeyCode::Y) {
+        // sphere_.world_transform = glm::translate(sphere_.world_transform, glm::vec3(0,1,0));
+        // as_->set_matrix(sphere_.identifier, sphere_.world_transform);
+        // clear_image_ = true;
+    } else if (event.type == display::InputEventType::KeyPressed && event.key == display::KeyCode::H) {
+        // sphere_.world_transform = glm::translate(sphere_.world_transform, glm::vec3(0,-1,0));
+        // as_->set_matrix(sphere_.identifier, sphere_.world_transform);
+        // clear_image_ = true;
     }
 };
 
@@ -381,11 +394,11 @@ gfx::ComputeTexturePtr PathTracerKHR::renderFrame(
 
     // Set descriptors.
     compute_buffer->bindAccelerationStructure(0,0, as_);
-    compute_buffer->bindStorageImage(0, 1, accum_textures_[texture_index]);
-    compute_buffer->bindStorageImage(0, 2, accum_textures_[(texture_index + 1) % 2]);
-    compute_buffer->bindStorageImage(0, 3, resolve_texture_);
-    compute_buffer->bindUniformBuffer(0, 4, random_seeds_[image_index]);
-    compute_buffer->bindUniformBuffer(1, 0, obj_descriptions_);
+    compute_buffer->bindStorageImage(1, 1, accum_textures_[texture_index]);
+    compute_buffer->bindStorageImage(1, 2, accum_textures_[(texture_index + 1) % 2]);
+    compute_buffer->bindStorageImage(1, 3, resolve_texture_);
+    compute_buffer->bindUniformBuffer(1, 4, random_seeds_[image_index]);
+    compute_buffer->bindUniformBuffer(2, 0, obj_descriptions_);
     texture_index = (texture_index + 1) % 2;
 
     // set push constants.

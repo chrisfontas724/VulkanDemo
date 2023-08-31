@@ -90,6 +90,7 @@ private:
     gfx::Geometry createBBox(const gfx::LogicalDevicePtr& logical_device,
                                 const Material& material);
 
+    gfx::GeomInstance sphere_;
     bool clear_image_ = false;
 };
 
