@@ -33,6 +33,7 @@ file(GLOB_RECURSE SHADER_FILES
     "${SHADER_SOURCE_DIR}/raytrace_khr/*.rchit"
     "${SHADER_SOURCE_DIR}/raytrace_khr/*.rgen"
     "${SHADER_SOURCE_DIR}/raytrace_khr/*.rmiss"
+    "${SHADER_SOURCE_DIR}/raytrace_khr/*.rint"
 )
 
 # Iterate over shader files and add custom commands to compile them

@@ -42,7 +42,6 @@ layout(buffer_reference, scalar) buffer Indices { int i[]; };       // Triangle 
 layout(buffer_reference, scalar) buffer Vertices { float v[]; };       // Positions of an object
 
 
-layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 layout(set = 1, binding = 0, scalar) buffer ObjDesc_ { ObjDesc i[]; } objDesc;
 
 
@@ -75,7 +74,6 @@ void main()
   //const vec3 nrm      = v0.nrm * barycentrics.x + v1.nrm * barycentrics.y + v2.nrm * barycentrics.z;
   const vec3 nrm = normalize(cross(v0-v1, v0-v2));
   const vec3 worldNrm = normalize(vec3(nrm * gl_WorldToObjectEXT));  // Transforming the normal to world space
-
 
   // Calculate new ray here
   float xi1 = uniformRandomVariable(payload.seed); 
@@ -118,10 +116,4 @@ void main()
 
   payload.origin = new_pos;
   payload.direction = new_dir;
-
-  float tmin     = 0.001;
-  float tmax     = 10000.0;
-
-  //payload.hitValue = material.m.diffuse_color.xyz * abs(dot(worldNrm, gl_WorldRayDirectionEXT));
-  // traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, new_pos, tmin, new_dir, tmax, 0);
 }

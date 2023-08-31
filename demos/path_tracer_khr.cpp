@@ -70,13 +70,33 @@ void readObjFile(const std::string& filename, std::vector<float>& positions, std
 
 } // anonymous namespace
 
+static uint64_t identifier = 1;
 
+gfx::Geometry PathTracerKHR::createBBox(const gfx::LogicalDevicePtr& logical_device,
+                                          const Material& material) {
+    VkAabbPositionsKHR bbox;
+    bbox.minX = -1;
+    bbox.minY = -1;
+    bbox.minZ = -1;
+    bbox.maxX = 1;
+    bbox.maxY = 1;
+    bbox.maxZ = 1;
+    gfx::Geometry sphere;
+    sphere.identifier = identifier++;
+    sphere.type = gfx::GeometryType::eAABB;
+	std::vector<VkAabbPositionsKHR> aabbs = {bbox};
+	sphere.bbox = gfx::ComputeBuffer::createFromVector(logical_device, aabbs, vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eAccelerationStructureBuildInputReadOnlyKHR);
+    
+    auto mat_buf = gfx::ComputeBuffer::createHostAccessableBuffer(logical_device, sizeof(Material), vk::BufferUsageFlagBits::eShaderDeviceAddress);
+    mat_buf->write(&material, 1);
+    materials_map_[sphere.identifier] = mat_buf;
+    return sphere;
+}
 
 gfx::Geometry PathTracerKHR::createGeometry(const gfx::LogicalDevicePtr& logical_device, 
                             const std::vector<float>& positions, 
                             const std::vector<uint32_t>& indices,
                             const Material& material) {
-    static uint64_t identifier = 1;
     gfx::Geometry geometry; 
     vk::BufferUsageFlags flags = vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eAccelerationStructureBuildInputReadOnlyKHR;
     geometry.attributes[gfx::VTX_POS] = gfx::ComputeBuffer::createFromVector(logical_device, positions, flags);
@@ -118,15 +138,22 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
     auto raygen = getModule(logical_device, "pathtrace.rgen.spv", vk::ShaderStageFlagBits::eRaygenKHR);
     auto closest = getModule(logical_device, "pathtrace.rchit.spv", vk::ShaderStageFlagBits::eClosestHitKHR);
     auto miss = getModule(logical_device, "pathtrace.rmiss.spv", vk::ShaderStageFlagBits::eMissKHR);
+
+    auto sphere_intersect = getModule(logical_device, "sphere.rint.spv", vk::ShaderStageFlagBits::eIntersectionKHR);
+    auto sphere_chit = getModule(logical_device, "sphere.rchit.spv", vk::ShaderStageFlagBits::eClosestHitKHR);
+
     CXL_DCHECK(raygen);
     CXL_DCHECK(closest);
     CXL_DCHECK(miss);
 
     auto raygen_id = shader_manager_->set_raygen_shader(raygen);
     auto closest_id = shader_manager_->add_closest_hit_shader(closest);
+    auto sphere_closest_id = shader_manager_->add_closest_hit_shader(sphere_chit);
+    auto sphere_intersect_id = shader_manager_->add_intersection_shader(sphere_intersect);
     auto miss_id = shader_manager_->add_miss_shader(miss);
 
     auto hit_group_id = shader_manager_->create_hit_group(/*any*/10000, closest_id, /*intersect*/10000);
+    auto sphere_hit_group = shader_manager_->create_hit_group(/*any*/10000, sphere_closest_id, sphere_intersect_id);
 
     shader_manager_->build();
 
@@ -137,14 +164,14 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
     camera_.matrix = glm::translate(glm::mat4(1), glm::vec3(278, 273, -800));
 
     // Light
-    geometries.push_back(createGeometry(
-                        logical_device, 
-                        {343.0, 548.75, 227.0,
-                        343.0, 548.75, 332.0,
-                        213.0, 548.75, 332.0,
-                        213.0, 548.75, 227.0},
-                        {0,1,2,0,2,3}, 
-                        Material(glm::vec4(0,0,0,0), glm::vec4(50,50,50,1)))); 
+    // geometries.push_back(createGeometry(
+    //                     logical_device, 
+    //                     {343.0, 548.75, 227.0,
+    //                     343.0, 548.75, 332.0,
+    //                     213.0, 548.75, 332.0,
+    //                     213.0, 548.75, 227.0},
+    //                     {0,1,2,0,2,3}, 
+    //                     Material(glm::vec4(0,0,0,0), glm::vec4(50,50,50,1)))); 
 
 
     // Ceiling - White
@@ -197,106 +224,27 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
                         {0,1,2,0,2,3}, 
                         Material(glm::vec4(0.9, 0.9, 0.9, 1.0))));
 
-
-    // Tall box - White
-    // geometries.push_back(createGeometry(
-    //                     logical_device,
-    //                     {423.0, 330.0, 247.0,
-    //                     265.0, 330.0, 296.0,
-    //                     314.0, 330.0, 456.0,
-    //                     472.0, 330.0, 406.0,
-
-    //                     423.0,   0.0, 247.0,
-    //                     423.0, 330.0, 247.0,
-    //                     472.0, 330.0, 406.0,
-    //                     472.0,   0.0, 406.0,
-
-    //                     472.0,   0.0, 406.0,
-    //                     472.0, 330.0, 406.0,
-    //                     314.0, 330.0, 456.0,
-    //                     314.0,   0.0, 456.0,
-
-    //                     314.0,   0.0, 456.0,
-    //                     314.0, 330.0, 456.0,
-    //                     265.0, 330.0, 296.0,
-    //                     265.0,   0.0, 296.0,
-
-    //                     265.0,   0.0, 296.0,
-    //                     265.0, 330.0, 296.0,
-    //                     423.0, 330.0, 247.0,
-    //                     423.0,   0.0, 247.0},
-
-    //                     {0, 1, 2, 0, 2, 3,
-    //                     4, 5, 6, 4, 6, 7,
-    //                     8, 9, 10, 8, 10, 11,
-    //                     12, 13, 14, 12, 14, 15,
-    //                     16, 17, 18, 16, 18, 19},
-
-    //                     Material(glm::vec4(0.7))));
-
-
-    // // Short box - White
-    // geometries.push_back(createGeometry(
-    //                     logical_device,
-    //                     {130.0, 165.0, 65.0,
-    //                     82.0, 165.0, 225.0,
-    //                     240.0, 165.0, 272.0,
-    //                     290.0, 165.0, 114.0,
-
-    //                     290.0, 0.0, 114.0,
-    //                     290.0, 165.0, 114.0,
-    //                     240.0, 165.0, 272.0,
-    //                     240.0,   0.0, 272.0,
-
-    //                     130.0,   0.0,  65.0,
-    //                     130.0, 165.0,  65.0,
-    //                     290.0, 165.0, 114.0,
-    //                     290.0,   0.0, 114.0,
-
-    //                     82.0,   0.0, 225.0,
-    //                     82.0, 165.0, 225.0,
-    //                     130.0, 165.0,  65.0,
-    //                     130.0,   0.0,  65.0,
-
-    //                     240.0,   0.0, 272.0,
-    //                     240.0, 165.0, 272.0,
-    //                     82.0, 165.0, 225.0,
-    //                     82.0,   0.0, 225.0},
-
-    //                     {0, 1, 2, 0, 2, 3,
-    //                     4, 5, 6, 4, 6, 7,
-    //                     8, 9, 10, 8, 10, 11,
-    //                     12, 13, 14, 12, 14, 15,
-    //                     16, 17, 18, 16, 18, 19},
-
-    //                     Material(glm::vec4(0.7))));
-    
-    
-    // Bunny
     std::vector<float> bunny_pos;
     std::vector<uint32_t> bunny_indices;
     readObjFile("lucy_resized.obj", bunny_pos, bunny_indices);
-    CXL_LOG(INFO) << "MODEL VERTS: " << bunny_pos.size();
-    CXL_LOG(INFO) << "MODEL INDICES: " << bunny_indices.size();
     geometries.push_back(createGeometry(logical_device, bunny_pos, bunny_indices, Material(glm::vec4(0.8))));
 
-
-    std::vector<gfx::Instance> instances;
+    std::vector<gfx::GeomInstance> instances;
     for (uint32_t i = 1; i <= geometries.size(); i++) {
-        gfx::Instance instance;
+        gfx::GeomInstance instance;
         instance.geometryID = i;
         instances.push_back(instance);
     }
 
+
     // Duplicate lucy
-    gfx::Instance instance;
+    gfx::GeomInstance instance;
     instance.geometryID = geometries.size();
     instances.push_back(instance);
 
  //   Bunny params
  //   glm::vec3 scaleFactors(2000.0f, 2000.f, 2000.f);
  //   glm::vec3 translation(250, -80, 300);
-
     // Lucy params
     {
         glm::vec3 scaleFactors(210.0f, 210.f, 210.f);
@@ -317,13 +265,33 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
         instances[instances.size()-1].world_transform = finalMatrix;
     }
 
+
+    // Create sphere.
+    geometries.push_back(createBBox(logical_device, Material(glm::vec4(0), glm::vec4(50))));
+    {
+        gfx::GeomInstance instance;
+        instance.geometryID = geometries[geometries.size()-1].identifier;
+        glm::vec3 scaleFactors(30, 30, 30);
+        glm::vec3 translation(250, 20, 275);
+        glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), scaleFactors);
+        glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), translation);
+        glm::mat4 finalMatrix = translationMatrix * scaleMatrix;
+        instance.world_transform = finalMatrix;
+        instance.shaderTableOffset = shader_manager_->index_for_hit_group(sphere_hit_group);
+        instances.push_back(instance);
+    }
+
+
     std::vector<ObjDesc> obj_descs;
     uint32_t k = 0;
     for (auto instance : instances) {
         ObjDesc desc;
         desc.materialAddress = materials_map_[instance.geometryID]->device_address();
-        desc.indexAddress = geometries[instance.geometryID-1].indices->device_address();
-        desc.vertexAddress = geometries[instance.geometryID-1].attributes[gfx::VTX_POS]->device_address();
+        auto geometry = geometries[instance.geometryID-1];
+        if (geometry.type == gfx::GeometryType::eTriangles) {
+            desc.indexAddress = geometries[instance.geometryID-1].indices->device_address();
+            desc.vertexAddress = geometries[instance.geometryID-1].attributes[gfx::VTX_POS]->device_address();
+        }
         obj_descs.push_back(desc);
         k++;
     }                         
@@ -333,7 +301,6 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
     as_ = std::make_shared<gfx::AccelerationStructure>(logical_device);
     as_->buildTopLevel(instances, geometries);
     CXL_DCHECK(as_);
-
     CXL_LOG(INFO) << "Made the AS!";
 
     // Random seeds
@@ -360,6 +327,7 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
     compute_buffer->endRecording();
     logical_device->getQueue(gfx::Queue::Type::kCompute).submit(compute_buffer);
     logical_device->waitIdle();
+    CXL_LOG(INFO) << "Finished setup!";
 }
 
 void PathTracerKHR::resize(uint32_t width, uint32_t height) {

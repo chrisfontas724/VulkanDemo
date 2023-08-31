@@ -1,0 +1,31 @@
+#version 460
+#extension GL_EXT_ray_tracing : require
+
+float intersect(vec3 O, vec3 D) {    
+    vec3 Ecc = O;
+    float A = dot(D, D);
+    float B = dot(D, Ecc);
+    float C = dot(Ecc, Ecc)- 1.0;
+    
+    float discriminant = (B*B-A*C);
+    if (discriminant < 0.0) {
+        return -1.0;
+    }
+    
+    float sqrtDisc = sqrt(discriminant);
+    float t = (-B - sqrtDisc)/A;
+    if (t <  0.0)  {
+        float t2 = (-B + sqrtDisc) / A;
+        return (t2 < 0.0) ? -1.0 : t2;
+    }
+    else return t;
+}
+
+
+void main() {
+    float hit = intersect(gl_ObjectRayOriginEXT, gl_ObjectRayDirectionEXT);
+
+    if (hit > 0) {
+        reportIntersectionEXT(hit, 0);
+    }
+}

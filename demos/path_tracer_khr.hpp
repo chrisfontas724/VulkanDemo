@@ -85,6 +85,8 @@ private:
                                 const std::vector<uint32_t>& indices,
                                 const Material& material);
 
+    gfx::Geometry createBBox(const gfx::LogicalDevicePtr& logical_device,
+                                const Material& material);
 };
 
 #endif // PATH_TRACER_KHR_HPP_

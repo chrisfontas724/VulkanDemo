@@ -79,10 +79,11 @@ void RayTraceTriangleKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t nu
     geometry.identifier = 5;
     as_ = std::make_shared<gfx::AccelerationStructure>(logical_device);
 
-    gfx::Instance instance;
+    gfx::GeomInstance instance;
     instance.geometryID = geometry.identifier;
     as_->buildTopLevel({instance}, {geometry});
     CXL_DCHECK(as_);
+    CXL_LOG(INFO) << "Finished RT Triangle setup!";
 }
 
 void RayTraceTriangleKHR::resize(uint32_t width, uint32_t height) {
