@@ -272,7 +272,7 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
         gfx::GeomInstance instance;
         instance.geometryID = geometries[geometries.size()-1].identifier;
         glm::vec3 scaleFactors(30, 30, 30);
-        glm::vec3 translation(250, 20, 275);
+        glm::vec3 translation(265, 25, 275);
         glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), scaleFactors);
         glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), translation);
         glm::mat4 finalMatrix = translationMatrix * scaleMatrix;
@@ -333,6 +333,24 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
 void PathTracerKHR::resize(uint32_t width, uint32_t height) {
 }
 
+void PathTracerKHR::processEvent(display::InputEvent event) {
+    if (event.type == display::InputEventType::KeyPressed && event.key == display::KeyCode::I) {
+        // Apply translation to the existing matrix
+        camera_.matrix = glm::translate(camera_.matrix, glm::vec3(0,0,1));
+        clear_image_ = true;
+    } else if (event.type == display::InputEventType::KeyPressed && event.key == display::KeyCode::K) {
+
+    } else if (event.type == display::InputEventType::KeyPressed && event.key == display::KeyCode::J) {
+
+    } else if (event.type == display::InputEventType::KeyPressed && event.key == display::KeyCode::L) {
+
+    } else if (event.type == display::InputEventType::KeyPressed && event.key == display::KeyCode::O) {
+
+    } else if (event.type == display::InputEventType::KeyPressed && event.key == display::KeyCode::P) {
+
+    }
+};
+
 gfx::ComputeTexturePtr PathTracerKHR::renderFrame(
                 gfx::CommandBufferPtr command_buffer, 
                 uint32_t image_index, 
@@ -348,6 +366,13 @@ gfx::ComputeTexturePtr PathTracerKHR::renderFrame(
 
     compute_buffer->reset();
     compute_buffer->beginRecording();
+
+    if (clear_image_) {
+        command_buffer->clearColorImage(accum_textures_[0], {0,0,0,0});
+        command_buffer->clearColorImage(accum_textures_[1], {0,0,0,0});
+        clear_image_ = false;
+        sample_ = 1;
+    }
 
     resolve_texture_->transitionImageLayout(*compute_buffer.get(), vk::ImageLayout::eGeneral);
 

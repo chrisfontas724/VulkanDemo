@@ -37,6 +37,8 @@ public:
     
     std::string name() override { return "RayTraceTriangleKHR"; }
 
+    void processEvent(display::InputEvent event) override {};
+
 private:
 
     std::shared_ptr<gfx::AccelerationStructure> as_;

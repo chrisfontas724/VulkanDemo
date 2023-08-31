@@ -33,6 +33,7 @@ public:
     std::string name() override { return "NaivePathTracer"; }
 
 
+    void processEvent(display::InputEvent event) override {}
 
 private:
 

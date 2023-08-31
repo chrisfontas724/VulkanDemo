@@ -31,6 +31,8 @@ public:
 
     std::string name() override { return "Viking Room"; }
 
+    void processEvent(display::InputEvent event) override {};
+
 private:
     std::vector<gfx::RenderPassInfo> render_passes_;
 

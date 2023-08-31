@@ -29,6 +29,9 @@ public:
                 std::vector<vk::PipelineStageFlags>* signal_wait_stages = nullptr) override;
     
     std::string name() override { return "Multipass Example"; }
+
+    void processEvent(display::InputEvent event) override {};
+
 private:
 
     std::vector<gfx::RenderPassInfo> render_passes_;

@@ -130,6 +130,9 @@ void DemoHarness::processInputEvents() {
             index++;
             index %= demos_.size();
             current_demo_ = demos_[index];
+            platform_->set_title(current_demo_->name());
+        } else {
+            current_demo_->processEvent(event);
         }
     }
 }
@@ -197,6 +200,7 @@ void DemoHarness::WindowDelegate::onStart(PlatformNativeWindowHandle window, std
     harness_->initialize(window, extensions, width, height);
     harness_->render_thread_ = std::thread([this]{
         harness_->current_demo_ = harness_->demos_[0];
+        harness_->platform_->set_title(harness_->current_demo_->name());
         harness_->should_render_ = true;
         harness_->render();
     });

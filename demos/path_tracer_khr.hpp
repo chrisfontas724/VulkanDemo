@@ -33,6 +33,8 @@ public:
     
     std::string name() override { return "PathTracerKHR"; }
 
+    void processEvent(display::InputEvent event) override;
+
 private:
 
     struct Camera {
@@ -87,6 +89,8 @@ private:
 
     gfx::Geometry createBBox(const gfx::LogicalDevicePtr& logical_device,
                                 const Material& material);
+
+    bool clear_image_ = false;
 };
 
 #endif // PATH_TRACER_KHR_HPP_

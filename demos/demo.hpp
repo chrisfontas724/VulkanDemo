@@ -8,6 +8,7 @@
 #include <string>
 #include <VulkanWrappers/logical_device.hpp>
 #include <VulkanWrappers/swap_chain.hpp>
+#include <Windowing/platform.hpp>
 
 class Demo {
 
@@ -23,6 +24,8 @@ public:
     virtual std::string name() = 0;
 
     uint32_t sample() const { return sample_; }
+
+    virtual void processEvent(display::InputEvent event) = 0;
 
 protected:
     gfx::LogicalDeviceWeakPtr logical_device_;
