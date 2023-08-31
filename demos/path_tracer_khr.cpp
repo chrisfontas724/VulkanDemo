@@ -284,7 +284,7 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
 
     std::vector<ObjDesc> obj_descs;
     uint32_t k = 0;
-    for (auto instance : instances) {
+    for (auto& instance : instances) {
         ObjDesc desc;
         desc.materialAddress = materials_map_[instance.geometryID]->device_address();
         auto geometry = geometries[instance.geometryID-1];
@@ -292,6 +292,7 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
             desc.indexAddress = geometries[instance.geometryID-1].indices->device_address();
             desc.vertexAddress = geometries[instance.geometryID-1].attributes[gfx::VTX_POS]->device_address();
         }
+        instance.custom_index = k;
         obj_descs.push_back(desc);
         k++;
     }                         
@@ -362,7 +363,6 @@ gfx::ComputeTexturePtr PathTracerKHR::renderFrame(
 
     auto compute_buffer = compute_command_buffers_[image_index];
     CXL_DCHECK(compute_buffer);
-
 
     compute_buffer->reset();
     compute_buffer->beginRecording();
