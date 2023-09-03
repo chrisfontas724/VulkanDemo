@@ -91,6 +91,7 @@ private:
                                 const Material& material);
 
     gfx::GeomInstance sphere_;
+    gfx::GeomInstance lucy2_;
     bool clear_image_ = false;
 };
 

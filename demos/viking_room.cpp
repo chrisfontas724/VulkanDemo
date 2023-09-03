@@ -132,7 +132,7 @@ VikingRoom::renderFrame(gfx::CommandBufferPtr command_buffer,
     command_buffer->bindVertexBuffer(model_->vertices());
     command_buffer->bindIndexBuffer(model_->indices());
     command_buffer->bindUniformBuffer(0, 0, ubo_buffer_);
-    command_buffer->bindTexture(0, 1, model_->texture());
+    command_buffer->bindTexture(model_->texture(), 0, 1);
     command_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kOpaque);
     command_buffer->setDepth(/*test*/ true, /*write*/ true);
     command_buffer->drawIndexed(model_->num_indices());

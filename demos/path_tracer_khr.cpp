@@ -73,7 +73,7 @@ void readObjFile(const std::string& filename, std::vector<float>& positions, std
 static uint64_t identifier = 1;
 
 gfx::Geometry PathTracerKHR::createBBox(const gfx::LogicalDevicePtr& logical_device,
-                                          const Material& material) {
+                                        const Material& material) {
     VkAabbPositionsKHR bbox;
     bbox.minX = -1;
     bbox.minY = -1;
@@ -81,16 +81,18 @@ gfx::Geometry PathTracerKHR::createBBox(const gfx::LogicalDevicePtr& logical_dev
     bbox.maxX = 1;
     bbox.maxY = 1;
     bbox.maxZ = 1;
-    gfx::Geometry sphere;
-    sphere.identifier = identifier++;
-    sphere.type = gfx::GeometryType::eAABB;
+    gfx::Geometry bbox_geom;
+    bbox_geom.identifier = identifier++;
+    bbox_geom.type = gfx::GeometryType::eAABB;
+
 	std::vector<VkAabbPositionsKHR> aabbs = {bbox};
-	sphere.bbox = gfx::ComputeBuffer::createFromVector(logical_device, aabbs, vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eAccelerationStructureBuildInputReadOnlyKHR);
-    
+	bbox_geom.bbox = gfx::ComputeBuffer::createFromVector(logical_device, aabbs, vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eAccelerationStructureBuildInputReadOnlyKHR);
+    as_->addGeometry(bbox_geom);
+
     auto mat_buf = gfx::ComputeBuffer::createHostAccessableBuffer(logical_device, sizeof(Material), vk::BufferUsageFlagBits::eShaderDeviceAddress);
     mat_buf->write(&material, 1);
-    materials_map_[sphere.identifier] = mat_buf;
-    return sphere;
+    materials_map_[bbox_geom.identifier] = mat_buf;
+    return bbox_geom;
 }
 
 gfx::Geometry PathTracerKHR::createGeometry(const gfx::LogicalDevicePtr& logical_device, 
@@ -99,12 +101,12 @@ gfx::Geometry PathTracerKHR::createGeometry(const gfx::LogicalDevicePtr& logical
                             const Material& material) {
     gfx::Geometry geometry; 
     vk::BufferUsageFlags flags = vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eAccelerationStructureBuildInputReadOnlyKHR;
-    geometry.attributes[gfx::VTX_POS] = gfx::ComputeBuffer::createFromVector(logical_device, positions, flags);
+    geometry.positions = gfx::ComputeBuffer::createFromVector(logical_device, positions, flags);
     geometry.indices = gfx::ComputeBuffer::createFromVector(logical_device, indices, flags);
-    geometry.flags = gfx::VTX_POS_FLAG;
     geometry.num_indices = indices.size();
     geometry.num_vertices = positions.size() / 3;
     geometry.identifier = identifier++;
+    as_->addGeometry(geometry);
 
     auto mat_buf = gfx::ComputeBuffer::createHostAccessableBuffer(logical_device, sizeof(Material), vk::BufferUsageFlagBits::eShaderDeviceAddress);
     mat_buf->write(&material, 1);
@@ -156,6 +158,7 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
     auto sphere_hit_group = shader_manager_->create_hit_group(/*any*/10000, sphere_closest_id, sphere_intersect_id);
 
     shader_manager_->build();
+    as_ = std::make_shared<gfx::AccelerationStructure>(logical_device);
 
     // Camera
     camera_.sensor_width = 0.025;
@@ -237,12 +240,10 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
         instances.push_back(instance);
     }
 
-
     // Duplicate lucy
-    gfx::GeomInstance instance;
-    instance.identifier = geometries.size();
-    instance.geometryID = geometries.size();
-    instances.push_back(instance);
+    lucy2_.identifier = geometries.size();
+    lucy2_.geometryID = geometries.size();
+    instances.push_back(lucy2_);
 
  //   Bunny params
  //   glm::vec3 scaleFactors(2000.0f, 2000.f, 2000.f);
@@ -267,11 +268,10 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
         instances[instances.size()-1].world_transform = finalMatrix;
     }
 
-
     // Create sphere.
     geometries.push_back(createBBox(logical_device, Material(glm::vec4(0), glm::vec4(50))));
     {
-        sphere_.identifier = instance.geometryID;
+        sphere_.identifier = 9999;
         sphere_.geometryID = geometries[geometries.size()-1].identifier;
         glm::vec3 scaleFactors(30, 30, 30);
         glm::vec3 translation(265, 510, 230);
@@ -291,19 +291,17 @@ void PathTracerKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t num_swap
         auto geometry = geometries[instance.geometryID-1];
         if (geometry.type == gfx::GeometryType::eTriangles) {
             desc.indexAddress = geometries[instance.geometryID-1].indices->device_address();
-            desc.vertexAddress = geometries[instance.geometryID-1].attributes[gfx::VTX_POS]->device_address();
+            desc.vertexAddress = geometries[instance.geometryID-1].positions->device_address();
         }
         instance.custom_index = k;
         obj_descs.push_back(desc);
         k++;
-    }                         
+    }         
 
     obj_descriptions_ = gfx::ComputeBuffer::createFromVector(logical_device, obj_descs, vk::BufferUsageFlagBits::eStorageBuffer);
 
-    as_ = std::make_shared<gfx::AccelerationStructure>(logical_device);
-    as_->buildTopLevel(instances, geometries);
+    as_->build(instances);
     CXL_DCHECK(as_);
-    CXL_LOG(INFO) << "Made the AS!";
 
     // Random seeds
     cxl::FileSystem fs(cxl::FileSystem::currentExecutablePath() + "/resources/spirv");
@@ -355,13 +353,35 @@ void PathTracerKHR::processEvent(display::InputEvent event) {
         camera_.matrix = glm::translate(camera_.matrix, glm::vec3(0,-1,0));
         clear_image_ = true;
     } else if (event.type == display::InputEventType::KeyPressed && event.key == display::KeyCode::Y) {
-        // sphere_.world_transform = glm::translate(sphere_.world_transform, glm::vec3(0,1,0));
-        // as_->set_matrix(sphere_.identifier, sphere_.world_transform);
-        // clear_image_ = true;
+        sphere_.world_transform = glm::translate(sphere_.world_transform, glm::vec3(0,1.0/30.0,0));
+        as_->set_matrix(sphere_.identifier, sphere_.world_transform);
+        clear_image_ = true;
     } else if (event.type == display::InputEventType::KeyPressed && event.key == display::KeyCode::H) {
-        // sphere_.world_transform = glm::translate(sphere_.world_transform, glm::vec3(0,-1,0));
-        // as_->set_matrix(sphere_.identifier, sphere_.world_transform);
-        // clear_image_ = true;
+        sphere_.world_transform = glm::translate(sphere_.world_transform, glm::vec3(0,-1.0/30.0,0));
+        as_->set_matrix(sphere_.identifier, sphere_.world_transform);
+        clear_image_ = true;
+    } else if (event.type == display::InputEventType::KeyPressed && event.key == display::KeyCode::V) {
+        glm::vec3 scaleFactors(210.0f, 210.f, 210.f);
+        glm::vec3 translation(160, 0, 320);
+        glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), scaleFactors);
+        glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), translation);
+        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 finalMatrix = translationMatrix * rotationMatrix * scaleMatrix;
+            
+        lucy2_.world_transform = finalMatrix;
+        as_->set_matrix(lucy2_.identifier, lucy2_.world_transform);
+        clear_image_ = true;
+    } else if (event.type == display::InputEventType::KeyPressed && event.key == display::KeyCode::B) {
+        glm::vec3 scaleFactors(210.0f, 210.f, 210.f);
+        glm::vec3 translation(160, 0, 220);
+        glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), scaleFactors);
+        glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), translation);
+        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 finalMatrix = translationMatrix * rotationMatrix * scaleMatrix;
+        
+        lucy2_.world_transform = finalMatrix;
+        as_->set_matrix(lucy2_.identifier, lucy2_.world_transform);
+        clear_image_ = true;
     }
 };
 
@@ -394,10 +414,10 @@ gfx::ComputeTexturePtr PathTracerKHR::renderFrame(
 
     // Set descriptors.
     compute_buffer->bindAccelerationStructure(0,0, as_);
-    compute_buffer->bindStorageImage(1, 1, accum_textures_[texture_index]);
-    compute_buffer->bindStorageImage(1, 2, accum_textures_[(texture_index + 1) % 2]);
-    compute_buffer->bindStorageImage(1, 3, resolve_texture_);
-    compute_buffer->bindUniformBuffer(1, 4, random_seeds_[image_index]);
+    compute_buffer->bindStorageImage(1, 0, accum_textures_[texture_index]);
+    compute_buffer->bindStorageImage(1, 1, accum_textures_[(texture_index + 1) % 2]);
+    compute_buffer->bindStorageImage(1, 2, resolve_texture_);
+    compute_buffer->bindUniformBuffer(1, 3, random_seeds_[image_index]);
     compute_buffer->bindUniformBuffer(2, 0, obj_descriptions_);
     texture_index = (texture_index + 1) % 2;
 

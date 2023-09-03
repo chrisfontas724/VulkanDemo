@@ -86,7 +86,7 @@ void DemoHarness::render() {
             command_buffer->beginRenderPass(display_render_passes_[image_index]);
             command_buffer->setProgram(post_shader_->program());
             command_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kOpaque);
-            command_buffer->bindTexture(0, 0, texture);
+            command_buffer->bindTexture(texture, 0, 0);
             command_buffer->setDepth(/*test*/ false, /*write*/ false);
             command_buffer->draw(3);
 

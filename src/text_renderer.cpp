@@ -76,7 +76,7 @@ void TextRenderer::renderText(gfx::CommandBufferPtr cmd_buffer,
     float glyph_height = fabs(bottom_right.y - top_left.y) / num_rows;
 
     cmd_buffer->setProgram(shader_->program());
-    cmd_buffer->bindTexture(0, 0, glyph_texture_);
+    cmd_buffer->bindTexture(glyph_texture_, 0, 0);
     cmd_buffer->setDepth(/*test*/ false, /*write*/ false);
     cmd_buffer->setDefaultState(gfx::CommandBufferState::DefaultState::kTranslucent);
 

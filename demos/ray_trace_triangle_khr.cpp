@@ -71,17 +71,17 @@ void RayTraceTriangleKHR::setup(gfx::LogicalDevicePtr logical_device, int32_t nu
 
     gfx::Geometry geometry; 
     vk::BufferUsageFlags flags = vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eAccelerationStructureBuildInputReadOnlyKHR;
-    geometry.attributes[gfx::VTX_POS] = gfx::ComputeBuffer::createFromVector(logical_device, positions, flags);
+    geometry.positions = gfx::ComputeBuffer::createFromVector(logical_device, positions, flags);
     geometry.indices = gfx::ComputeBuffer::createFromVector(logical_device, indices, flags);
-    geometry.flags = gfx::VTX_POS_FLAG;
     geometry.num_indices = indices.size();
     geometry.num_vertices = positions.size();
     geometry.identifier = 5;
     as_ = std::make_shared<gfx::AccelerationStructure>(logical_device);
+    as_->addGeometry(geometry);
 
     gfx::GeomInstance instance;
     instance.geometryID = geometry.identifier;
-    as_->buildTopLevel({instance}, {geometry});
+    as_->build({instance});
     CXL_DCHECK(as_);
     CXL_LOG(INFO) << "Finished RT Triangle setup!";
 }
